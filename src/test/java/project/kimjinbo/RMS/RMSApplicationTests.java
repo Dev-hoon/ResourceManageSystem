@@ -1,10 +1,10 @@
-package project.kimjinbo.kimjinbo;
+package project.kimjinbo.RMS;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class KimjinboApplicationTests {
+public class RMSApplicationTests {
 
 	@Test
 	void contextLoads() {
