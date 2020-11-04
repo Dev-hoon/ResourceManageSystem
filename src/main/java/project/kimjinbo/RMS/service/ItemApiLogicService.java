@@ -53,6 +53,7 @@ public class ItemApiLogicService implements CRUDInterface<ItemApiRequest,ItemApi
         return Header.OK( response(newItem) );
     }
 
+
     @Override
     public Header<ItemApiResponse> read(Long id) {
         return itemRepository.findById(id)
@@ -106,7 +107,7 @@ public class ItemApiLogicService implements CRUDInterface<ItemApiRequest,ItemApi
         }).orElseGet(()->Header.ERROR("데이터 없음"));
     }
 
-    public void readWhere(ItemApiRequest request-) {
+    public Header readWhere(Header<ItemApiRequest> request) {
         LocalDate date = LocalDate.now();
 
         ItemApiRequest req = request.getData();
@@ -123,9 +124,8 @@ public class ItemApiLogicService implements CRUDInterface<ItemApiRequest,ItemApi
 
         ).stream().forEach((item)->{System.out.println("item : "+item);});
 
+        return Header.OK();
     }
-
-
 
     public ItemApiResponse response(Item item){
 

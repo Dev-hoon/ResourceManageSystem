@@ -19,19 +19,19 @@ public class ItemController implements CRUDInterface<ItemApiRequest, ItemApiResp
 
     @PostMapping("/items") // localhost:8080/api/items
     public void readItems(@RequestBody Header<ItemApiRequest> request) {
-        itemApiLogicService.readTest( request );
+        itemApiLogicService.readWhere( request );
     }
 
     @GetMapping("/items") // localhost:8080/api/items
     @ResponseBody
-    public void readItems(ItemApiRequest itemApiRequest) {
+    public Header<ItemApiResponse> readItems(ItemApiRequest itemApiRequest) {
         System.out.println("request : "+itemApiRequest);
-        return itemApiLogicService.readWhere( itemApiRequest );
+        return itemApiLogicService.readWhere( new Header<ItemApiRequest>(itemApiRequest) );
     }
 
     @Override
-    @GetMapping("/item/{id}") // /api/user/{id}
-    public Header<ItemApiResponse> read(@PathVariable(name = "id") Long id) {
+    @GetMapping("/item") // /api/user?id={id}
+    public Header<ItemApiResponse> read(@RequestParam(name = "id") Long id) {
         return itemApiLogicService.read(id);
     }
 

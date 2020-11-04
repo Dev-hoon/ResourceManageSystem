@@ -15,7 +15,13 @@ public class ItemSpecs {
 
     public static Specification<Item> subCateFirst(String subCateFirst) {
         return (subCateFirst!=null)
-                ? (Specification<Item>) ((root, query, builder) -> builder.equal(root.get("superCate"), subCateFirst) )
+                ? (Specification<Item>) ((root, query, builder) -> builder.equal(root.get("subCateFirst"), subCateFirst) )
+                : (Specification<Item>) ((root, query, builder) -> builder.and() );
+    }
+
+    public static Specification<Item> subCateSecond(String subCateSecond) {
+        return (subCateSecond!=null)
+                ? (Specification<Item>) ((root, query, builder) -> builder.equal(root.get("subCateSecond"), subCateSecond) )
                 : (Specification<Item>) ((root, query, builder) -> builder.and() );
     }
 

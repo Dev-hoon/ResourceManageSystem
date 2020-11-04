@@ -1,0 +1,289 @@
+<html lang="ko"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org/" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml">
+
+<!-- head Start-->
+<div th:replace="fragment/head :: head"></div>
+<!-- head End-->
+
+
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+
+
+    <!-- HEADER Start -->
+    <div th:replace="fragment/headerTitle :: headerTitle"></div>
+    <!-- HEADER End -->
+
+    <!-- Side Menu Start -->
+    <div th:replace="fragment/sideMenu :: sideMenu(${code},${menuList})"></div>
+    <!-- Side Menu End -->
+
+
+    <!-- Contents-->
+    <div class="content-wrapper">
+        <section class="content-header">
+            <h1>
+                사용자 관리
+                <small>회원 관리</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="#"><i class="fa fa-dashboard"></i> 자산 관리</a></li>
+                <li class="active">자산 조회</li>
+            </ol>
+        </section>
+
+        <section class="content">
+
+            <!--<div class="row">
+                <div class="col-xs-12">
+                    <div class="box box-danger">
+                        <div class="box-header with-border">
+                            <h3 class="box-title"></h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <label for="email">Email</label>
+                                    <input id="email" type="text" class="form-control" placeholder="Email">
+                                </div>
+                                <div class="col-xs-3">
+                                    <label for="account">Account</label>
+                                    <input id="account" type="text" class="form-control" placeholder="Account">
+                                </div>
+                                <div class="col-xs-3">
+                                    <label for="phoneNumber">PhoneNumber</label>
+                                    <input id="phoneNumber" type="text" class="form-control" placeholder="PhoneNumber">
+                                </div>
+                                <div class="col-xs-3">
+                                    <label for="itemName">Name</label>
+                                    <input id="itemName" type="text" class="form-control" placeholder="Name">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="box-footer">
+                            <button id="search" type="submit" class="btn btn-primary bg-light-blue-gradient pull-right">검색</button>
+                        </div>
+                    </div>
+                </div>
+            </div>--><!-- row end-->
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header">
+                            <h3 class="box-title">결과</h3>
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <form>
+                                <div class="col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-1 col-form-label">자산</label>
+                                        <div class="col-sm-2">
+                                            <label class="sr-only" for="itemId">superCate</label>
+                                            <input type="text" class="form-control mb-2 mr-sm-2" id="itemId" placeholder="자산번호">
+                                        </div>
+
+                                        <label class="col-sm-1 col-form-label">일자정보</label>
+                                        <div class="col-sm-3">
+                                            <label class="sr-only" for="createDate">superCate</label>
+                                            <input type="text" class="form-control mb-2 mr-sm-2" id="createDate" placeholder="등록일">
+                                        </div>
+
+                                        <div class="col-sm-3 ">
+                                            <label class="sr-only" for="expireDate">superCate</label>
+                                            <input type="text" class="form-control mb-2 mr-sm-2" id="expireDate" placeholder="만료일">
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-1 col-form-label">일자정보</label>
+                                        <div class="col-sm-3">
+                                            <label for="superCate">대분류</label>
+                                            <select id="superCate" class="form-control">
+                                                <option selected>null</option>
+                                                <option>null</option>
+                                                <option>null</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="subCateFirst">소분류 1</label>
+                                            <select id="subCateFirst" class="form-control">
+                                                <option selected>Choose...</option>
+                                                <option>...</option>
+                                            </select>
+
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="subCateSecond">소분류 2</label>
+                                            <select id="subCateSecond" class="form-control">
+                                                <option selected>Choose...</option>
+                                                <option>...</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-1 col-form-label">일자정보</label>
+                                        <div class="col-sm-3">
+                                            <label for="itemState">자산상태</label>
+                                            <select id="itemState" class="form-control">
+                                                <option selected>null</option>
+                                                <option>null</option>
+                                                <option>null</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="rentalState">대여상태</label>
+                                            <select id="rentalState" class="form-control">
+                                                <option selected>Choose...</option>
+                                                <option>...</option>
+                                            </select>
+
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="placeState">위치상태</label>
+                                            <select id="placeState" class="form-control">
+                                                <option selected>Choose...</option>
+                                                <option>...</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <button type="button" class="btn btn-primary col-sm-offset-9 col-sm-1 "> 초기화 </button>
+                                        <div class="col-sm-2">
+                                            <button type="button" class="btn btn-primary w-100" > 조회 </button>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header">
+                            <h3 class="box-title">결과</h3>
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <table id="example2" class="table table-bordered table-hover dataTable"
+                                               role="grid" aria-describedby="example2_info">
+                                            <thead>
+                                            <tr role="row">
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    자산번호
+                                                </th>
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대분류
+                                                </th>
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    소분류 1
+                                                </th>
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    소분류 2
+                                                </th>
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    만료일
+                                                </th>
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    자산상태
+                                                </th>
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대여상태
+                                                </th>
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    자산위치
+                                                </th>
+                                            </tr>
+                                            </thead>
+
+                                            <tbody id="itemList">
+
+                                            <tr role="row" class="odd" v-for="dto in itemList">
+                                                <td class="text-center">{{dto.id}}              </td>
+                                                <td class="text-center">{{dto.superCate}}       </td>
+                                                <td class="text-center">{{dto.subCateFirst}}    </td>
+                                                <td class="text-center">{{dto.subCateSecond}}   </td>
+                                                <td class="text-center">{{dto.expireDate}}      </td>
+                                                <td class="text-center">{{dto.itemState}}       </td>
+                                                <td class="text-center">{{dto.rentalState}}     </td>
+                                                <td class="text-center">{{dto.placeState}}      </td>
+                                            </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div id="showPage" class="dataTables_info" role="status" aria-live="polite">
+                                            Showing {{currentPage}} to 10 of {{totalElements}} entries
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <div class="dataTables_paginate paging_simple_numbers" id="pageBtn">
+                                            <ul class="pagination">
+                                                <li class="paginate_button previous" id="previousBtn">
+                                                    <a href="javascript:;" v-on:click="previousClick()">이전</a>
+                                                </li>
+
+                                                <li class="paginate_button" v-for="btn in btnList" v-bind:btn_id="btn" v-on:click="indexClick(btn)">
+                                                    <a href="javascript:;" aria-controls="example2">{{btn}}</a>
+                                                </li>
+
+                                                <li class="paginate_button next" id="nextBtn">
+                                                    <a href="javascript:;" v-on:click="nextClick()">다음</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+    <!-- Content End -->
+
+    <!-- Footer Start -->
+    <div th:replace="fragment/footer :: footer"></div>
+    <!-- Footer End -->
+
+    <!-- controlSidebar Start -->
+    <div th:replace="fragment/controlSidebar :: controlSidebar"></div>
+    <!-- controlSidebar End -->
+
+
+    <div class="control-sidebar-bg"></div>
+</div>
+
+
+<script src="/app/item.js"></script>
+</body>
+</html>
