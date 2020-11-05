@@ -1,10 +1,8 @@
 package project.kimjinbo.RMS.controller.api;
 
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import project.kimjinbo.RMS.interfaces.CRUDInterface;
-import project.kimjinbo.RMS.model.entity.Item;
+import project.kimjinbo.RMS.interfaces.CrudInterface;
 import project.kimjinbo.RMS.model.network.Header;
 import project.kimjinbo.RMS.model.network.request.ItemApiRequest;
 import project.kimjinbo.RMS.model.network.response.ItemApiResponse;
@@ -13,7 +11,7 @@ import project.kimjinbo.RMS.service.ItemApiLogicService;
 
 @RestController
 @RequestMapping("/api") //localhost:8080/api
-public class ItemController implements CRUDInterface<ItemApiRequest, ItemApiResponse > {
+public class ItemController implements CrudInterface<ItemApiRequest, ItemApiResponse > {
     @Autowired
     private ItemApiLogicService itemApiLogicService;
 

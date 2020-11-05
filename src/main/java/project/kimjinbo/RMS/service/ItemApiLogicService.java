@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import project.kimjinbo.RMS.configs.ItemSpecs;
 import project.kimjinbo.RMS.model.entity.Item;
-import project.kimjinbo.RMS.interfaces.CRUDInterface;
+import project.kimjinbo.RMS.interfaces.CrudInterface;
 import project.kimjinbo.RMS.model.network.Header;
 import project.kimjinbo.RMS.model.network.request.ItemApiRequest;
 import project.kimjinbo.RMS.model.network.response.ItemApiResponse;
@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
-public class ItemApiLogicService implements CRUDInterface<ItemApiRequest,ItemApiResponse> {
+public class ItemApiLogicService implements CrudInterface<ItemApiRequest,ItemApiResponse> {
 
     @Autowired
     private ItemRepository itemRepository;
@@ -52,7 +52,6 @@ public class ItemApiLogicService implements CRUDInterface<ItemApiRequest,ItemApi
         // 3. 생성된 데이터 -> userApiResponse return
         return Header.OK( response(newItem) );
     }
-
 
     @Override
     public Header<ItemApiResponse> read(Long id) {

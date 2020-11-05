@@ -4,7 +4,7 @@ import java.util.List;
 
 import project.kimjinbo.RMS.model.network.Header;
 
-public interface CRUDInterface<Req,Res> {
+public interface CrudInterface<Req,Res> {
 
     Header<Res> create( Header<Req> request );
 
