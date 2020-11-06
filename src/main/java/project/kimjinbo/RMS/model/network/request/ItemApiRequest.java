@@ -23,16 +23,18 @@ public class ItemApiRequest {
     private String      subCateSecond;
 
     private Long        registerUser;
-    private LocalDate   expireDate;
+    private String      registerDate;
+    private String      expireDate;
 
     private String      name;
     private String      memo;
     private Long        cost;
     private Long        purchasedCost;
-    private Integer     itemState;
+    private String      itemState;
     private Integer     placeState;
-    private Integer     rentalState;
+    private String      rentalState;
 
     private String      cdKey;
     private String      licence;
+
 }

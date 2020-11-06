@@ -1,4 +1,4 @@
-package project.kimjinbo.RMS.controller;
+package project.kimjinbo.RMS.controller.api;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import project.kimjinbo.RMS.model.entity.Category;
 import project.kimjinbo.RMS.model.entity.CategoryId;
 import project.kimjinbo.RMS.repository.CategoryRepository;
+import project.kimjinbo.RMS.service.CateApiLogicService;
 
 import java.util.List;
 import java.util.Map;
@@ -21,14 +22,12 @@ public class CategoryController {
     @Autowired
     CategoryRepository cateRepo;
 
+    @Autowired
+    CateApiLogicService cateApiLogicService;
+
     @GetMapping("/categories") // localhost:8080/api/categories
     public Object ReadCategories() {
-        List<Category> categories = cateRepo.findAll();
-
-        Map<String, Map<String, List<String>>> categoriesMap =
-                categories.stream().collect(groupingBy(Category::getSuperCate, groupingBy(Category::getSubCateFirst, mapping(Category::getSubCateSecond, toList()))));
-
-        return categoriesMap;
+        return cateApiLogicService.readCategories();
     }
 
     @PostMapping("/category") // localhost:8080/api/category
@@ -66,7 +65,6 @@ public class CategoryController {
             if (!DBCategory.isPresent()) {
                 return "Not exist on DB";
             }
-            // cateRepo.deleteById(categoryId);
 
             DBCategory.get().updateCategory((String) bodyObject.get("toSuperCate"), (String) bodyObject.get("toSubCateFirst"), (String) bodyObject.get("toSubCateSecond"), new Long( (Integer)bodyObject.get("updateUser") ) );
 

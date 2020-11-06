@@ -1,40 +1,35 @@
 package project.kimjinbo.RMS.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.kimjinbo.RMS.configs.ItemSpecs;
+import project.kimjinbo.RMS.interfaces.CrudInterface;
 import project.kimjinbo.RMS.model.entity.Category;
 import project.kimjinbo.RMS.model.entity.Item;
-import project.kimjinbo.RMS.interfaces.CrudInterface;
 import project.kimjinbo.RMS.model.enumclass.ItemState;
-import project.kimjinbo.RMS.model.enumclass.RentalState;
 import project.kimjinbo.RMS.model.network.Header;
 import project.kimjinbo.RMS.model.network.Pagination;
 import project.kimjinbo.RMS.model.network.request.ItemApiRequest;
 import project.kimjinbo.RMS.model.network.response.ItemApiResponse;
+import project.kimjinbo.RMS.repository.CategoryRepository;
 import project.kimjinbo.RMS.repository.ItemRepository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.*;
 
 @Service
-public class ItemApiLogicService implements CrudInterface<ItemApiRequest,ItemApiResponse> {
+public class CateApiLogicService implements CrudInterface<ItemApiRequest,ItemApiResponse> {
 
     @Autowired
-    private ItemRepository itemRepository;
-
-    @Autowired
-    private CateApiLogicService cateApiLogicService;
+    private CategoryRepository cateRepository;
 
     @Override
     public Header<ItemApiResponse> create( Header<ItemApiRequest> request ) {
@@ -58,27 +53,45 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest,ItemApi
                 .cost( itemApiRequest.getCost() )
                 .purchasedCost( itemApiRequest.getPurchasedCost() )
                 .memo( itemApiRequest.getMemo() )
-                .itemState( ItemState.idOf(itemApiRequest.getItemState()) )
-                .rentalState( RentalState.idOf(itemApiRequest.getRentalState()) )
+                .itemState( Integer.valueOf( itemApiRequest.getItemState() ) )
                 .placeState( itemApiRequest.getPlaceState() )
+                .rentalState(Integer.valueOf(itemApiRequest.getRentalState()))
                 .build();
 
-        Item newItem = itemRepository.save(item);
+        // Item newItem = itemRepository.save(item);
 
         // 3. 생성된 데이터 -> userApiResponse return
-        return Header.OK( response(newItem) );
+        //return Header.OK( response(newItem) );
+        return Header.OK( );
     }
 
     @Override
     public Header<ItemApiResponse> read(Long id) {
+        /*return itemRepository.findById(id)
+                .map( item->response(item))
+                .map(Header::OK)
+                .orElseGet( () ->Header.ERROR("데이터 없음") );*/
+                return null;
+    }
+
+    public Header<Map> readCategories( ) {
+        List<Category> categories = cateRepository.findAll();
+
+        Map<String, Map<String, List<String>>> categoriesMap =
+                categories.stream().collect(groupingBy(Category::getSuperCate, groupingBy(Category::getSubCateFirst, mapping(Category::getSubCateSecond, toList()))));
+
+        return new Header<Map>( ).OK( categoriesMap );
+
+        /*
         return itemRepository.findById(id)
                 .map( item->response(item))
                 .map(Header::OK)
                 .orElseGet( () ->Header.ERROR("데이터 없음") );
+        return null;*/
     }
 
     @Override
-    public Header<ItemApiResponse> update(Header<ItemApiRequest> request) {
+    public Header<ItemApiResponse> update(Header<ItemApiRequest> request) {/*
         LocalDate date = LocalDate.now();
 
         ItemApiRequest itemApiRequest = request.getData();
@@ -101,43 +114,44 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest,ItemApi
                 .setCost( itemApiRequest.getCost() )
                 .setPurchasedCost( itemApiRequest.getPurchasedCost() )
                 .setMemo( itemApiRequest.getMemo() )
-                .setItemState( ItemState.idOf(itemApiRequest.getItemState()) )
+                .setItemState( itemApiRequest.getItemState() )
                 .setPlaceState( itemApiRequest.getPlaceState() )
-                .setRentalState(  RentalState.idOf(itemApiRequest.getRentalState()));
+                .setRentalState( itemApiRequest.getRentalState() );
             return item;
         })
         .map(item -> itemRepository.save(item) )             // update -> newUser
         .map(item -> response(item) )                        // userApiResponse
         .map(Header::OK)
-        .orElseGet(()->Header.ERROR("데이터 없음"));
+        .orElseGet(()->Header.ERROR("데이터 없음"));*/
+        return null;
     }
 
     @Override
     public Header delete(Long id) {
+        /*
         Optional<Item> optional = itemRepository.findById(id);
 
         return optional.map( item ->{
             itemRepository.delete(item);
             return Header.OK();
         }).orElseGet(()->Header.ERROR("데이터 없음"));
+        */
+
+        return null;
     }
 
     public Header<List<ItemApiResponse>> search(Pageable pageable,ItemApiRequest request) {
+        /*
         LocalDate date = LocalDate.now();
 
         Page<Item> items =itemRepository.findAll(
                 ItemSpecs.superCate( request.getSuperCate() ).and(
-                ItemSpecs.subCateFirst(request.getSubCateFirst())).and(
-                ItemSpecs.subCateSecond(request.getSubCateSecond())).and(
-                ItemSpecs.expireDate(request.getExpireDate())).and(
-                ItemSpecs.registerDate(request.getRegisterDate())).and(
-                ItemSpecs.name( request.getName())).and(
-                ItemSpecs.itemState( ItemState.idOf(request.getItemState()) )).and(
-                ItemSpecs.rentalState( RentalState.idOf(request.getRentalState()) ))
-                ,pageable);
+                ItemSpecs.subCateFirst(request.getSubCateFirst()) ).and(
+                ItemSpecs.subCateSecond(request.getSubCateSecond())),
+                pageable);
 
         List<ItemApiResponse> itemApiResponseList = items.stream()
-                .map(item -> response(item))
+                .map(user -> response(user))
                 .collect(Collectors.toList());
 
         Pagination pagination = Pagination.builder()
@@ -147,10 +161,11 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest,ItemApi
                 .currentElements(items.getNumberOfElements())
                 .build();
 
-        return Header.OK( itemApiResponseList, pagination );
+        return Header.OK( itemApiResponseList,pagination );*/
+        return null;
     }
 
-    public ItemApiResponse response(Item item){
+    public ItemApiResponse response(Item item){/*
 
         ItemApiResponse itemApiResponse = ItemApiResponse.builder()
                 .id(item.getId())
@@ -163,22 +178,13 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest,ItemApi
                 .cost( item.getCost() )
                 .purchasedCost( item.getPurchasedCost() )
                 .memo( item.getMemo() )
-                .itemState( ItemState.titleOf( item.getItemState()) )
+                .itemState( item.getItemState() )
                 .placeState( item.getPlaceState() )
-                .rentalState( RentalState.titleOf(item.getRentalState()) )
+                .rentalState( item.getRentalState() )
                 .build();
 
-        return itemApiResponse;
-    }
-
-    public Header<Object> setting(){
-        Map settings = new HashMap<String,Object>();
-
-        settings.put( "itemState"   , Stream.of( ItemState.values() ).map(ItemState::getTitle).collect(Collectors.toList()) );
-        settings.put( "rentalState" , Stream.of( RentalState.values() ).map(RentalState::getTitle).collect(Collectors.toList()) );
-        settings.put( "categories"  , cateApiLogicService.readCategories().getData() );
-
-        return Header.OK( settings );
+        return itemApiResponse;*/
+        return null;
     }
 
 }
