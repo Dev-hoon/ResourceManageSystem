@@ -15,7 +15,7 @@ import java.util.Optional;
 public class BookmarkPK implements Serializable {
 
     private Long    itemId;
-    @Column(name = "coup_id")
+
     private Long    registerUser;
 
     public void validate() throws Exception {

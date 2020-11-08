@@ -54,4 +54,12 @@ public class PageController {
                 .addObject("code", "user")
                 ;
     }
+
+    @RequestMapping("/bookmark")
+    public ModelAndView bookmark() {
+        return new ModelAndView("/pages/bookmark")
+                .addObject("menuList", adminMenuService.getAdminMenu())
+                .addObject("code", "user")
+                ;
+    }
 }

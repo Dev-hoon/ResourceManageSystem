@@ -10,3 +10,4 @@ import project.kimjinbo.RMS.model.entity.BookmarkPK;
 public interface BookmarkRepository extends JpaRepository<Bookmark, BookmarkPK> {
 
 }
+
