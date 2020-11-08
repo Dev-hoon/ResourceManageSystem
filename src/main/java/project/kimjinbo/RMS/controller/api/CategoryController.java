@@ -5,15 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.web.bind.annotation.*;
 import project.kimjinbo.RMS.model.entity.Category;
-import project.kimjinbo.RMS.model.entity.CategoryId;
+import project.kimjinbo.RMS.model.entity.CategoryPK;
 import project.kimjinbo.RMS.repository.CategoryRepository;
 import project.kimjinbo.RMS.service.CateApiLogicService;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import static java.util.stream.Collectors.*;
 
 @RestController
 @RequestMapping("/api") //localhost:8080/api
@@ -32,16 +29,16 @@ public class CategoryController {
 
     @PostMapping("/category") // localhost:8080/api/category
     public String InsertMethod(@RequestBody Map<String, Object> bodyObject) {
-        CategoryId categoryId  = new CategoryId((String) bodyObject.get("superCate"), (String) bodyObject.get("subCateFirst"), (String) bodyObject.get("subCateSecond"));
+        CategoryPK categoryPK = new CategoryPK((String) bodyObject.get("superCate"), (String) bodyObject.get("subCateFirst"), (String) bodyObject.get("subCateSecond"));
 
         // 입력 전 데이터가 있는지 확인
-        Optional<Category> DBCategory = cateRepo.findById(categoryId);
+        Optional<Category> DBCategory = cateRepo.findById(categoryPK);
 
         if (DBCategory.isPresent()) {
             return "Exist on DB";
         }
 
-        Category category = new Category(categoryId, new Long( (Integer)bodyObject.get("registerUser") ) );
+        Category category = new Category(categoryPK, new Long( (Integer)bodyObject.get("registerUser") ) );
 
         // 새로운 값 생성
         try {
@@ -55,9 +52,9 @@ public class CategoryController {
 
     @PutMapping("/category") // localhost:8080/api/category
     public String UpdateMethod(@RequestBody Map<String, Object> bodyObject) {
-        CategoryId categoryId  = new CategoryId((String)bodyObject.get("superCate"),(String) bodyObject.get("subCateFirst"),(String) bodyObject.get("subCateSecond"));
+        CategoryPK categoryPK = new CategoryPK((String)bodyObject.get("superCate"),(String) bodyObject.get("subCateFirst"),(String) bodyObject.get("subCateSecond"));
 
-        Optional<Category> DBCategory = cateRepo.findById(categoryId);
+        Optional<Category> DBCategory = cateRepo.findById(categoryPK);
 
         // 입력 전 데이터가 있는지 확인
         try {
@@ -78,8 +75,8 @@ public class CategoryController {
     }
 
     @DeleteMapping("/category") // localhost:8080/api/category?superCate=HW&subCateFirst=TEST&subCateSecond=노트북
-    public String DeleteMethod(CategoryId categoryId) {
-        Optional<Category> DBCategory = cateRepo.findById(categoryId);
+    public String DeleteMethod(CategoryPK categoryPK) {
+        Optional<Category> DBCategory = cateRepo.findById(categoryPK);
 
         // 입력 전 데이터가 있는지 확인
         try {
@@ -87,7 +84,7 @@ public class CategoryController {
                 return "Not exist on DB";
             }
 
-            cateRepo.deleteById(categoryId);
+            cateRepo.deleteById(categoryPK);
 
         } catch (Exception event) {
             System.out.println("Event : " + event);

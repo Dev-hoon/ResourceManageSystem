@@ -49,9 +49,9 @@ public class ItemSpecs {
                 ? (Specification<Item>) ((root, query, builder) -> builder.equal(root.get("cost"), cost) )
                 : (Specification<Item>) ((root, query, builder) -> builder.and() );
     }
-    public static Specification<Item> purchasedCost(Long purchasedCost) {
-        return (purchasedCost!=null)
-                ? (Specification<Item>) ((root, query, builder) -> builder.equal(root.get("purchasedCost"), purchasedCost) )
+    public static Specification<Item> purchaseCost(Long purchaseCost) {
+        return (purchaseCost!=null)
+                ? (Specification<Item>) ((root, query, builder) -> builder.equal(root.get("purchaseCost"), purchaseCost) )
                 : (Specification<Item>) ((root, query, builder) -> builder.and() );
     }
 

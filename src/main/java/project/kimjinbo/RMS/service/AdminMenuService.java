@@ -13,7 +13,18 @@ public class AdminMenuService {
     public List<AdminMenu> getAdminMenu(){
 
         return Arrays.asList(
-                AdminMenu.builder().title("고객 관리").url("/pages/user").code("user").build()
+                AdminMenu.builder().title("자산신규등록").url("/pages/item/enroll").code("user").build(),
+                AdminMenu.builder().title("임시자산목록").url("/pages/temp").code("user").build(),
+                AdminMenu.builder().title("자산상세조회").url("/pages/item/detail").code("user").build(),
+                AdminMenu.builder().title("자산대여신청").url("/pages/rental").code("user").build(),
+                AdminMenu.builder().title("자산내역조회").url("/pages/item/history").code("user").build(),
+
+                AdminMenu.builder().title("대여 관리").url("/pages/rental/detail").code("user").build(),
+                AdminMenu.builder().title("대여상세조회").url("/pages/rental/detail").code("user").build(),
+
+                AdminMenu.builder().title("사원 관리").url("/pages/user").code("user").build(),
+                AdminMenu.builder().title("팀/부서관리").url("/pages/department").code("user").build()
+
         );
 
     }

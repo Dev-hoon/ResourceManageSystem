@@ -1,0 +1,197 @@
+<html lang="ko"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org/" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml">
+
+<!-- head Start-->
+<div th:replace="fragment/head :: head"></div>
+<!-- head End-->
+
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+
+
+    <!-- HEADER Start -->
+    <div th:replace="fragment/headerTitle :: headerTitle"></div>
+    <!-- HEADER End -->
+
+    <!-- Side Menu Start -->
+    <div th:replace="fragment/sideMenu :: sideMenu(${code},${menuList})"></div>
+    <!-- Side Menu End -->
+
+
+    <!-- Contents-->
+    <div class="content-wrapper">
+        <section class="content-header">
+            <h1>
+                자산 관리
+                <small>신규 등록</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="#"><i class="fa fa-dashboard"></i> 자산 관리</a></li>
+                <li class="active">신규 등록</li>
+            </ol>
+        </section>
+
+        <section class="content">
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div id="itemData" class="box">
+                        <div class="box-header md-1 mt-1">
+                            <h3 class="box-title">신규 등록</h3>
+                            <span v-if="tempAmount != 0" class="ml-3">
+                                temporary item(s) : {{tempAmount}}
+                            </span>
+
+                            <div class="form-group pull-right md-0">
+                                <button type="button" class="btn btn-sm btn-primary" v-on:click="initItem"> 초기화 </button>
+                                <button type="button" class="btn btn-sm btn-primary" v-on:click="createTempItem"> 임시저장 </button>
+                                <button type="button" class="btn btn-sm btn-primary"> 신규등록 </button>
+                            </div>
+
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <form>
+                                <div class="col-sm-12 ">
+                                    <!-- 자산ID / 자산이름 -->
+                                    <div class="form-group row row-center text-center md-3">
+                                        <label class="col-sm-2 col-form-label">자산ID</label>
+                                        <div class="col-sm-5">
+                                            <label class="sr-only" for="itemId">superCate</label>
+                                            <input type="text" class="form-control" id="itemId" placeholder="자산ID" v-model="id" v-on:change="onlyNumber">
+                                        </div>
+
+                                        <label class="col-sm-2 col-form-label" >자산이름</label>
+                                        <div class="col-sm-5">
+                                            <label class="sr-only" for="itemId">superCate</label>
+                                            <input type="text" class="form-control" id="itemName" placeholder="자산이름" v-model="name">
+                                        </div>
+
+                                    </div>
+
+                                    <!-- 등록일 / 만료일 -->
+                                    <div class="form-group row row-center text-center md-3">
+                                        <label class="col-sm-2 col-form-label">등록일</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" id="registerDate" class="form-control col-sm-3" placeholder="등록일" v-model="registerDate">
+                                        </div>
+
+                                        <label class="col-sm-2 col-form-label">만료일</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" id="expireDate" class="form-control col-sm-3" placeholder="만료일" v-model="expireDate">
+                                        </div>
+
+                                    </div>
+
+                                    <!-- 대분류 / 소분류 1 / 소분류 2 -->
+                                    <div class="form-group row row-center text-center md-3">
+                                        <label class="col-sm-2 col-form-label">분류정보</label>
+                                        <div class="col-sm-4">
+                                            <label for="superCate">대분류</label>
+                                            <select id="superCate" class="form-control" v-model="superCate" v-on:change="handleCate01">
+                                                <option value="">선택</option>
+                                                <option v-for="category in selectCate01" >{{category}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="subCateFirst">소분류 1</label>
+                                            <select id="subCateFirst" class="form-control" v-model="subCateFirst" v-on:change="handleCate02">
+                                                <option value="">선택</option>
+                                                <option v-for="category in selectCate02" >{{category}}</option>
+                                            </select>
+
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="subCateSecond">소분류 2</label>
+                                            <select id="subCateSecond" class="form-control" v-model="subCateSecond">
+                                                <option value="">선택</option>
+                                                <option v-for="category in selectCate03" >{{category}}</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+                                    <!-- 자산상태 / 대여상태 / 장소상태 -->
+                                    <div class="form-group row row-center text-center md-3">
+                                        <label class="col-sm-2 col-form-label">상태정보</label>
+                                        <div class="col-sm-4">
+                                            <label for="itemState">자산상태</label>
+                                            <select id="itemState" class="form-control" v-model="itemState">
+                                                <option value="">선택</option>
+                                                <option v-for="state in selectItem" >{{state}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="rentalState">대여상태</label>
+                                            <select id="rentalState" class="form-control" v-model="rentalState">
+                                                <option value="">선택</option>
+                                                <option v-for="state in selectRental" >{{state}}</option>
+                                            </select>
+
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="placeState">위치상태</label>
+                                            <select id="placeState" class="form-control" v-model="placeState">
+                                                <option value="">선택</option>
+                                                <option>...</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+                                    <!-- 자산 상세 정보 -->
+                                    <div class="form-group row row-center text-center md-3">
+                                        <label class="col-sm-2 col-form-label">자산상세정보</label>
+                                        <div class="col-sm-12">
+                                            <textarea type="text" class="form-control" aria-label="..." rows="5" v-model="detail"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <!-- 자산 메모 -->
+                                    <div class="form-group row row-center text-center md-3">
+                                        <label class="col-sm-2 col-form-label">메모</label>
+                                        <div class="col-sm-12">
+                                            <textarea type="text" class="form-control" aria-label="..." rows="5" v-model="memo"></textarea>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+
+        </section>
+    </div>
+    <!-- Content End -->
+
+    <!-- Footer Start -->
+    <div th:replace="fragment/footer :: footer"></div>
+    <!-- Footer End -->
+
+    <!-- controlSidebar Start -->
+    <div th:replace="fragment/controlSidebar :: controlSidebar"></div>
+    <!-- controlSidebar End -->
+
+    <div class="control-sidebar-bg"></div>
+
+    <!-- itemModal Start -->
+    <div th:replace="fragment/itemTempModal :: itemTempModal"></div>
+    <!-- itemModal End -->
+
+    <!-- alterBox Start -->
+    <div th:replace="fragment/alertBox :: alertBox"></div>
+    <!-- alterBox End -->
+
+</div>
+
+
+<script src="/app/itemEnroll.js"></script>
+</body>
+</html>

@@ -1,47 +1,41 @@
-package project.kimjinbo.RMS.model.entity;
+package project.kimjinbo.RMS.model.network.response;
 
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDate;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import java.time.LocalDate;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain=true)
-@Entity
-public class Item {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ItemTempApiResponse {
     private Long        id;
     private Long        registerUser;
     private LocalDate   registerDate;
+    private LocalDate   updateDate;
+
     private String      superCate;
     private String      subCateFirst;
     private String      subCateSecond;
-    private LocalDate   updateDate;
-    private Long        updateUser;
+
     private String      name;
-    private String      memo;
     private String      detail;
-    private LocalDate   expireDate;
-    private Integer     itemState;
-    private Integer     placeState;
-    private Integer     rentalState;
-    private String      cdKey;
-    private String      licence;
+    private String      memo;
     private Long        cost;
     private Long        purchaseCost;
-
+    private LocalDate   expireDate;
+    private String      itemState;
+    private Integer     placeState;
+    private String      rentalState;
+    private String      cdKey;
+    private String      licence;
 
 }
 

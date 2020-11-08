@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import project.kimjinbo.RMS.RMSApplicationTests;
 import project.kimjinbo.RMS.model.entity.Category;
-import project.kimjinbo.RMS.model.entity.CategoryId;
+import project.kimjinbo.RMS.model.entity.CategoryPK;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -20,7 +20,7 @@ public class CategoryRepositoryTest extends RMSApplicationTests {
 
     @Test
     public void create(){
-        CategoryId cateId = new CategoryId("HW","컴퓨터","노트북");
+        CategoryPK cateId = new CategoryPK("HW","컴퓨터","노트북");
         Category category = new Category();
         category.setSuperCate( cateId.getSuperCate() );
         category.setSubCateFirst( cateId.getSubCateFirst() );
@@ -38,7 +38,7 @@ public class CategoryRepositoryTest extends RMSApplicationTests {
 
     @Test
     public void read(){
-        Optional<Category> dep = cateRepo.findById( new CategoryId("HW","컴퓨터","노트북") );
+        Optional<Category> dep = cateRepo.findById( new CategoryPK("HW","컴퓨터","노트북") );
 
         dep.ifPresent(test ->{
             System.out.println("test:" + test);

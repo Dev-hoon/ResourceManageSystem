@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.kimjinbo.RMS.configs.ItemSpecs;
-import project.kimjinbo.RMS.model.entity.Category;
 import project.kimjinbo.RMS.model.entity.Item;
 import project.kimjinbo.RMS.interfaces.CrudInterface;
 import project.kimjinbo.RMS.model.enumclass.ItemState;
@@ -15,6 +14,7 @@ import project.kimjinbo.RMS.model.network.Header;
 import project.kimjinbo.RMS.model.network.Pagination;
 import project.kimjinbo.RMS.model.network.request.ItemApiRequest;
 import project.kimjinbo.RMS.model.network.response.ItemApiResponse;
+import project.kimjinbo.RMS.model.network.response.ItemTempApiResponse;
 import project.kimjinbo.RMS.repository.ItemRepository;
 
 import java.time.LocalDate;
@@ -23,18 +23,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class ItemApiLogicService implements CrudInterface<ItemApiRequest,ItemApiResponse> {
+public class ItemApiLogicService implements CrudInterface<ItemApiRequest, ItemApiResponse> {
 
     @Autowired
     private ItemRepository itemRepository;
 
     @Autowired
     private CateApiLogicService cateApiLogicService;
+
+    @Autowired
+    private ItemTempApiLogicService itemTempApiLogicService;
 
     @Override
     public Header<ItemApiResponse> create( Header<ItemApiRequest> request ) {
@@ -56,7 +58,7 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest,ItemApi
                 .expireDate( LocalDate.parse(itemApiRequest.getExpireDate(), DateTimeFormatter.ISO_DATE) )
                 .name( itemApiRequest.getName() )
                 .cost( itemApiRequest.getCost() )
-                .purchasedCost( itemApiRequest.getPurchasedCost() )
+                .purchaseCost( itemApiRequest.getPurchaseCost() )
                 .memo( itemApiRequest.getMemo() )
                 .itemState( ItemState.idOf(itemApiRequest.getItemState()) )
                 .rentalState( RentalState.idOf(itemApiRequest.getRentalState()) )
@@ -94,12 +96,11 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest,ItemApi
                 .setSubCateFirst( itemApiRequest.getSubCateFirst() )
                 .setSubCateSecond(itemApiRequest.getSubCateSecond() )
                 .setUpdateDate( date )
-                .setRegisterUser( itemApiRequest.getRegisterUser() )
                 .setUpdateUser( itemApiRequest.getRegisterUser() )
                 .setExpireDate( LocalDate.parse(itemApiRequest.getExpireDate(), DateTimeFormatter.ISO_DATE)  )
                 .setName( itemApiRequest.getName() )
                 .setCost( itemApiRequest.getCost() )
-                .setPurchasedCost( itemApiRequest.getPurchasedCost() )
+                .setPurchaseCost( itemApiRequest.getPurchaseCost() )
                 .setMemo( itemApiRequest.getMemo() )
                 .setItemState( ItemState.idOf(itemApiRequest.getItemState()) )
                 .setPlaceState( itemApiRequest.getPlaceState() )
@@ -123,7 +124,6 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest,ItemApi
     }
 
     public Header<List<ItemApiResponse>> search(Pageable pageable,ItemApiRequest request) {
-        LocalDate date = LocalDate.now();
 
         Page<Item> items =itemRepository.findAll(
                 ItemSpecs.superCate( request.getSuperCate() ).and(
@@ -161,7 +161,7 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest,ItemApi
                 .expireDate(item.getExpireDate() )
                 .name( item.getName() )
                 .cost( item.getCost() )
-                .purchasedCost( item.getPurchasedCost() )
+                .purchaseCost( item.getPurchaseCost() )
                 .memo( item.getMemo() )
                 .itemState( ItemState.titleOf( item.getItemState()) )
                 .placeState( item.getPlaceState() )
@@ -174,9 +174,9 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest,ItemApi
     public Header<Object> setting(){
         Map settings = new HashMap<String,Object>();
 
-        settings.put( "itemState"   , Stream.of( ItemState.values() ).map(ItemState::getTitle).collect(Collectors.toList()) );
-        settings.put( "rentalState" , Stream.of( RentalState.values() ).map(RentalState::getTitle).collect(Collectors.toList()) );
-        settings.put( "categories"  , cateApiLogicService.readCategories().getData() );
+        settings.put( "itemState"       , Stream.of( ItemState.values() ).map(ItemState::getTitle).collect(Collectors.toList()) );
+        settings.put( "rentalState"     , Stream.of( RentalState.values() ).map(RentalState::getTitle).collect(Collectors.toList()) );
+        settings.put( "categories"      , cateApiLogicService.readCategories().getData() );
 
         return Header.OK( settings );
     }

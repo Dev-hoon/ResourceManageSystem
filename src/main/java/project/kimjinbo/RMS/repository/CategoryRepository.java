@@ -5,10 +5,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import project.kimjinbo.RMS.model.entity.Category;
-import project.kimjinbo.RMS.model.entity.CategoryId;
+import project.kimjinbo.RMS.model.entity.CategoryPK;
 
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, CategoryId> {
+public interface CategoryRepository extends JpaRepository<Category, CategoryPK> {
 
 }

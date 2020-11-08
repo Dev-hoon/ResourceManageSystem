@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
 import java.util.Objects;
 import java.io.Serializable;
 import java.util.Optional;
@@ -12,7 +11,7 @@ import java.util.Optional;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryId implements Serializable {
+public class CategoryPK implements Serializable {
     private String      superCate;
     private String      subCateFirst;
     private String      subCateSecond;
@@ -28,7 +27,7 @@ public class CategoryId implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        CategoryId that = (CategoryId) o;
+        CategoryPK that = (CategoryPK) o;
 
         if (!superCate.equals(that.superCate))          return false;
         if (!subCateFirst.equals(that.subCateFirst))    return false;

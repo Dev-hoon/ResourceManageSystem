@@ -1,0 +1,170 @@
+<html lang="ko"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org/" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml">
+
+<!-- head Start-->
+<div th:replace="fragment/head :: head"></div>
+<!-- head End-->
+
+
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+
+
+    <!-- HEADER Start -->
+    <div th:replace="fragment/headerTitle :: headerTitle"></div>
+    <!-- HEADER End -->
+
+    <!-- Side Menu Start -->
+    <div th:replace="fragment/sideMenu :: sideMenu(${code},${menuList})"></div>
+    <!-- Side Menu End -->
+
+
+    <!-- Contents-->
+    <div class="content-wrapper">
+        <section class="content-header">
+            <h1>
+                자산 관리
+                <small>임시자산조회</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="#"><i class="fa fa-dashboard"></i>자산 관리</a></li>
+                <li class="active">임시자산조회</li>
+            </ol>
+        </section>
+
+        <section class="content">
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <!-- /.box-header -->
+                        <div class="box-header">
+                            <h3 class="box-title">자산상세정보</h3>
+                        </div>
+                        <!-- /.box-body -->
+                        <div class="box-body">
+                            <div id="items_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <table id="items_table" class="table table-bordered table-hover dataTable font-14"
+                                               role="grid" aria-describedby="example2_info">
+                                            <thead>
+                                            <tr role="row">
+                                                <th id="selectAll" class="text-center bg-light-blue-gradient table-middle" tabindex="0" rowspan="1" colspan="1">
+                                                    <input type="checkbox" id="rowID" aria-label="Checkbox for following text input">
+                                                </th>
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    자산번호
+                                                </th>
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    자산명칭
+                                                </th>
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대분류
+                                                </th>
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    소분류 1
+                                                </th>
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    소분류 2
+                                                </th>
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    등록일
+                                                </th>
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    만료일
+                                                </th>
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    상세정보
+                                                </th>
+                                                <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    메모
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="itemList">
+                                            <tr role="row" class="odd item" v-for="(dto, idx) in itemList" >
+                                                <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="handlerCheckBox"> </td>
+                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.id}}              </td>
+                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.name}}            </td>
+                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.superCate}}       </td>
+                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.subCateFirst}}    </td>
+                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.subCateSecond}}   </td>
+                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.registerDate}}    </td>
+                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.expireDate}}      </td>
+                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.detail}}          </td>
+                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.memo}}            </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div id="showPage" class="col-sm-6">
+                                        <span  class="dataTables_info" role="status" aria-live="polite">
+                                            Showing {{currentPage}} to 10 of {{totalElements}} entries
+                                        </span>
+                                        <span v-if="selectedElements != 0">
+                                            / selected item(s) {{selectedElements}}
+                                        </span>
+
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group pull-right">
+                                            <button type="button" class="btn btn-sm btn-primary" v-on:click="initConditions"> 대기열 담기 </button>
+                                            <button type="button" class="btn btn-sm btn-primary" v-on:click="initConditions"> 대기열 열기 </button>
+                                            <button type="button" class="btn btn-sm btn-primary" v-on:click="initConditions"> 대여신청    </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row text-center col-sm-12">
+                                    <div class="dataTables_paginate paging_simple_numbers" id="pageBtn">
+                                        <ul class="pagination">
+                                            <li class="paginate_button previous" id="previousBtn">
+                                                <a href="javascript:;" v-on:click="previousClick">이전</a>
+                                            </li>
+
+                                            <li class="paginate_button" v-for="btn in btnList" v-bind:btn_id="btn" v-on:click="indexClick">
+                                                <a href="javascript:;" aria-controls="example2" v-bind:btn_id="btn">{{btn}}</a>
+                                            </li>
+
+                                            <li class="paginate_button next" id="nextBtn">
+                                                <a href="javascript:;" v-on:click="nextClick">다음</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+    <!-- Content End -->
+
+    <!-- Footer Start -->
+    <div th:replace="fragment/footer :: footer"></div>
+    <!-- Footer End -->
+
+    <!-- controlSidebar Start -->
+    <div th:replace="fragment/controlSidebar :: controlSidebar"></div>
+    <!-- controlSidebar End -->
+
+    <div class="control-sidebar-bg"></div>
+
+    <!-- itemModal Start -->
+    <div th:replace="fragment/itemModal :: itemModal"></div>
+    <!-- itemModal End -->
+
+</div>
+
+
+<script src="/app/itemTemp.js"></script>
+</body>
+</html>

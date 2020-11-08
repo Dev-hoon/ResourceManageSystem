@@ -25,7 +25,7 @@ public enum RentalState {
     }
     public static Integer idOf(String title) {
         if(title==null) return null;
-        return Arrays.stream(RentalState.values()).filter(item->(item.getTitle()==title)).findFirst().get().getId();
+        return Arrays.stream(RentalState.values()).filter( item->(item.getTitle().equals(title)) ).findFirst().get().getId();
     }
 
 }

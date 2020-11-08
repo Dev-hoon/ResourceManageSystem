@@ -1,16 +1,9 @@
 package project.kimjinbo.RMS.model.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
-import java.lang.reflect.Array;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 
@@ -19,8 +12,9 @@ import java.util.Optional;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@IdClass(CategoryId.class)
-public class Category extends CategoryId {
+@IdClass(CategoryPK.class)
+@EqualsAndHashCode(callSuper=false)
+public class Category extends CategoryPK {
     @Id
     private String      superCate;
     @Id
@@ -33,7 +27,7 @@ public class Category extends CategoryId {
     private LocalDate   registerDate;
     private LocalDate   updateDate;
 
-    public Category( CategoryId cateId, long registerUser ){
+    public Category(CategoryPK cateId, long registerUser ){
         System.out.println(" public Category( CategoryId cateId, Long registerUser ) ");
         LocalDate date = LocalDate.now();
 

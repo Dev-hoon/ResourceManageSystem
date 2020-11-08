@@ -11,8 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-
-public class ItemSample extends RMSApplicationTests {
+public class ItemTempSample extends RMSApplicationTests {
 
     @Autowired
     ItemRepository itemRepository;

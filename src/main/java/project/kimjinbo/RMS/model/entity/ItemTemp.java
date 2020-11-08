@@ -1,17 +1,13 @@
 package project.kimjinbo.RMS.model.entity;
 
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import javax.persistence.*;
 import java.time.LocalDate;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Entity;
 
 @Data
 @Builder
@@ -19,7 +15,13 @@ import javax.persistence.Entity;
 @AllArgsConstructor
 @Accessors(chain=true)
 @Entity
-public class Item {
+@Table(
+    indexes = {
+        @Index(name = "item_temp_idx", columnList = "registerUser"),
+        @Index(name = "item_temp_idx", columnList = "updateDate")
+    }
+)
+public class ItemTemp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long        id;
@@ -29,7 +31,6 @@ public class Item {
     private String      subCateFirst;
     private String      subCateSecond;
     private LocalDate   updateDate;
-    private Long        updateUser;
     private String      name;
     private String      memo;
     private String      detail;
@@ -41,7 +42,6 @@ public class Item {
     private String      licence;
     private Long        cost;
     private Long        purchaseCost;
-
 
 }
 

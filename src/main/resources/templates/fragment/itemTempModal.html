@@ -1,0 +1,85 @@
+<html lang="ko"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org/">
+
+<div id="itemTempModal" class="modal fade" tabindex="-1" role="dialog"  th:fragment="itemTempModal">
+    <div class="modal-dialog modal-lx" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">자산 정보 수정</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="panel panel-default">
+                            <table id="items_table" class="table table-bordered table-hover dataTable"
+                                   role="grid" aria-describedby="example2_info">
+                                <thead>
+                                <tr role="row">
+                                    <th id="selectAll" class="text-center bg-light-blue-gradient table-middle" tabindex="0" rowspan="1" colspan="1">
+                                        <input type="checkbox" id="rowID" aria-label="Checkbox for following text input">
+                                    </th>
+                                    <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                        자산번호
+                                    </th>
+                                    <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                        자산명칭
+                                    </th>
+                                    <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                        대분류
+                                    </th>
+                                    <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                        소분류 1
+                                    </th>
+                                    <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                        소분류 2
+                                    </th>
+                                    <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                        등록일
+                                    </th>
+                                    <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                        만료일
+                                    </th>
+                                    <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                        자산상태
+                                    </th>
+                                    <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                        대여상태
+                                    </th>
+                                    <th class="text-center bg-light-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                        자산위치
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody id="itemList">
+                                <tr role="row" class="odd item" v-for="(dto, idx) in itemList" >
+                                    <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="handlerCheckBox"> </td>
+                                    <td class="text-center">{{dto.id}}              </td>
+                                    <td class="text-center">{{dto.name}}            </td>
+                                    <td class="text-center">{{dto.superCate}}       </td>
+                                    <td class="text-center">{{dto.subCateFirst}}    </td>
+                                    <td class="text-center">{{dto.subCateSecond}}   </td>
+                                    <td class="text-center">{{dto.registerDate}}    </td>
+                                    <td class="text-center">{{dto.expireDate}}      </td>
+                                    <td class="text-center">{{dto.itemState}}       </td>
+                                    <td class="text-center">{{dto.rentalState}}     </td>
+                                    <td class="text-center">{{dto.placeState}}      </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+</html>
+

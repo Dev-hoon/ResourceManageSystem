@@ -28,7 +28,7 @@ public enum ItemState {
 
     public static Integer idOf(String title) {
         if(title==null) return null;
-        return Arrays.stream(ItemState.values()).filter(item->(item.getTitle()==title)).findFirst().get().getId();
+        return Arrays.stream(ItemState.values()).filter(item->(item.getTitle().equals(title)) ).findFirst().get().getId();
     }
 
 }

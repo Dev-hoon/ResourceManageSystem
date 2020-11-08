@@ -22,4 +22,11 @@ public class ControllerExceptionHandler {
     public ResponseEntity<Header> handleBindException(final BindException error) {
         return new ResponseEntity<Header>(Header.ERROR("Type Error"), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(UserAuthException.class)
+    public ResponseEntity<Header> handleUserAuthException(final UserAuthException error) {
+        return new ResponseEntity<Header>(Header.ERROR("No User Data"), HttpStatus.BAD_REQUEST);
+    }
+
+
 }

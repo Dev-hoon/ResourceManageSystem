@@ -1,5 +1,6 @@
 package project.kimjinbo.RMS.model.entity;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -12,12 +13,13 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long        id;
-    private Long        registerId;
-    private Long        updateId;
+    private Long        registerUser;
+    private Long        updateUser;
     private LocalDate   registerDate;
     private LocalDate   updateDate;
     private LocalDate   enteredDate;

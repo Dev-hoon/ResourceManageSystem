@@ -31,9 +31,25 @@ public class PageController {
                 ;
     }
 
-    @RequestMapping("/item")
+    @RequestMapping("/item/detail")
     public ModelAndView item() {
         return new ModelAndView("/pages/item")
+                .addObject("menuList", adminMenuService.getAdminMenu())
+                .addObject("code", "user")
+                ;
+    }
+
+    @RequestMapping("/item/enroll")
+    public ModelAndView itemEnroll() {
+        return new ModelAndView("/pages/itemEnroll")
+                .addObject("menuList", adminMenuService.getAdminMenu())
+                .addObject("code", "user")
+                ;
+    }
+
+    @RequestMapping("/temp")
+    public ModelAndView itemTemp() {
+        return new ModelAndView("/pages/itemTemp")
                 .addObject("menuList", adminMenuService.getAdminMenu())
                 .addObject("code", "user")
                 ;

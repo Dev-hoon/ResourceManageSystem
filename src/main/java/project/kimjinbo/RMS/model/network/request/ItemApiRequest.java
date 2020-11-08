@@ -15,7 +15,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemApiRequest {
-    @Id
     private Long        id;
 
     private String      superCate;
@@ -29,7 +28,7 @@ public class ItemApiRequest {
     private String      name;
     private String      memo;
     private Long        cost;
-    private Long        purchasedCost;
+    private Long        purchaseCost;
     private String      itemState;
     private Integer     placeState;
     private String      rentalState;
