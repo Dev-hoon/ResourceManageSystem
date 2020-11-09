@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookApiRequest {
+public class BookmarkApiRequest {
     private Long        itemId;
     private Long        registerUser;
 

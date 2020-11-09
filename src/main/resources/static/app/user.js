@@ -4,7 +4,7 @@
     var indexBtn = [];               // 인덱스 버튼
 
     // 페이징 처리 데이터
-    var pagination = {
+    let pagination = {
         total_pages : 0,            // 전체 페이지수
         total_elements : 0,         // 전체 데이터수
         current_page :  0,          // 현재 페이지수

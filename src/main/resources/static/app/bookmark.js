@@ -57,11 +57,13 @@
 
     // 데이터 받아오기
     function search(index, registerUser) {
-        $.get("/api/temps?page="+index+"&registerUser="+registerUser, function (response) {
+        $.get("/api/bookmarks?page="+index+"&registerUser="+registerUser, function (response) {
             /* 데이터 셋팅 */
             // 페이징 처리 데이터
             indexBtn = [];
             pagination = response.pagination;
+
+            console.log("response.pagination; : ", response.pagination)
 
             //전체 페이지
             showPage.totalElements      = pagination.currentElements;
@@ -238,11 +240,12 @@
             selectCate03        : [],
 
         },methods: {
-            initCategory: function(){
+            initCategory: function( ){
                 this.selectCate01  = Object.keys( this.categories );
-                console.log("this.selectCate01[this.selectedItem.superCate] : ",this.selectCate01[this.selectedItem.superCate])
                 this.selectCate02  = Object.keys( this.categories[this.selectedItem.superCate] )
                 this.selectCate03  = this.categories[this.selectedItem.superCate][this.selectedItem.subCateFirst];
+
+                this.isChange  =  false;
             },
             handleCate01: function () {
                 if( this.categories.hasOwnProperty( this.selectedItem.superCate) ) {
@@ -257,16 +260,53 @@
                     this.selectedItem.subCateSecond = ""
                 }
             },
+            updateItem  : function ( updateUser ) {
+                Object.entries(this._data.selectedItem).map((t)=>{console.log("T : ",t)});
+
+                console.log( "validation : "+this.validation() )
+
+                let postBody = Object.entries(this._data.selectedItem)
+                    .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
+                    .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
+
+                Object.defineProperty(postBody, 'updateUser', { value : updateUser})
+
+                $.ajax({
+                    type: 'PUT',
+                    url: '/api/item',
+                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    success: function(data) { alert('data: ' + data); },function(response){
+                        console.log( "response : ",response)
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
+            },
+            closeHandler: function ( event ){
+                if( !this.validation() ){
+                    console.log( "not changed ")
+                    $('#itemModal').modal("hide");
+                }else{
+                    console.log( "changed ");
+
+                }
+
+
+            },validation: function(){
+                let originData = itemList.itemList.filter((item)=>(item.id==itemModal.selectedItem.id))[0];
+                return Object.entries( itemModal.selectedItem ).reduce( ( acc, cur )=>{ return acc || (originData[cur[0]]!=cur[1]) }, false )
+            }
         },mounted: function( ) {
             // 등록일 datepicker 처리
-            $('#modalCreateDate').datepicker({
+            $('#modalRegisterDate').datepicker({
                 format: "yyyy-mm-dd",	//데이터 포맷 형식(yyyy : 년 mm : 월 dd : 일 )
                 autoclose : true,	//사용자가 날짜를 클릭하면 자동 캘린더가 닫히는 옵션
                 startDate: '-10d',	//달력에서 선택 할 수 있는 가장 빠른 날짜. 이전으로는 선택 불가능 ( d : 일 m : 달 y : 년 w : 주)
                 language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
             }).on('changeDate', function (event) {
+                console.log("changeDate : ")
                 itemModal.selectedItem.createDate = dateString(event.date);
-            });
+            }).unbind('change');
 
             // 만료일 datepicker 처리
             $('#modalExpireDate').datepicker({
@@ -276,7 +316,7 @@
                 language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
             }).on('changeDate', function (event) {
                 itemModal.selectedItem.exprieDate =  dateString(event.date);
-            });
+            }).unbind('change');
         }
     })
 

@@ -16,4 +16,10 @@ public class AdminMenu {
     private String title;
     private String url;
     private String code;
+    private String mode;
+
+    public AdminMenu check(String title){
+        this.code = ( this.title.equals(title) )? "user" : "";
+        return this;
+    }
 }

@@ -15,9 +15,8 @@ import java.time.LocalDate;
 @Accessors(chain=true)
 public class BookmarkApiResponse {
     private Long        id;
-    private Long        registerUser;
+
     private LocalDate   registerDate;
-    private LocalDate   updateDate;
 
     private String      superCate;
     private String      subCateFirst;
@@ -29,11 +28,10 @@ public class BookmarkApiResponse {
     private Long        cost;
     private Long        purchaseCost;
     private LocalDate   expireDate;
+
     private String      itemState;
     private Integer     placeState;
     private String      rentalState;
-    private String      cdKey;
-    private String      licence;
 
 }
 

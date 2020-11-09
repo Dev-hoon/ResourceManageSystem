@@ -30,7 +30,7 @@
             </h1>
             <ol class="breadcrumb">
                 <li><a href="#"><i class="fa fa-dashboard"></i>대여 관리</a></li>
-                <li class="active">장바구니 목록</li>
+                <li class="active">대여기록조회</li>
             </ol>
         </section>
 
@@ -41,7 +41,22 @@
                     <div class="box">
                         <!-- /.box-header -->
                         <div class="box-header">
-                            <h3 class="box-title">장바구니 목록</h3>
+                            <h3 class="box-title">대여기록조회</h3>
+                            <div class="form-group pull-right md-0">
+                                 <span class="CheckSelector">
+                                    <input type="checkbox" aria-label="Checkbox for following text input">
+                                    <label>대여요청</label>
+                                </span>
+                                <span class="CheckSelector">
+                                    <input type="checkbox" aria-label="Checkbox for following text input">
+                                    <label>대여중</label>
+                                </span>
+                                <span class="CheckSelector">
+                                    <input type="checkbox" aria-label="Checkbox for following text input">
+                                    <label>반납</label>
+                                </span>
+
+                            </div>
                         </div>
                         <!-- /.box-body -->
                         <div class="box-body">
@@ -71,13 +86,13 @@
                                                     소분류 2
                                                 </th>
                                                 <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    등록일
+                                                    대여일
                                                 </th>
                                                 <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    만료일
+                                                    종료일
                                                 </th>
                                                 <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    상세정보
+                                                    대여상태
                                                 </th>
                                                 <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
                                                     메모
@@ -92,9 +107,9 @@
                                                 <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.superCate}}       </td>
                                                 <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.subCateFirst}}    </td>
                                                 <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.subCateSecond}}   </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.registerDate}}    </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.expireDate}}      </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.detail}}          </td>
+                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.startDate}}       </td>
+                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.endDate}}         </td>
+                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.rentalState}}     </td>
                                                 <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.memo}}            </td>
                                             </tr>
                                             </tbody>
@@ -114,9 +129,9 @@
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group pull-right">
-                                            <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 신청 </button>
-                                            <button type="button" class="btn btn-sm btn-warning" v-on:click="initConditions"> 수정 </button>
-                                            <button type="button" class="btn btn-sm btn-danger" v-on:click="initConditions"> 삭제 </button>
+                                            <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions">  신청 </button>
+                                            <button type="button" class="btn btn-sm btn-warning" v-on:click="initConditions">       수정 </button>
+                                            <button type="button" class="btn btn-sm btn-danger" v-on:click="initConditions">        취소 </button>
                                         </div>
                                     </div>
                                 </div>

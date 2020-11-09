@@ -7,9 +7,12 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import project.kimjinbo.RMS.interfaces.CrudInterface;
 import project.kimjinbo.RMS.model.network.Header;
+import project.kimjinbo.RMS.model.network.request.BookmarkApiRequest;
 import project.kimjinbo.RMS.model.network.request.ItemTempApiRequest;
+import project.kimjinbo.RMS.model.network.response.BookmarkApiResponse;
 import project.kimjinbo.RMS.model.network.response.ItemTempApiResponse;
 import project.kimjinbo.RMS.repository.ItemTempRepository;
+import project.kimjinbo.RMS.service.BookmarkApiLogicService;
 import project.kimjinbo.RMS.service.ItemTempApiLogicService;
 
 import java.util.List;
@@ -19,16 +22,16 @@ import java.util.List;
 public class BookmarkController implements CrudInterface<ItemTempApiRequest, ItemTempApiRequest > {
 
     @Autowired
-    private ItemTempRepository itemTempRepository;
+    private BookmarkApiLogicService bookmarkApiLogicService;
 
     @Autowired
     private ItemTempApiLogicService itemTempApiLogicService;
 
     @GetMapping("/bookmarks")
     @ResponseBody
-    public Header<List<ItemTempApiResponse>> readItems(@PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable, ItemTempApiRequest ItemTempApiRequest) {
-        System.out.println("request : "+ItemTempApiRequest);
-        return itemTempApiLogicService.search( pageable, ItemTempApiRequest );
+    public Header<List<BookmarkApiResponse>> readItems(@PageableDefault(sort = { "item_id" }, direction = Sort.Direction.ASC) Pageable pageable, BookmarkApiRequest bookmarkApiRequest) {
+        System.out.println("request : "+bookmarkApiRequest);
+        return bookmarkApiLogicService.search( pageable, bookmarkApiRequest );
     }
 
     @GetMapping("/bookmark/amount")

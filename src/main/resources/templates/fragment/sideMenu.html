@@ -6,12 +6,19 @@
     <section class="sidebar">
         <ul class="sidebar-menu" data-widget="tree">
             <th:block th:each="entry : ${menuList}">
-                <li th:class="${entry.code == code ? 'active':''}">
+
+                <li th:if="${entry.mode=='header'}" class="header">
+                    <i class="fa fa-link"></i>
+                    <span th:text="${entry.title}"></span>
+                </li>
+
+                <li th:unless="${entry.mode=='header'}" th:class="${entry.code == code ? 'active':''}">
                     <a th:href="${entry.url}">
                         <i class="fa fa-link"></i>
                         <span th:text="${entry.title}"></span>
                     </a>
                 </li>
+
             </th:block>
 
             <!--<li class="treeview">
