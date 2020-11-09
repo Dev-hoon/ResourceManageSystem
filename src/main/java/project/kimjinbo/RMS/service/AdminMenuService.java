@@ -28,7 +28,7 @@ public class AdminMenuService {
                 AdminMenu.builder().title("관리").mode("header").build(),
                 AdminMenu.builder().title("사원 관리").url("/pages/user").mode("item").build().check(title),
                 AdminMenu.builder().title("팀/부서관리").url("/pages/department").mode("item").build().check(title),
-                AdminMenu.builder().title("카테코리관리").url("/pages/department").mode("item").build().check(title)
+                AdminMenu.builder().title("카테고리관리").url("/pages/category").mode("item").build().check(title)
 
         );
     }

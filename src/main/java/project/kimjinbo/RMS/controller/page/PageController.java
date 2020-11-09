@@ -81,5 +81,21 @@ public class PageController {
                 ;
     }
 
+    @RequestMapping("/department")
+    public ModelAndView department() {
+        return new ModelAndView("/pages/department")
+                .addObject("menuList", adminMenuService.getAdminMenu("팀/부서관리"))
+                .addObject("code", "user")
+                ;
+    }
+
+    @RequestMapping("/category")
+    public ModelAndView category() {
+        return new ModelAndView("/pages/category")
+                .addObject("menuList", adminMenuService.getAdminMenu("카테고리관리"))
+                .addObject("code", "user")
+                ;
+    }
+
 
 }
