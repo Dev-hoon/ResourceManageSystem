@@ -2,7 +2,7 @@
 
     $(document).ready(function () {
         search(0,window.registerUser);
-        getSetting();
+        // getSetting();
 
         // table에 모두 선택 처리
         $('#selectAll').click(function(e){
@@ -37,51 +37,52 @@
     }
 
     // 데이터 받아오기
-    function search(index, registerUser) {
-        $.get("/api/bookmarks?page="+index+"&registerUser="+registerUser, function (response) {
+    function search( index, registerUser,  tabName ) {
+        $.get("/api/"+tabName+"?page="+index+"&registerUser="+registerUser, function (response) {
             /* 데이터 셋팅 */
             // 페이징 처리 데이터
             indexBtn = [];
-            pagination = response.pagination;
+            paginationList[tabName] = response.pagination;
 
             console.log("response.pagination; : ", response.pagination)
 
             //전체 페이지
-            showPage.totalElements      = pagination.currentElements;
-            showPage.currentPage        = pagination.currentPage+1;
+            showPages[tabName].totalElements      = paginationList[tabName].currentElements;
+            showPages[tabName].currentPage        = paginationList[tabName].currentPage+1;
+
             // 검색 데이터
-            itemList.setItemList( response.data );
+            Lists[tabName].setItemList( response.data );
 
             // 이전버튼
-            if(pagination.currentPage === 0){
-                $('#previousBtn').addClass("disabled")
+            if(paginationList[tabName].currentPage === 0){
+                $('#'+tabName+'previousBtn').addClass("disabled")
             }else{
-                $('#previousBtn').removeClass("disabled")
+                $('#'+tabName+'previousBtn').removeClass("disabled")
             }
             // 다음버튼
-            if(pagination.currentPage === pagination.totalPages-1){
-                $('#nextBtn').addClass("disabled")
+            if(paginationList[tabName].currentPage === pagination.totalPages-1){
+                $('#'+tabName+'nextBtn').addClass("disabled")
             }else{
-                $('#nextBtn').removeClass("disabled")
+                $('#'+tabName+'nextBtn').removeClass("disabled")
             }
 
             // 페이징 버튼 처리
-            var temp = Math.floor(pagination.currentPage / maxBtnSize);
+            var temp = Math.floor(paginationList[tabName].currentPage / maxBtnSize);
             for(var i = 1; i <= maxBtnSize; i++){
                 var value = i+(temp*maxBtnSize);
 
-                if(value <= pagination.totalPages){
+                if(value <= paginationList[tabName].totalPages){
                     indexBtn.push(value)
                 }
             }
 
             // 페이지 버튼 셋팅
-            pageBtnList.btnList = indexBtn;
+            pageBtnList[tabName].btnList = indexBtn;
 
             // 색상처리
             setTimeout(function () {
                 $('li[btn_id]').removeClass( "active" );
-                $('li[btn_id='+(pagination.currentPage+1)+']').addClass( "active" );
+                $('li[btn_id='+(paginationList[tabName].currentPage+1)+']').addClass( "active" );
             },50)
         });
     }
@@ -186,10 +187,12 @@
         }
     })
 
+
     // 부서 리스트
     let departmentList = new Vue({
         el : '#departmentList',
         data : {
+            showPage         : true,
             itemList         : {},
             selectedItemList : {},
             amountSelect     : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
@@ -225,7 +228,7 @@
             },
             handlerCheckBox     : function( event ){
                 event.stopImmediatePropagation();
-                
+
                 let seletedItem = this.itemList[ parseInt( event.target.getAttribute("index") ) ];
 
                 if(event.target.checked){
@@ -255,32 +258,42 @@
     };
     // 페이지 정보
     let departmentShowPage = new Vue({
-        el : '#showPage',
+        el : '#departmentShowPage',
         data : {
-            totalElements       : {},
-            currentPage         : {},
+            totalElements       : 0,
+            currentPage         : 0,
             selectedElements    : 0,    // 현재 조건 중 선택된 값들의 수
+        },methods:{
+            createHandler : function( evnet ){
+                $("#departmentModal").modal().off()
+            },
+            updateHandler : function( evnet ){
+                $("#departmentModal").modal().off()
+            },
+            deleteHandler : function( evnet ){
+
+            },
         }
     });
     // 페이지 버튼 리스트
     let departmentPageBtnList = new Vue({
-        el : '#pageBtn',
+        el : '#departmentPageBtn',
         data : {
             btnList : {}
         },
         methods: {
             indexClick: function (event) {
                 let id = parseInt( event.target.getAttribute("btn_id") );
-                search(id-1, conditions.getParameter());
+                search(id-1, window.registerUser, "department" );;
             },
             previousClick:function (event) {
-                if(pagination.currentPage !== 0){
-                    search(pagination.currentPage-1, conditions.getParameter() );
+                if(departmentPagination.currentPage !== 0){
+                    search(departmentPagination.currentPage-1, window.registerUser, "department" );
                 }
             },
             nextClick:function (event) {
-                if(pagination.currentPage !== pagination.totalPages-1){
-                    search(pagination.currentPage+1, conditions.getParameter() );
+                if(departmentPagination.currentPage !== departmentPagination.totalPages-1){
+                    search(departmentPagination.currentPage+1, window.registerUser, "department" );
                 }
             }
         },
@@ -288,7 +301,7 @@
             // 제일 처음 랜더링 후 색상 처리
             setTimeout(function () {
                 $('li[btn_id]').removeClass( "active" );
-                $('li[btn_id='+(pagination.currentPage+1)+']').addClass( "active" );
+                $('li[btn_id='+(departmentPagination.currentPage+1)+']').addClass( "active" );
             },50)
         }
     });
@@ -296,8 +309,9 @@
 
     // 팀 리스트
     let teamList = new Vue({
-        el : '#itemList',
+        el : '#teamList',
         data : {
+            showPage         : false,
             itemList         : {},
             selectedItemList : {},
             amountSelect     : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
@@ -367,32 +381,42 @@
     };
     // 페이지 정보
     let teamShowPage = new Vue({
-        el : '#showPage',
+        el : '#teamShowPage',
         data : {
-            totalElements       : {},
-            currentPage         : {},
+            totalElements       : 0,
+            currentPage         : 0,
             selectedElements    : 0,    // 현재 조건 중 선택된 값들의 수
+        },methods:{
+            createHandler : function( evnet ){
+                $("#teamModal").modal().off()
+            },
+            updateHandler : function( evnet ){
+                $("#teamModal").modal().off()
+            },
+            deleteHandler : function( evnet ){
+
+            },
         }
     });
     // 페이지 버튼 리스트
     let teamPageBtnList = new Vue({
-        el : '#pageBtn',
+        el : '#teamPageBtn',
         data : {
             btnList : {}
         },
         methods: {
             indexClick: function (event) {
                 let id = parseInt( event.target.getAttribute("btn_id") );
-                search(id-1, conditions.getParameter());
+                search(id-1, window.registerUser, "team" );
             },
             previousClick:function (event) {
-                if(pagination.currentPage !== 0){
-                    search(pagination.currentPage-1, conditions.getParameter() );
+                if(teamPagination.currentPage !== 0){
+                    search(teamPagination.currentPage-1, window.registerUser, "team" );
                 }
             },
             nextClick:function (event) {
-                if(pagination.currentPage !== pagination.totalPages-1){
-                    search(pagination.currentPage+1, conditions.getParameter() );
+                if(teamPagination.currentPage !== teamPagination.totalPages-1){
+                    search(teamPagination.currentPage+1, window.registerUser, "team" );
                 }
             }
         },
@@ -400,16 +424,17 @@
             // 제일 처음 랜더링 후 색상 처리
             setTimeout(function () {
                 $('li[btn_id]').removeClass( "active" );
-                $('li[btn_id='+(pagination.currentPage+1)+']').addClass( "active" );
+                $('li[btn_id='+(teamPagination.currentPage+1)+']').addClass( "active" );
             },50)
         }
     });
 
 
     // 위치 리스트
-    let placeList = new Vue({
-        el : '#itemList',
+    let addressList = new Vue({
+        el : '#addressList',
         data : {
+            showPage         : false,
             itemList         : {},
             selectedItemList : {},
             amountSelect     : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
@@ -470,7 +495,7 @@
         }
     });
     // 페이징 처리 데이터
-    let placePagination = {
+    let addressPagination = {
         totalPages         :  0,       // 전체 페이지수
         totalElements      :  0,       // 전체 데이터수
         currentPage        :  0,       // 현재 페이지수
@@ -478,33 +503,43 @@
         amountPerPage      :  10,
     };
     // 페이지 정보
-    let placeShowPage = new Vue({
-        el : '#showPage',
+    let addressShowPage = new Vue({
+        el : '#addressShowPage',
         data : {
-            totalElements       : {},
-            currentPage         : {},
+            totalElements       : 0,
+            currentPage         : 0,
             selectedElements    : 0,    // 현재 조건 중 선택된 값들의 수
+        },methods:{
+            createHandler : function( evnet ){
+                $("#addressModal").modal().off()
+            },
+            updateHandler : function( evnet ){
+                $("#addressModal").modal().off()
+            },
+            deleteHandler : function( evnet ){
+
+            },
         }
     });
     // 페이지 버튼 리스트
-    let placePageBtnList = new Vue({
-        el : '#pageBtn',
+    let addressPageBtnList = new Vue({
+        el : '#addressPageBtn',
         data : {
             btnList : {}
         },
         methods: {
             indexClick: function (event) {
                 let id = parseInt( event.target.getAttribute("btn_id") );
-                search(id-1, conditions.getParameter());
+                search(id-1, window.registerUser, "address" );
             },
             previousClick:function (event) {
-                if(pagination.currentPage !== 0){
-                    search(pagination.currentPage-1, conditions.getParameter() );
+                if(addressPagination.currentPage !== 0){
+                    search(addressPagination.currentPage-1, window.registerUser, "address" );
                 }
             },
             nextClick:function (event) {
-                if(pagination.currentPage !== pagination.totalPages-1){
-                    search(pagination.currentPage+1, conditions.getParameter() );
+                if(addressPagination.currentPage !== addressPagination.totalPages-1){
+                    search(addressPagination.currentPage+1, window.registerUser, "address" );
                 }
             }
         },
@@ -512,14 +547,42 @@
             // 제일 처음 랜더링 후 색상 처리
             setTimeout(function () {
                 $('li[btn_id]').removeClass( "active" );
-                $('li[btn_id='+(pagination.currentPage+1)+']').addClass( "active" );
+                $('li[btn_id='+(addressPagination.currentPage+1)+']').addClass( "active" );
             },50)
         }
     });
 
 
+    const showPages = {
+        "department"    : departmentShowPage,
+        "team"          : teamShowPage,
+        "address"       : addressShowPage
+    };
+
+    const Lists = {
+        "department"    : departmentList,
+        "team"          : teamList,
+        "address"       : addressList
+    };
+
+    const pageBtnList = {
+        "department"    : departmentPageBtnList,
+        "team"          : teamPageBtnList,
+        "address"       : addressPageBtnList
+    };
+
+    const paginationList = {
+        "department"    : departmentPagination,
+        "team"          : teamPagination,
+        "address"       : addressPagination
+    };
+
+
     // for test
-    window.itemList     = itemList;
+    window.Lists            = Lists;
+    window.pageBtnList      = pageBtnList;
+    window.showPages        = showPages;
+    window.paginationList   = paginationList;
     window.registerUser = 1;
 
 

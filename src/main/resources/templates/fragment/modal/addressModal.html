@@ -1,0 +1,72 @@
+<html lang="ko"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org/" xmlns:v-on="http://www.w3.org/1999/xhtml">
+
+<div id="addressModal" class="modal fade" tabindex="-1" role="dialog"  th:fragment="addressModal"  >
+    <div class="modal-dialog modal-lg" role="document" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="closeHandler"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">주소정보수정</h4>
+            </div>
+            <div class="modal-body">
+                <form id="itemModalForm" >
+
+                    <div class="col-sm-12 md-4">
+                        <div class="form-group row row-center text-center">
+                            <label class="col-sm-2 col-form-label">주소별칭</label>
+                            <div class="col-sm-5">
+                                <label class="sr-only" for="id">id</label>
+                                <input  type="text" class="form-control" id="id" placeholder="위치명" v-model="selectedItem.id">
+                            </div>
+                            <div class="col-sm-7"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 md-4">
+                        <div class="form-group row row-center text-center">
+                            <label class="col-sm-2 col-form-label">대표번호</label>
+                            <div class="col-sm-5">
+                                <label class="sr-only" for="phone">phone</label>
+                                <input  type="text" class="form-control" id="phone" placeholder="대표번호" v-model="selectedItem.phone">
+                            </div>
+                            <label class="col-sm-2 col-form-label">Fax번호</label>
+                            <div class="col-sm-5">
+                                <label class="sr-only" for="fax">fax</label>
+                                <input type="text" class="form-control" id="fax" placeholder="Fax번호" v-model="selectedItem.fax">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 md-4">
+                        <div class="form-group row row-center text-center">
+                            <label class="col-sm-2 col-form-label">주소정보</label>
+                            <div class="col-sm-12">
+                                <label class="sr-only" for="address">address</label>
+                                <input  type="text" class="form-control" id="address" placeholder="주소정보" v-model="selectedItem.address">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 md-4">
+                        <div class="form-group row row-center text-center">
+                            <label class="col-sm-2 col-form-label">상세주소</label>
+                            <div class="col-sm-12">
+                                <label class="sr-only" for="addressDetail">addressDetail</label>
+                                <input type="text" class="form-control" id="addressDetail" placeholder="상세주소" v-model="selectedItem.addressDetail">
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" v-on:click="updateItem( window.updateUser)" >Save changes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" v-on:click="closeHandler">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+</html>
+

@@ -49,7 +49,7 @@
                             <ul class="nav nav-tabs">
                                 <li role="presentation" class="active"><a data-toggle="tab" href="#department">부서</a></li>
                                 <li role="presentation"><a data-toggle="tab" href="#team">팀</a></li>
-                                <li role="presentation"><a data-toggle="tab" href="#place">위치</a></li>
+                                <li role="presentation"><a data-toggle="tab" href="#address">위치</a></li>
                             </ul>
 
                             <!-- 관리 항목 tab-content -->
@@ -81,7 +81,7 @@
                                                         대표번호
                                                     </th>
                                                     <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                        대표fax
+                                                        Fax번호
                                                     </th>
                                                 </tr>
                                                 </thead>
@@ -91,7 +91,7 @@
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.name}}            </td>
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.head}}            </td>
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.headDate}}        </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.place}}           </td>
+                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.address}}           </td>
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.phone}}           </td>
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.fax}}             </td>
                                                 </tr>
@@ -99,8 +99,8 @@
                                             </table>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div id="departmentShowPage" class="col-sm-6">
+                                    <div id="departmentShowPage" class="row">
+                                        <div class="col-sm-6">
                                         <span  class="dataTables_info" role="status" aria-live="polite">
                                             Showing {{currentPage}} to 10 of {{totalElements}} entries
                                         </span>
@@ -111,15 +111,16 @@
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group pull-right">
-                                                <button type="button" class="btn btn-sm btn-warning" v-on:click="initConditions">   수정 </button>
-                                                <button type="button" class="btn btn-sm btn-danger" v-on:click="initConditions">    삭제 </button>
+                                                <button type="button" class="btn btn-sm btn-primary dark"   v-on:click="createHandler('department')">  등록 </button>
+                                                <button type="button" class="btn btn-sm btn-warning"        v-on:click="updateHandler('department')">  수정 </button>
+                                                <button type="button" class="btn btn-sm btn-danger"         v-on:click="deleteHandler('department')">  삭제 </button>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row text-center col-sm-12">
-                                        <div class="dataTables_paginate paging_simple_numbers" id="pageBtn">
+                                        <div class="dataTables_paginate paging_simple_numbers" id="departmentPageBtn">
                                             <ul class="pagination">
-                                                <li class="paginate_button previous" id="previousBtn">
+                                                <li class="paginate_button previous" id="departmentPreviousBtn">
                                                     <a href="javascript:;" v-on:click="previousClick">이전</a>
                                                 </li>
 
@@ -127,7 +128,7 @@
                                                     <a href="javascript:;" aria-controls="example2" v-bind:btn_id="btn">{{btn}}</a>
                                                 </li>
 
-                                                <li class="paginate_button next" id="nextBtn">
+                                                <li class="paginate_button next" id="departmentNextBtn">
                                                     <a href="javascript:;" v-on:click="nextClick">다음</a>
                                                 </li>
                                             </ul>
@@ -162,7 +163,7 @@
                                                         대표전화
                                                     </th>
                                                     <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                        대표Fax
+                                                        Fax번호
                                                     </th>
                                                 </tr>
                                                 </thead>
@@ -172,7 +173,7 @@
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.name}}            </td>
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.head}}            </td>
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.headDate}}        </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.place}}           </td>
+                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.address}}           </td>
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.phone}}           </td>
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.fax}}             </td>
                                                 </tr>
@@ -180,8 +181,8 @@
                                             </table>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div id="teamShowPage" class="col-sm-6">
+                                    <div id="teamShowPage" class="row">
+                                        <div class="col-sm-6">
                                         <span  class="dataTables_info" role="status" aria-live="polite">
                                             Showing {{currentPage}} to 10 of {{totalElements}} entries
                                         </span>
@@ -192,16 +193,16 @@
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group pull-right">
-                                                <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 등록 </button>
-                                                <button type="button" class="btn btn-sm btn-warning" v-on:click="initConditions"> 보류 </button>
-                                                <button type="button" class="btn btn-sm btn-danger" v-on:click="initConditions"> 반려 </button>
+                                                <button type="button" class="btn btn-sm btn-primary dark"   v-on:click="createHandler('team')"> 등록 </button>
+                                                <button type="button" class="btn btn-sm btn-warning"        v-on:click="updateHandler('team')"> 수정 </button>
+                                                <button type="button" class="btn btn-sm btn-danger"         v-on:click="deleteHandler('team')"> 삭제 </button>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row text-center col-sm-12">
-                                        <div class="dataTables_paginate paging_simple_numbers" id="pageBtn">
+                                        <div class="dataTables_paginate paging_simple_numbers" id="teamPageBtn">
                                             <ul class="pagination">
-                                                <li class="paginate_button previous" id="previousBtn">
+                                                <li class="paginate_button previous" id="teamPreviousBtn">
                                                     <a href="javascript:;" v-on:click="previousClick">이전</a>
                                                 </li>
 
@@ -209,7 +210,7 @@
                                                     <a href="javascript:;" aria-controls="example2" v-bind:btn_id="btn">{{btn}}</a>
                                                 </li>
 
-                                                <li class="paginate_button next" id="nextBtn">
+                                                <li class="paginate_button next" id="teamNextBtn">
                                                     <a href="javascript:;" v-on:click="nextClick">다음</a>
                                                 </li>
                                             </ul>
@@ -218,15 +219,15 @@
                                 </div>
 
                                 <!-- 위치 관리 항목 -->
-                                <div id="place" class="tab-pane fade">
+                                <div id="address"  class="tab-pane fade">
                                     <div class="row">
                                         <div class="col-sm-12">
-                                            <table id="placeTable" class="table table-bordered table-hover dataTable font-14"
+                                            <table id="addressTable" class="table table-bordered table-hover dataTable font-14"
                                                    role="grid" aria-describedby="example2_info">
                                                 <thead>
                                                 <tr role="row">
-                                                    <th id="selectAllPlace" class="text-center bg-dark-blue-gradient table-middle" tabindex="0" rowspan="1" colspan="1">
-                                                        <input type="checkbox" id="placeCheckBox" aria-label="Checkbox for following text input">
+                                                    <th id="selectAllAddress" class="text-center bg-dark-blue-gradient table-middle" tabindex="0" rowspan="1" colspan="1">
+                                                        <input type="checkbox" id="addressCheckBox" aria-label="Checkbox for following text input">
                                                     </th>
                                                     <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
                                                         위치명
@@ -241,24 +242,24 @@
                                                         대표전화
                                                     </th>
                                                     <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                        대표Fax
+                                                        Fax번호
                                                     </th>
                                                 </tr>
                                                 </thead>
-                                                <tbody id="placeList">
+                                                <tbody id="addressList">
                                                 <tr role="row" class="odd item" v-for="(dto, idx) in itemList" >
                                                     <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="handlerCheckBox"> </td>
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.name}}            </td>
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.head}}            </td>
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.headDate}}              </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.place}}            </td>
+                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.address}}            </td>
                                                 </tr>
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div id="placeShowPage" class="col-sm-6">
+                                    <div id="addressShowPage" class="row">
+                                        <div class="col-sm-6">
                                         <span  class="dataTables_info" role="status" aria-live="polite">
                                             Showing {{currentPage}} to 10 of {{totalElements}} entries
                                         </span>
@@ -269,16 +270,16 @@
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group pull-right">
-                                                <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 등록 </button>
-                                                <button type="button" class="btn btn-sm btn-warning" v-on:click="initConditions"> 보류 </button>
-                                                <button type="button" class="btn btn-sm btn-danger" v-on:click="initConditions"> 반려 </button>
+                                                <button type="button" class="btn btn-sm btn-primary dark"   v-on:click="createHandler('address')"> 등록 </button>
+                                                <button type="button" class="btn btn-sm btn-warning"        v-on:click="updateHandler('address')"> 수정 </button>
+                                                <button type="button" class="btn btn-sm btn-danger"         v-on:click="deleteHandler('address')"> 삭제 </button>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row text-center col-sm-12">
-                                        <div class="dataTables_paginate paging_simple_numbers" id="pageBtn">
+                                        <div class="dataTables_paginate paging_simple_numbers" id="addressPageBtn">
                                             <ul class="pagination">
-                                                <li class="paginate_button previous" id="previousBtn">
+                                                <li class="paginate_button previous" id="addressPreviousBtn">
                                                     <a href="javascript:;" v-on:click="previousClick">이전</a>
                                                 </li>
 
@@ -286,7 +287,7 @@
                                                     <a href="javascript:;" aria-controls="example2" v-bind:btn_id="btn">{{btn}}</a>
                                                 </li>
 
-                                                <li class="paginate_button next" id="nextBtn">
+                                                <li class="paginate_button next" id="addressNextBtn">
                                                     <a href="javascript:;" v-on:click="nextClick">다음</a>
                                                 </li>
                                             </ul>
@@ -314,9 +315,17 @@
 
     <div class="control-sidebar-bg"></div>
 
-    <!-- itemModal Start -->
-    <div th:replace="fragment/itemModal :: itemModal"></div>
-    <!-- itemModal End -->
+    <!-- departmentModal Start -->
+    <div th:replace="fragment/modal/departmentModal :: departmentModal"></div>
+    <!-- departmentModal End -->
+
+    <!-- teamModal Start -->
+    <div th:replace="fragment/modal/teamModal :: teamModal"></div>
+    <!-- teamModal End -->
+
+    <!-- addressModal Start -->
+    <div th:replace="fragment/modal/addressModal :: addressModal"></div>
+    <!-- addressModal End -->
 
 </div>
 

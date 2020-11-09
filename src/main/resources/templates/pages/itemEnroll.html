@@ -40,10 +40,6 @@
                     <div id="itemData" class="box">
                         <div class="box-header md-1 mt-1">
                             <h3 class="box-title">신규 등록</h3>
-                            <span v-if="tempAmount != 0" class="ml-3">
-                                temporary item(s) : {{tempAmount}}
-                            </span>
-
                             <div class="form-group pull-right md-0">
                                 <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initItem"> 초기화 </button>
                                 <button type="button" class="btn btn-sm btn-primary dark" v-on:click="createTempItem"> 임시저장 </button>
