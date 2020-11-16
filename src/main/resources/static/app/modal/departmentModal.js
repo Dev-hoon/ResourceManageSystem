@@ -67,22 +67,62 @@ function search(index,conditions) {
 let departmentModal = new Vue({
     el: '#departmentModal',
     data: {
-        selectedItem        : {},
+        name    : "",
+        selectedItem    : {
+            name            : "",
+            head            : "",
+            headDate        : "",
+            phone           : "",
+            fax             : "",
+            id              : "",
+            address         : "",
+            addressDetail   : "",
+        },
 
     },methods: {
-        initCategory    : function( ){
-            this.selectCate01  = Object.keys( this.categories );
-            this.selectCate02  = Object.keys( this.categories[this.selectedItem.superCate] )
-            this.selectCate03  = this.categories[this.selectedItem.superCate][this.selectedItem.subCateFirst];
+        getOriginData   : function( ){
+            return Object.entries( Lists.department.itemList ).filter((item)=>(item.id==this.selectedItem.id));
+        },
+        validation      : function(  ){
+            console.log("originData in validation : ",originData)
+            return  ( originData )
+                    ? Object.entries( originData ).reduce( ( acc, cur )=>{ return acc || (originData[cur[0]]!=cur[1]) }, false )
+                    : false;
+        },
+        closeHandler    : function ( event ){
+            console.log('closeHandler !')
 
-            this.isChange  =  false;
+            // for test
+            console.log( Object.entries(this.selectedItem).filter((item)=>(item[1]!="") ).map((item)=>{console.log(item)}) );
+
+            let originData = this.getOriginData();
+
+            // 신규등록인 경우
+            if( originData.length == 0 ){
+                // 입력된 값이 존재하는지 확인
+                let insertedItem = Object.entries(this.selectedItem).filter((item)=>(item[1]!="") );
+
+                if( insertedItem.length != 0 ){
+                    alert("입력된 값이 존재합니다.");
+                    return;
+                }
+            }
+            // 데이터 수정인 경우
+            else{
+
+                this.validation( originData );
+                console.log('originData : ',originData)
+                
+            }
+
+            $('#departmentModal').modal("hide");
         },
         updateItem      : function ( updateUser ) {
             Object.entries(this._data.selectedItem).map((t)=>{console.log("T : ",t)});
 
             console.log( "validation : "+this.validation() )
 
-            let postBody = Object.entries(this._data.selectedItem)
+            let postBody = Object.entries(this.selectedItem)
                 .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
                 .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
 
@@ -99,20 +139,6 @@ let departmentModal = new Vue({
                 dataType: 'json'
             });
         },
-        closeHandler    : function ( event ){
-            console.log('closeHandler !')
-
-            if( !this.validation() ){
-                console.log( "not changed ")
-                $('#itemModal').modal("hide");
-            }else{
-                console.log( "changed ");
-            }
-        },
-        validation      : function(){
-            let originData = itemList.itemList.filter((item)=>(item.id==itemModal.selectedItem.id))[0];
-            return Object.entries( itemModal.selectedItem ).reduce( ( acc, cur )=>{ return acc || (originData[cur[0]]!=cur[1]) }, false )
-        }
     },mounted: function( ) {
         // 등록일 datepicker 처리
         $('#modalRegisterDate').datepicker({

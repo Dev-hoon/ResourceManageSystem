@@ -90,21 +90,21 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest, ItemAp
 
         // 3. data -> update   id
         return optional.map( item -> {
-                item
-                .setId( itemApiRequest.getId() )
-                .setSuperCate( itemApiRequest.getSuperCate() )
-                .setSubCateFirst( itemApiRequest.getSubCateFirst() )
-                .setSubCateSecond(itemApiRequest.getSubCateSecond() )
-                .setUpdateDate( date )
-                .setUpdateUser( itemApiRequest.getRegisterUser() )
-                .setExpireDate( LocalDate.parse(itemApiRequest.getExpireDate(), DateTimeFormatter.ISO_DATE)  )
-                .setName( itemApiRequest.getName() )
-                .setCost( itemApiRequest.getCost() )
-                .setPurchaseCost( itemApiRequest.getPurchaseCost() )
-                .setMemo( itemApiRequest.getMemo() )
-                .setItemState( ItemState.idOf(itemApiRequest.getItemState()) )
-                .setPlaceState( itemApiRequest.getPlaceState() )
-                .setRentalState(  RentalState.idOf(itemApiRequest.getRentalState()));
+            item
+            .setId( itemApiRequest.getId() )
+            .setSuperCate( itemApiRequest.getSuperCate() )
+            .setSubCateFirst( itemApiRequest.getSubCateFirst() )
+            .setSubCateSecond(itemApiRequest.getSubCateSecond() )
+            .setUpdateDate( date )
+            .setUpdateUser( itemApiRequest.getRegisterUser() )
+            .setExpireDate( LocalDate.parse(itemApiRequest.getExpireDate(), DateTimeFormatter.ISO_DATE)  )
+            .setName( itemApiRequest.getName() )
+            .setCost( itemApiRequest.getCost() )
+            .setPurchaseCost( itemApiRequest.getPurchaseCost() )
+            .setMemo( itemApiRequest.getMemo() )
+            .setItemState( ItemState.idOf(itemApiRequest.getItemState()) )
+            .setPlaceState( itemApiRequest.getPlaceState() )
+            .setRentalState(  RentalState.idOf(itemApiRequest.getRentalState()));
             return item;
         })
         .map(item -> itemRepository.save(item) )             // update -> newUser

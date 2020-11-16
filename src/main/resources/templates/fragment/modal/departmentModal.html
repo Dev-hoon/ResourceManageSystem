@@ -7,7 +7,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="closeHandler"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">부서정보수정</h4>
+                <h4 class="modal-title">{{}}</h4>
             </div>
             <div class="modal-body">
                 <form id="itemModalForm" >
@@ -17,7 +17,7 @@
                             <label class="col-sm-2 col-form-label">부서명</label>
                             <div class="col-sm-5">
                                 <label class="sr-only" for="id">id</label>
-                                <input  type="text" class="form-control" id="id" placeholder="부서명" v-model="selectedItem.id">
+                                <input  type="text" class="form-control" id="id" placeholder="부서명" v-model="selectedItem.name">
                             </div>
                             <div class="col-sm-7"></div>
                         </div>
@@ -76,7 +76,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" v-on:click="updateItem( window.updateUser )" >Save changes</button>
+                <button type="button" class="btn btn-primary" v-on:click="updateItem( window.updateUser )" >저장</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal" v-on:click="closeHandler">Close</button>
             </div>
         </div><!-- /.modal-content -->

@@ -1,7 +1,9 @@
 (function ($) {
+    let maxBtnSize = 7;              // 검색 하단 최대 범위
+    let indexBtn = [];               // 인덱스 버튼
 
     $(document).ready(function () {
-        search(0,window.registerUser);
+        search(0, window.registerUser, 'places');
         // getSetting();
 
         // table에 모두 선택 처리
@@ -37,7 +39,7 @@
     }
 
     // 데이터 받아오기
-    function search( index, registerUser,  tabName ) {
+    function search( index, registerUser, tabName ) {
         $.get("/api/"+tabName+"?page="+index+"&registerUser="+registerUser, function (response) {
             /* 데이터 셋팅 */
             // 페이징 처리 데이터
@@ -60,7 +62,7 @@
                 $('#'+tabName+'previousBtn').removeClass("disabled")
             }
             // 다음버튼
-            if(paginationList[tabName].currentPage === pagination.totalPages-1){
+            if(paginationList[tabName].currentPage === paginationList[tabName].totalPages-1){
                 $('#'+tabName+'nextBtn').addClass("disabled")
             }else{
                 $('#'+tabName+'nextBtn').removeClass("disabled")
@@ -265,6 +267,7 @@
             selectedElements    : 0,    // 현재 조건 중 선택된 값들의 수
         },methods:{
             createHandler : function( evnet ){
+
                 $("#departmentModal").modal().off()
             },
             updateHandler : function( evnet ){
@@ -530,16 +533,16 @@
         methods: {
             indexClick: function (event) {
                 let id = parseInt( event.target.getAttribute("btn_id") );
-                search(id-1, window.registerUser, "address" );
+                search(id-1, window.registerUser, "place" );
             },
             previousClick:function (event) {
                 if(addressPagination.currentPage !== 0){
-                    search(addressPagination.currentPage-1, window.registerUser, "address" );
+                    search(addressPagination.currentPage-1, window.registerUser, "place" );
                 }
             },
             nextClick:function (event) {
                 if(addressPagination.currentPage !== addressPagination.totalPages-1){
-                    search(addressPagination.currentPage+1, window.registerUser, "address" );
+                    search(addressPagination.currentPage+1, window.registerUser, "place" );
                 }
             }
         },
@@ -554,27 +557,27 @@
 
 
     const showPages = {
-        "department"    : departmentShowPage,
-        "team"          : teamShowPage,
-        "address"       : addressShowPage
+        "departments"    : departmentShowPage,
+        "teams"          : teamShowPage,
+        "places"         : addressShowPage
     };
 
     const Lists = {
-        "department"    : departmentList,
-        "team"          : teamList,
-        "address"       : addressList
+        "departments"    : departmentList,
+        "teams"          : teamList,
+        "places"         : addressList
     };
 
     const pageBtnList = {
-        "department"    : departmentPageBtnList,
-        "team"          : teamPageBtnList,
-        "address"       : addressPageBtnList
+        "departments"    : departmentPageBtnList,
+        "teams"          : teamPageBtnList,
+        "places"         : addressPageBtnList
     };
 
     const paginationList = {
-        "department"    : departmentPagination,
-        "team"          : teamPagination,
-        "address"       : addressPagination
+        "departments"    : departmentPagination,
+        "teams"          : teamPagination,
+        "places"         : addressPagination
     };
 
 
