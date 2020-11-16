@@ -64,3 +64,6 @@ function search(index,conditions) {
 }
 
 
+// for test
+window.updateUser       = 1;
+window.addressModal    = addressModal;

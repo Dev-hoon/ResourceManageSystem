@@ -16,8 +16,8 @@
                         <div class="form-group row row-center text-center">
                             <label class="col-sm-2 col-form-label">주소별칭</label>
                             <div class="col-sm-5">
-                                <label class="sr-only" for="id">id</label>
-                                <input  type="text" class="form-control" id="id" placeholder="위치명" v-model="selectedItem.id">
+                                <label class="sr-only" for="name">name</label>
+                                <input  type="text" class="form-control" id="name" placeholder="위치명" v-model="selectedItem.name">
                             </div>
                             <div class="col-sm-7"></div>
                         </div>
@@ -61,7 +61,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" v-on:click="updateItem( window.updateUser)" >저장</button>
+                <button type="button" class="btn btn-primary" v-if="!mode" v-on:click="createItem( window.registerUser)" >Create</button>
+                <button type="button" class="btn btn-primary" v-if="mode"  v-on:click="updateItem( window.updateUser)" >Save changes</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal" v-on:click="closeHandler">Close</button>
             </div>
         </div><!-- /.modal-content -->
