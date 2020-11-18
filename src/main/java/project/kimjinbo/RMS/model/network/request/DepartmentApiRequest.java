@@ -12,11 +12,12 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DepartmentApiRequest {
-    private Long        id;
+    private Integer     id;
     private Long        registerUser;
     private Long        updateUser;
     private LocalDate   registerDate;
     private LocalDate   updateDate;
+
     private String      name;
     private String      head;
     private String      phone;

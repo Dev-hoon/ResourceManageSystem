@@ -11,6 +11,7 @@ import project.kimjinbo.RMS.model.network.request.ItemApiRequest;
 import project.kimjinbo.RMS.model.network.request.PlaceApiRequest;
 import project.kimjinbo.RMS.model.network.response.ItemApiResponse;
 import project.kimjinbo.RMS.model.network.response.PlaceApiResponse;
+import project.kimjinbo.RMS.model.network.response.PlaceListApiResponse;
 import project.kimjinbo.RMS.service.PlaceApiLogicService;
 
 import java.util.List;
@@ -22,11 +23,16 @@ public class PlaceController implements CrudInterface<PlaceApiRequest, PlaceApiR
     @Autowired
     private PlaceApiLogicService placeApiLogicService;
 
+    @GetMapping("/placeList")
+    @ResponseBody
+    public Header<List<PlaceListApiResponse>> readPlaceList(@PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable, PlaceApiRequest placeApiRequest) {
+        return placeApiLogicService.searchList( placeApiRequest );
+    }
+
     // 조건 사용 가능  localhost:8080/api/items
     @GetMapping("/places")
     @ResponseBody
     public Header<List<PlaceApiResponse>> readPlaces(@PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable, PlaceApiRequest placeApiRequest) {
-        System.out.println("request : "+placeApiRequest);
         return placeApiLogicService.search( pageable, placeApiRequest );
     }
 
@@ -48,13 +54,14 @@ public class PlaceController implements CrudInterface<PlaceApiRequest, PlaceApiR
     @Override
     @PutMapping("/place")
     public Header<PlaceApiResponse> update(@RequestBody Header<PlaceApiRequest> request) {
-        return  null;
+        return placeApiLogicService.update( request );
     }
 
     @Override
     @DeleteMapping("/place/{id}")
     public Header delete(@PathVariable(name = "id") Long id) {
-        return null;
+        System.out.println("id : "+id);
+        return placeApiLogicService.delete( id );
     }
 
      /*

@@ -3,6 +3,7 @@ package project.kimjinbo.RMS.model.entity;
 import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import project.kimjinbo.RMS.model.network.request.CateApiRequest;
 
 import java.util.Objects;
 import java.io.Serializable;
@@ -15,6 +16,13 @@ public class CategoryPK implements Serializable {
     private String      superCate;
     private String      subCateFirst;
     private String      subCateSecond;
+
+    public CategoryPK( CateApiRequest cateApiRequest ){
+        this.superCate      = cateApiRequest.getSuperCate();
+        this.subCateFirst   = cateApiRequest.getSubCateFirst();
+        this.subCateSecond  = cateApiRequest.getSubCateSecond();
+    }
+
 
     public void validate() throws Exception {
         if( !Optional.ofNullable(superCate).isPresent() || !Optional.ofNullable(subCateFirst).isPresent() || !Optional.ofNullable(subCateSecond).isPresent() ){

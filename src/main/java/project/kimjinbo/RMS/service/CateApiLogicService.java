@@ -4,17 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import project.kimjinbo.RMS.configs.CategorySpecs;
 import project.kimjinbo.RMS.configs.ItemSpecs;
 import project.kimjinbo.RMS.interfaces.CrudInterface;
 import project.kimjinbo.RMS.model.entity.Category;
-import project.kimjinbo.RMS.model.entity.Item;
-import project.kimjinbo.RMS.model.enumclass.ItemState;
+import project.kimjinbo.RMS.model.entity.CategoryPK;
+import project.kimjinbo.RMS.model.entity.Department;
 import project.kimjinbo.RMS.model.network.Header;
 import project.kimjinbo.RMS.model.network.Pagination;
-import project.kimjinbo.RMS.model.network.request.ItemApiRequest;
-import project.kimjinbo.RMS.model.network.response.ItemApiResponse;
+import project.kimjinbo.RMS.model.network.request.CateApiRequest;
+import project.kimjinbo.RMS.model.network.request.DepartmentApiRequest;
+import project.kimjinbo.RMS.model.network.response.CateApiResponse;
 import project.kimjinbo.RMS.repository.CategoryRepository;
-import project.kimjinbo.RMS.repository.ItemRepository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -26,182 +27,123 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.*;
 
 @Service
-public class CateApiLogicService implements CrudInterface<ItemApiRequest,ItemApiResponse> {
+public class CateApiLogicService implements CrudInterface<CateApiRequest, CateApiResponse> {
 
     @Autowired
-    private CategoryRepository cateRepository;
+    private CategoryRepository categoryRepository;
 
     @Override
-    public Header<ItemApiResponse> create( Header<ItemApiRequest> request ) {
+    public Header<CateApiResponse> create( Header<CateApiRequest> request ) {
         LocalDate date = LocalDate.now();
 
-        // 1. request data
-        ItemApiRequest itemApiRequest = request.getData();
+        System.out.println("request: "+request.getData() );
 
-        // 2. Item 생성
-        Item item = Item.builder()
-                .id( itemApiRequest.getId() )
-                .superCate( itemApiRequest.getSuperCate() )
-                .subCateFirst( itemApiRequest.getSubCateFirst() )
-                .subCateSecond(itemApiRequest.getSubCateSecond() )
+        // 1. request data
+        CateApiRequest cateApiRequest = request.getData();
+
+        // 2. Cate 생성
+        Category category = Category.builder()
+                .id( cateApiRequest.getId() )
+                .superCate( cateApiRequest.getSuperCate() )
+                .subCateFirst( cateApiRequest.getSubCateFirst() )
+                .subCateSecond(cateApiRequest.getSubCateSecond() )
                 .registerDate( date )
                 .updateDate( date )
-                .registerUser( itemApiRequest.getRegisterUser() )
-                .updateUser( itemApiRequest.getRegisterUser() )
-                .expireDate( LocalDate.parse(itemApiRequest.getExpireDate(), DateTimeFormatter.ISO_DATE) )
-                .name( itemApiRequest.getName() )
-                .cost( itemApiRequest.getCost() )
-                .purchaseCost( itemApiRequest.getPurchaseCost() )
-                .memo( itemApiRequest.getMemo() )
-                .itemState( Integer.valueOf( itemApiRequest.getItemState() ) )
-                .placeState( itemApiRequest.getPlaceState() )
-                .rentalState(Integer.valueOf(itemApiRequest.getRentalState()))
+                .registerUser( cateApiRequest.getRegisterUser() )
+                .updateUser( cateApiRequest.getRegisterUser() )
+                .expireDate( (cateApiRequest.getExpireDate()==null)? null : LocalDate.parse(cateApiRequest.getExpireDate(), DateTimeFormatter.ISO_DATE) )
                 .build();
 
-        // Item newItem = itemRepository.save(item);
+        Category newCategory = categoryRepository.save( category);
 
-        // 3. 생성된 데이터 -> userApiResponse return
-        //return Header.OK( response(newItem) );
-        return Header.OK( );
+        return Header.OK( response(newCategory) );
+
     }
 
     @Override
-    public Header<ItemApiResponse> read(Long id) {
-        /*return itemRepository.findById(id)
-                .map( item->response(item))
+    public Header<CateApiResponse> read(Long id) { return null; }
+
+    @Override
+    public Header<CateApiResponse> update( Header<CateApiRequest> request) {
+        LocalDate date = LocalDate.now();
+
+        CateApiRequest cateApiRequest = request.getData();
+
+        // 2. id -> department 데이터 를 찾고
+        Optional<Category> optional = categoryRepository.findById( cateApiRequest.getId() );
+
+        // 3. data -> update  id
+        return optional.map( item -> {
+            item
+            .setUpdateDate( date )
+            .setUpdateUser( cateApiRequest.getUpdateUser() )
+            .setExpireDate( (cateApiRequest.getExpireDate() == null)? null : LocalDate.parse( cateApiRequest.getExpireDate() , DateTimeFormatter.ISO_DATE) )
+            .setSuperCate( cateApiRequest.getSuperCate() )
+            .setSubCateFirst( cateApiRequest.getSubCateSecond() );
+
+            return item;
+        })
+                .map(item -> categoryRepository.save(item) )             // update -> newUser
+                .map(item -> response(item) )                        // userApiResponse
                 .map(Header::OK)
-                .orElseGet( () ->Header.ERROR("데이터 없음") );*/
-                return null;
+                .orElseGet(()->Header.ERROR("데이터 없음"));
+    }
+
+    @Override
+    public Header delete( Long id ) {
+
+        Optional<Category> optional = categoryRepository.findById( id );
+
+        return optional.map( category ->{
+            categoryRepository.delete( category );
+            return Header.OK();
+        }).orElseGet(()->Header.ERROR("데이터 없음"));
     }
 
     public Header<Map> readCategories( ) {
-        List<Category> categories = cateRepository.findAll();
+        List<Category> categories = categoryRepository.findAll( );
 
         Map<String, Map<String, List<String>>> categoriesMap =
                 categories.stream().collect(groupingBy(Category::getSuperCate, groupingBy(Category::getSubCateFirst, mapping(Category::getSubCateSecond, toList()))));
 
         return new Header<Map>( ).OK( categoriesMap );
 
-        /*
-        return itemRepository.findById(id)
-                .map( item->response(item))
-                .map(Header::OK)
-                .orElseGet( () ->Header.ERROR("데이터 없음") );
-        return null;*/
     }
 
-    @Override
-    public Header<ItemApiResponse> update(Header<ItemApiRequest> request) {/*
+    public Header<List<CateApiResponse>>search( Pageable pageable, CateApiRequest request ) {
         LocalDate date = LocalDate.now();
 
-        ItemApiRequest itemApiRequest = request.getData();
+        Page<Category> categorys = categoryRepository.findAll(
+                CategorySpecs.superCate( request.getSuperCate() ).and(
+                CategorySpecs.subCateFirst(request.getSubCateFirst())).and(
+                CategorySpecs.subCateSecond(request.getSubCateSecond()))
+                , pageable );
 
-        // 2. id -> user 데이터 를 찾고
-        Optional<Item> optional = itemRepository.findById( itemApiRequest.getId() );
-
-        // 3. data -> update   id
-        return optional.map( item -> {
-                item
-                .setId( itemApiRequest.getId() )
-                .setSuperCate( itemApiRequest.getSuperCate() )
-                .setSubCateFirst( itemApiRequest.getSubCateFirst() )
-                .setSubCateSecond(itemApiRequest.getSubCateSecond() )
-                .setUpdateDate( date )
-                .setRegisterUser( itemApiRequest.getRegisterUser() )
-                .setUpdateUser( itemApiRequest.getRegisterUser() )
-                .setExpireDate( LocalDate.parse(itemApiRequest.getExpireDate(), DateTimeFormatter.ISO_DATE)  )
-                .setName( itemApiRequest.getName() )
-                .setCost( itemApiRequest.getCost() )
-                .setpurchaseCost( itemApiRequest.getpurchaseCost() )
-                .setMemo( itemApiRequest.getMemo() )
-                .setItemState( itemApiRequest.getItemState() )
-                .setPlaceState( itemApiRequest.getPlaceState() )
-                .setRentalState( itemApiRequest.getRentalState() );
-            return item;
-        })
-        .map(item -> itemRepository.save(item) )             // update -> newUser
-        .map(item -> response(item) )                        // userApiResponse
-        .map(Header::OK)
-        .orElseGet(()->Header.ERROR("데이터 없음"));*/
-        return null;
-    }
-
-    @Override
-    public Header delete(Long id) {
-        /*
-        Optional<Item> optional = itemRepository.findById(id);
-
-        return optional.map( item ->{
-            itemRepository.delete(item);
-            return Header.OK();
-        }).orElseGet(()->Header.ERROR("데이터 없음"));
-        */
-
-        return null;
-    }
-
-    public Header<List<ItemApiResponse>> search(Pageable pageable,ItemApiRequest request) {
-        /*
-        LocalDate date = LocalDate.now();
-
-        Page<Item> items =itemRepository.findAll(
-                ItemSpecs.superCate( request.getSuperCate() ).and(
-                ItemSpecs.subCateFirst(request.getSubCateFirst()) ).and(
-                ItemSpecs.subCateSecond(request.getSubCateSecond())),
-                pageable);
-
-        List<ItemApiResponse> itemApiResponseList = items.stream()
-                .map(user -> response(user))
+        List<CateApiResponse> CateApiResponseListList = categorys.stream()
+                .map(category -> response(category))
                 .collect(Collectors.toList());
 
         Pagination pagination = Pagination.builder()
-                .totalPages(items.getTotalPages())
-                .totalElements(items.getTotalElements())
-                .currentPage(items.getNumber())
-                .currentElements(items.getNumberOfElements())
+                .totalPages(categorys.getTotalPages())
+                .totalElements(categorys.getTotalElements())
+                .currentPage(categorys.getNumber())
+                .currentElements(categorys.getNumberOfElements())
                 .build();
 
-        return Header.OK( itemApiResponseList,pagination );*/
-        return null;
+        return Header.OK( CateApiResponseListList, pagination );
     }
 
-    public ItemApiResponse response(Item item){/*
+    public CateApiResponse response(Category category){
 
-        ItemApiResponse itemApiResponse = ItemApiResponse.builder()
-                .id(item.getId())
-                .superCate( item.getSuperCate() )
-                .subCateFirst( item.getSubCateFirst() )
-                .subCateSecond(item.getSubCateSecond() )
-                .registerDate(item.getRegisterDate() )
-                .expireDate(item.getExpireDate() )
-                .name( item.getName() )
-                .cost( item.getCost() )
-                .purchaseCost( item.getpurchaseCost() )
-                .memo( item.getMemo() )
-                .itemState( item.getItemState() )
-                .placeState( item.getPlaceState() )
-                .rentalState( item.getRentalState() )
+        CateApiResponse cateApiResponse = CateApiResponse.builder()
+                .id( category.getId() )
+                .superCate( category.getSuperCate() )
+                .subCateFirst( category.getSubCateFirst() )
+                .subCateSecond(category.getSubCateSecond() )
+                .expireDate(category.getExpireDate() )
                 .build();
 
-        return itemApiResponse;*/
-        return null;
+        return cateApiResponse;
     }
 
 }
-
-/*
-     public Header<ItemApiResponse> readWhere(Header<ItemApiRequest> request) {
-        LocalDate date = LocalDate.now();
-
-        ItemApiRequest req = request.getData();
-
-        List<ItemApiResponse> items = itemRepository.findAll(
-                ItemSpecs.superCate(  req.getSuperCate() ).and(
-                        ItemSpecs.subCateFirst(req.getSubCateFirst()) ).and(
-                        ItemSpecs.subCateSecond(req.getSubCateSecond())
-                )
-        ).stream().map( el-> ( response(el) ) ).collect(Collectors.toList());
-
-        return Header.OK( items.get(0) );
-    }
- */

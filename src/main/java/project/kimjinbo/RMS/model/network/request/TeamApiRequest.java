@@ -12,14 +12,16 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeamApiRequest {
-    private Long        id;
+    private Integer     id;
     private Long        registerUser;
     private Long        updateUser;
     private LocalDate   registerDate;
     private LocalDate   updateDate;
     private String      name;
-    private String      head;
     private String      phone;
     private String      fax;
+
+    private Long        head;
+    private Long        depId;
     private Integer     placeId;
 }

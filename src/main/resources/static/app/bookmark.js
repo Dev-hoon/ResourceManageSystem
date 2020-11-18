@@ -63,8 +63,6 @@
             indexBtn = [];
             pagination = response.pagination;
 
-            console.log("response.pagination; : ", response.pagination)
-
             //전체 페이지
             showPage.totalElements      = pagination.currentElements;
             showPage.currentPage        = pagination.currentPage+1;
@@ -138,8 +136,6 @@
             amountSelect     : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
         },methods:{
             handlerCheckBox: function(event){
-                console.log("handlerCheckBox")
-
                 event.stopImmediatePropagation();
 
                 let seletedItem = this.itemList[ parseInt( event.target.getAttribute("index") ) ];

@@ -7,7 +7,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="closeHandler"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">{{}}</h4>
+                <h4 class="modal-title" v-if="!mode">부서정보등록</h4>
+                <h4 class="modal-title" v-if="mode" >부서정보수정</h4>
             </div>
             <div class="modal-body">
                 <form id="itemModalForm" >
@@ -28,12 +29,12 @@
                             <label class="col-sm-2 col-form-label">부서장</label>
                             <div class="col-sm-5">
                                 <label class="sr-only" for="head">head</label>
-                                <input  type="text" class="form-control" id="head" placeholder="부서장" v-model="selectedItem.head">
+                                <input disabled type="text" class="form-control" id="head" placeholder="부서장" v-model="selectedItem.head">
                             </div>
-                            <label class="col-sm-2 col-form-label">지정일</label>
+                            <label class="col-sm-2 col-form-label">임명일</label>
                             <div class="col-sm-5">
                                 <label class="sr-only" for="headDate">headDate</label>
-                                <input type="text" class="form-control" id="headDate" placeholder="지정일" v-model="selectedItem.headDate">
+                                <input type="text" class="form-control" id="headDate" placeholder="임명일" v-model="selectedItem.headDate">
                             </div>
                         </div>
                     </div>
@@ -55,10 +56,23 @@
 
                     <div class="col-sm-12 md-4">
                         <div class="form-group row row-center text-center">
-                            <label class="col-sm-2 col-form-label">부서주소</label>
+                            <label class="col-sm-2 col-form-label">주소명칭</label>
+                            <div class="col-sm-12">
+                                <select id="itemState" class="form-control" v-model="selectedPlace" v-on:change="changeHandler">
+                                    <option value="">선택</option>
+                                    <option v-for="state in placeList" >{{state.name}}</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 md-4">
+                        <div class="form-group row row-center text-center">
+                            <label class="col-sm-2 col-form-label">주소</label>
                             <div class="col-sm-12">
                                 <label class="sr-only" for="address">address</label>
-                                <input  type="text" class="form-control" id="address" placeholder="부서주소" v-model="selectedItem.address">
+                                <input disabled type="text" class="form-control" id="address" placeholder="주소" v-model="address">
                             </div>
                         </div>
                     </div>
@@ -68,7 +82,7 @@
                             <label class="col-sm-2 col-form-label">상세주소</label>
                             <div class="col-sm-12">
                                 <label class="sr-only" for="addressDetail">addressDetail</label>
-                                <input type="text" class="form-control" id="addressDetail" placeholder="상세주소" v-model="selectedItem.addressDetail">
+                                <input disabled type="text" class="form-control" id="addressDetail" placeholder="상세주소" v-model="addressDetail">
                             </div>
                         </div>
                     </div>
@@ -76,13 +90,12 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" v-on:click="updateItem( window.updateUser )" >저장</button>
+                <button type="button" class="btn btn-primary" v-if="!mode" v-on:click="createItem( window.registerUser)" >Create</button>
+                <button type="button" class="btn btn-primary" v-if="mode"  v-on:click="updateItem( window.updateUser)" >Save changes</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal" v-on:click="closeHandler">Close</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
-
-    <script src="/app/modal/departmentModal.js"></script>
 </div><!-- /.modal -->
 
 </html>

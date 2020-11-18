@@ -113,7 +113,7 @@
                                             <div class="form-group pull-right">
                                                 <button type="button" class="btn btn-sm btn-primary dark"   v-on:click="createHandler('department')">  등록 </button>
                                                 <button type="button" class="btn btn-sm btn-warning"        v-on:click="updateHandler('department')">  수정 </button>
-                                                <button type="button" class="btn btn-sm btn-danger"         v-on:click="deleteHandler('department')">  삭제 </button>
+                                                <button type="button" class="btn btn-sm btn-danger"         v-on:click="deleteHandler( event, 'department')">  삭제 </button>
                                             </div>
                                         </div>
                                     </div>
@@ -148,6 +148,9 @@
                                                         <input type="checkbox" id="teamCheckBox" aria-label="Checkbox for following text input">
                                                     </th>
                                                     <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                        부서
+                                                    </th>
+                                                    <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
                                                         팀명
                                                     </th>
                                                     <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
@@ -170,10 +173,11 @@
                                                 <tbody id="teamList">
                                                 <tr role="row" class="odd item" v-for="(dto, idx) in itemList" >
                                                     <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="handlerCheckBox"> </td>
+                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.department}}      </td>
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.name}}            </td>
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.head}}            </td>
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.headDate}}        </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.address}}           </td>
+                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.address}}         </td>
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.phone}}           </td>
                                                     <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.fax}}             </td>
                                                 </tr>
@@ -195,7 +199,7 @@
                                             <div class="form-group pull-right">
                                                 <button type="button" class="btn btn-sm btn-primary dark"   v-on:click="createHandler('team')"> 등록 </button>
                                                 <button type="button" class="btn btn-sm btn-warning"        v-on:click="updateHandler('team')"> 수정 </button>
-                                                <button type="button" class="btn btn-sm btn-danger"         v-on:click="deleteHandler('team')"> 삭제 </button>
+                                                <button type="button" class="btn btn-sm btn-danger"         v-on:click="deleteHandler( event, 'team')"> 삭제 </button>
                                             </div>
                                         </div>
                                     </div>
@@ -273,7 +277,7 @@
                                             <div class="form-group pull-right">
                                                 <button type="button" class="btn btn-sm btn-primary dark"   v-on:click="createHandler('address')"> 등록 </button>
                                                 <button type="button" class="btn btn-sm btn-warning"        v-on:click="updateHandler('address')"> 수정 </button>
-                                                <button type="button" class="btn btn-sm btn-danger"         v-on:click="deleteHandler('address')"> 삭제 </button>
+                                                <button type="button" class="btn btn-sm btn-danger"         v-on:click="deleteHandler( event, 'address' )"> 삭제 </button>
                                             </div>
                                         </div>
                                     </div>

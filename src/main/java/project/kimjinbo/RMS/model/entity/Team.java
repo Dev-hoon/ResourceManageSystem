@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Entity
 @Builder
+@Accessors(chain=true)
 public class Team {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,17 +24,28 @@ public class Team {
     private LocalDate   registerDate;
     private Long        updateUser;
     private LocalDate   updateDate;
-    private String      head;
     private LocalDate   headDate;
     private String      phone;
     private String      fax;
 
-    @OneToOne
-    @JoinColumn(name="place_id", insertable = false, updatable = false)
-    Place placeId;
+    private Long        head;
+
+    @Column(name="place_id")
+    private Integer     placeId;
+
+    @Column(name="dep_id")
+    private Long        depId;
 
     @OneToOne
-    @JoinColumn(name="department_id", insertable = false, updatable = false)
-    Department departmentId;
+    @JoinColumn(name="head", insertable = false, updatable = false)
+    Employee headPserson;
+
+    @OneToOne
+    @JoinColumn(name="place_id", insertable = false, updatable = false)
+    Place place;
+
+    @OneToOne
+    @JoinColumn(name="dep_id", insertable = false, updatable = false)
+    Department department;
 
 }

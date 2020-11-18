@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Entity
 @Builder
+@Accessors(chain=true)
 public class Department {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,8 +29,14 @@ public class Department {
     private String      phone;
     private String      fax;
 
+    @Column(name="place_id")
+    private Integer     placeId;
+
+    @OneToOne
+    @JoinColumn(name="head", insertable = false, updatable = false)
+    Employee headPserson;
 
     @OneToOne
     @JoinColumn(name="place_id", insertable = false, updatable = false)
-    Place placeId;
+    Place place;
 }

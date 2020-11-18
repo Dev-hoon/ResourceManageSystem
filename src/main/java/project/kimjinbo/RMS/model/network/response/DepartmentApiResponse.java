@@ -14,12 +14,15 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Accessors(chain=true)
 public class DepartmentApiResponse {
-    private Long        id;
+    private Integer     id;
     private String      name;
     private String      head;
-    private LocalDate   updateDate;
-    private String      addressDetail;
+    private String      headDate;
+    private String      address;
     private String      phone;
     private String      fax;
+
+    private Integer     placeId;
+    private String      updateDate;
 }
 

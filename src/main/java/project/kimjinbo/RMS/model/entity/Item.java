@@ -20,6 +20,7 @@ public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long        id;
+
     private Long        registerUser;
     private LocalDate   registerDate;
     private String      superCate;

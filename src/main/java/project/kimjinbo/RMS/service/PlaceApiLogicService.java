@@ -7,16 +7,20 @@ import org.springframework.stereotype.Service;
 import project.kimjinbo.RMS.configs.ItemSpecs;
 import project.kimjinbo.RMS.interfaces.CrudInterface;
 import project.kimjinbo.RMS.model.entity.Category;
+import project.kimjinbo.RMS.model.entity.Department;
 import project.kimjinbo.RMS.model.entity.Item;
 import project.kimjinbo.RMS.model.entity.Place;
 import project.kimjinbo.RMS.model.enumclass.ItemState;
 import project.kimjinbo.RMS.model.enumclass.RentalState;
 import project.kimjinbo.RMS.model.network.Header;
 import project.kimjinbo.RMS.model.network.Pagination;
+import project.kimjinbo.RMS.model.network.request.DepartmentApiRequest;
 import project.kimjinbo.RMS.model.network.request.ItemApiRequest;
 import project.kimjinbo.RMS.model.network.request.PlaceApiRequest;
+import project.kimjinbo.RMS.model.network.response.DepartmentApiResponse;
 import project.kimjinbo.RMS.model.network.response.ItemApiResponse;
 import project.kimjinbo.RMS.model.network.response.PlaceApiResponse;
+import project.kimjinbo.RMS.model.network.response.PlaceListApiResponse;
 import project.kimjinbo.RMS.repository.CategoryRepository;
 import project.kimjinbo.RMS.repository.PlaceRepository;
 
@@ -123,6 +127,18 @@ public class PlaceApiLogicService implements CrudInterface<PlaceApiRequest, Plac
                 .build();
 
         return Header.OK( placeApiResponseList, pagination );
+    }
+
+    public Header<List<PlaceListApiResponse>> searchList(PlaceApiRequest request) {
+
+        List<Place> places = placeRepository.findAll();
+
+        List<PlaceListApiResponse> placeApiResponseList = places.stream()
+                .map(item -> PlaceListApiResponse.builder().id(item.getId()).name( item.getName() )
+                        .address( item.getAddress() ).addressDetail( item.getAddressDetail()).build() )
+                .collect(Collectors.toList());
+
+        return Header.OK( placeApiResponseList );
     }
 
     public PlaceApiResponse response(Place place){

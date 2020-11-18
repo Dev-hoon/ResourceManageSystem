@@ -1,10 +1,28 @@
 (function ($) {
-    let maxBtnSize = 7;              // 검색 하단 최대 범위
-    let indexBtn = [];               // 인덱스 버튼
+
+    let indexBtn    = [];             // 인덱스 버튼
+    let maxBtnSize  = 7;              // 검색 하단 최대 범위
+    let placeList   = [];
+
+    // 초기 설정 받아오기
+    function getSetting( ) {
+        $.get("/api/placeList", function(response){
+            console.log("response.data : ",response.data)
+            modalList['teams'].placeList        = response.data;
+            modalList['departments'].placeList  = response.data ;
+        });
+
+        $.get("/api/departmentList", function(response){
+            console.log("response.data : ",response.data)
+            modalList['teams'].departmentList   = response.data;
+        });
+    }
 
     $(document).ready(function () {
+        search(0, window.registerUser, 'teams');
         search(0, window.registerUser, 'places');
-        // getSetting();
+        search(0, window.registerUser, 'departments');
+        getSetting( );
 
         // address에 모두 선택 처리
         $('#selectAllAddress').click(function(e){
@@ -30,16 +48,6 @@
         
     });
 
-    // 초기 설정 받아오기
-    function getSetting( ) {
-        $.get("/api/item/setting", function(response){
-            itemList.selectItem     = response.data.itemState;
-            itemList.selectRental   = response.data.rentalState;
-            itemList.categories     = response.data.categories;
-            itemList.selectCate01   = Object.keys( itemList.categories );
-        });
-    }
-
     // 데이터 받아오기
     function search( index, registerUser, tabName ) {
         $.get("/api/"+tabName+"?page="+index+"&registerUser="+registerUser, function (response) {
@@ -47,8 +55,6 @@
             // 페이징 처리 데이터
             indexBtn = [];
             paginationList[tabName] = response.pagination;
-
-            console.log("response.pagination; : ", response.pagination)
 
             //전체 페이지
             showPages[tabName].totalElements      = paginationList[tabName].currentElements;
@@ -126,13 +132,18 @@
 
             },
             itemRowHandler      : function( event, item ){
-                departmentModal.pageMode      = 1;
-                departmentModal.selectedItem  = $.extend(true, {}, item );
+                modalList['departments'].mode          = 1;
+                modalList['departments'].pageMode      = 1;
+                modalList['departments'].selectedItem  = $.extend(true, {}, item );
+
+                modalList['departments'].selectedItem.placeId = item.id;
+                modalList['departments'].address = item.address;
+                modalList['departments'].addressDetail = item.addressDetail;
 
                 $('#departmentModal').modal()
             },
             handlerCheckBox     : function( event ){
-                event.stopImmediatePropagation();
+                 event.stopImmediatePropagation();
 
                 let seletedItem = this.itemList[ parseInt( event.target.getAttribute("index") ) ];
 
@@ -170,13 +181,50 @@
             selectedElements    : 0,    // 현재 조건 중 선택된 값들의 수
         },methods:{
             createHandler : function( evnet ){
-                departmentModal.selectedItem = { }
+                modalList['departments'].mode         = 0;
+                modalList['departments'].selectedItem = { }
                 $("#departmentModal").modal().off()
             },
             updateHandler : function( evnet ){
                 $("#departmentModal").modal().off()
             },
             deleteHandler : function( evnet ){
+                console.log(" departmentList.selectedItemList : ",departmentList.selectedItemList )
+                let IDs = Object.keys(departmentList.selectedItemList);
+
+                let result = {
+                    total           :   IDs.length,
+                    results         :   [],
+                    alertHandler    :   function (){
+                        if( this.total == this.results.length ) {
+                            search(0, window.registerUser, 'departments');
+                            let wait = alert( 'delete done' );
+                            if(!wait) $('#departmentModal').modal("hide");
+                            this.results    = [];
+                        }
+                    },
+                    createHandler   :   function ( data ){
+                        this.results.push(data);
+                    },
+                    errorHandler    :   function ( data ){
+                        this.results.push(data);
+                    },
+                }
+
+                IDs.map((id)=>{
+                    $.ajax({
+                        type: 'DELETE',
+                        url: '/api/department/'+id,
+                        success: function(data) {
+                            result.createHandler( data );
+                            result.alertHandler( );
+                        },
+                        error   : function(data) {
+                            result.errorHandler( data );
+                            result.alertHandler( );
+                        },
+                    });
+                });
 
             },
         }
@@ -215,8 +263,9 @@
     let departmentModal = new Vue({
         el: '#departmentModal',
         data: {
-            name    : "",
-            selectedItem    : {
+            mode                : 0, // 0 : create / 1 : update
+            name                : "",
+            selectedItem        : {
                 name            : "",
                 head            : "",
                 headDate        : "",
@@ -227,67 +276,72 @@
                 addressDetail   : "",
             },
 
-        },methods: {
-            getOriginData   : function( ){
-                return Object.entries( Lists.department.itemList ).filter((item)=>(item.id==this.selectedItem.id));
-            },
-            validation      : function(  ){
-                console.log("originData in validation : ",originData)
-                return  ( originData )
-                    ? Object.entries( originData ).reduce( ( acc, cur )=>{ return acc || (originData[cur[0]]!=cur[1]) }, false )
-                    : false;
-            },
-            closeHandler    : function ( event ){
-                console.log('closeHandler !')
-
-                // for test
-                console.log( Object.entries(this.selectedItem).filter((item)=>(item[1]!="") ).map((item)=>{console.log(item)}) );
-
-                let originData = this.getOriginData();
-
-                // 신규등록인 경우
-                if( originData.length == 0 ){
-                    // 입력된 값이 존재하는지 확인
-                    let insertedItem = Object.entries(this.selectedItem).filter((item)=>(item[1]!="") );
-
-                    if( insertedItem.length != 0 ){
-                        alert("입력된 값이 존재합니다.");
-                        return;
-                    }
-                }
-                // 데이터 수정인 경우
-                else{
-
-                    this.validation( originData );
-                    console.log('originData : ',originData)
-
-                }
-
-                $('#departmentModal').modal("hide");
-            },
-            updateItem      : function ( updateUser ) {
-                Object.entries(this._data.selectedItem).map((t)=>{console.log("T : ",t)});
-
-                console.log( "validation : "+this.validation() )
-
+            placeList           : [],
+            selectedPlace       : "",
+            address             : "",
+            addressDetail       : "",
+        },
+        methods: {
+            createItem : function ( registerUser ){
                 let postBody = Object.entries(this.selectedItem)
                     .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
                     .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
 
-                Object.defineProperty(postBody, 'updateUser', { value : updateUser})
+                postBody['updateUser']      = registerUser;
+                postBody['registerUser']    = registerUser;
+
+                console.log("postBody : ",postBody)
 
                 $.ajax({
-                    type: 'PUT',
-                    url: '/api/item',
+                    type: 'POST',
+                    url: '/api/department',
                     data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
-                    success: function(data) { alert('data: ' + data); },function(response){
-                        console.log( "response : ",response)
+                    success: function(data) {
+                        search(0, window.registerUser, 'departments');
+                        let wait = alert('data: ' + data);
+                        if(!wait) $('#departmentModal').modal("hide");
                     },
                     contentType: "application/json",
                     dataType: 'json'
                 });
             },
-        },mounted: function( ) {
+            updateItem  : function ( updateUser ) {
+                let postBody = Object.entries(this.selectedItem)
+                    .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
+                    .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
+
+                postBody['updateUser'] = updateUser;
+
+                $.ajax({
+                    type: 'PUT',
+                    url: '/api/department',
+                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    success: function(data) {
+                        search(0, window.registerUser, 'departments');
+                        let wait = alert('data: ' + data);
+                        if(!wait) $('#departmentModal').modal("hide");
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
+            },
+            closeHandler: function ( event ){
+                if( !this.validation() ){ $('#departmentModal').modal("hide"); }
+            },
+            validation: function(){
+                let originData = Lists['departments'].itemList.filter((item)=>(item.id==modalList['departments'].selectedItem.id))[0];
+                return (originData == null ) ?
+                    false : Object.entries( modalList['departments'].selectedItem ).reduce( ( acc, cur )=>{ return acc || (originData[cur[0]]!=cur[1]) }, false )
+            },
+            changeHandler: function (){
+                this.placeList.filter(item=>item.name==this.selectedPlace)?.map(item=>{
+                    modalList['departments'].selectedItem.placeId = item.id;
+                    modalList['departments'].address = item.address;
+                    modalList['departments'].addressDetail = item.addressDetail;
+                })
+            },
+        },
+        mounted: function( ) {
             // 등록일 datepicker 처리
             $('#modalRegisterDate').datepicker({
                 format: "yyyy-mm-dd",	//데이터 포맷 형식(yyyy : 년 mm : 월 dd : 일 )
@@ -304,7 +358,7 @@
 
 
     // 팀 리스트
-    let teamList = new Vue({
+    let teamList        = new Vue({
         el : '#teamList',
         data : {
             showPage         : false,
@@ -332,12 +386,11 @@
 
             },
             itemRowHandler      : function( event, item ){
+                modalList['teams'].mode          = 1;
+                modalList['teams'].pageMode      = 1;
+                modalList['teams'].selectedItem  = $.extend(true, {}, item );
 
-                teamModal.pageMode      = 1;
-                teamModal.selectedItem  = $.extend(true, {}, item );
-
-                $('#itemModal').modal()
-
+                $('#teamModal').modal()
             },
             handlerCheckBox     : function( event ){
                 console.log("handlerCheckBox")
@@ -364,7 +417,7 @@
         }
     });
     // 페이징 처리 데이터
-    let teamPagination = {
+    let teamPagination  = {
         totalPages         :  0,       // 전체 페이지수
         totalElements      :  0,       // 전체 데이터수
         currentPage        :  0,       // 현재 페이지수
@@ -372,21 +425,51 @@
         amountPerPage      :  10,
     };
     // 페이지 정보
-    let teamShowPage = new Vue({
+    let teamShowPage    = new Vue({
         el : '#teamShowPage',
         data : {
             totalElements       : 0,
             currentPage         : 0,
             selectedElements    : 0,    // 현재 조건 중 선택된 값들의 수
-        },methods:{
+        },
+        methods:{
             createHandler : function( evnet ){
-                teamModal.selectedItem = { }
+                modalList['teams'].mode         = 0;
+                modalList['teams'].selectedItem = { }
                 $("#teamModal").modal().off()
             },
             updateHandler : function( evnet ){
                 $("#teamModal").modal().off()
             },
             deleteHandler : function( evnet ){
+                console.log(" addressList.selectedItemList : ",addressList.selectedItemList)
+                let IDs = Object.keys(addressList.selectedItemList);
+
+                let result = {
+                    total           :   IDs.length,
+                    results         :   [],
+                    alertHandler    :   function (){
+                        if( this.total == this.results.length ) {
+                            search(0, window.registerUser, 'teams');
+                            let wait = alert('data: ' );
+                            if(!wait) $('#teamModal').modal("hide");
+                        }
+                    },
+                    createHandler   :   function ( temp ){
+                        this.results.push(temp);
+                    }
+                }
+
+                IDs.map((id)=>{
+                    $.ajax({
+                        type: 'DELETE',
+                        url: '/api/team/'+id,
+                        success: function(data) {
+                            result.createHandler( );
+                            result.alertHandler( );
+                        }
+                    });
+                });
 
             },
         }
@@ -422,48 +505,86 @@
         }
     });
     //team modal
-    let teamModal = new Vue({
+    let teamModal       = new Vue({
         el: '#teamModal',
         data: {
+            mode                : 0, // 0 : create / 1 : update
             pageMode            : 0,    // modal type 지정  0:create / 1:update
             selectedItem        : {},
-        },methods: {
-            updateItem  : function ( updateUser ) {
-                Object.entries(this._data.selectedItem).map((t)=>{console.log("T : ",t)});
 
-                console.log( "validation : "+this.validation() )
+            placeList           : [],
+            selectedPlace       : "",
+            address             : "",
+            addressDetail       : "",
 
-                let postBody = Object.entries(this._data.selectedItem)
+            departmentList      : [],
+            selectedDepartment  : [],
+        },
+        methods: {
+            createItem : function ( registerUser ){
+                let postBody = Object.entries(this.selectedItem)
                     .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
                     .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
 
-                Object.defineProperty(postBody, 'updateUser', { value : updateUser})
+                postBody['updateUser']      = registerUser;
+                postBody['registerUser']    = registerUser
+
+                console.log("postBody : ",postBody)
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/team',
+                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    success: function(data) {
+                        search(0, window.registerUser, 'teams');
+                        let wait = alert('data: ' + data);
+                        if(!wait) $('#teamModal').modal("hide");
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
+            },
+            updateItem  : function ( updateUser ) {
+                let postBody = Object.entries(this.selectedItem)
+                    .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
+                    .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
+
+                postBody['updateUser'] = updateUser;
 
                 $.ajax({
                     type: 'PUT',
-                    url: '/api/item',
+                    url: '/api/team',
                     data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
-                    success: function(data) { alert('data: ' + data); },function(response){
-                        console.log( "response : ",response)
+                    success: function(data) {
+                        search(0, window.registerUser, 'teams');
+                        let wait = alert('data: ' + data);
+                        if(!wait) $('#teamModal').modal("hide");
                     },
                     contentType: "application/json",
                     dataType: 'json'
                 });
             },
             closeHandler: function ( event ){
-                if( !this.validation() ){
-                    console.log( "not changed ")
-                    $('#itemModal').modal("hide");
-                }else{
-                    console.log( "changed ");
-
-                }
-
-
-            },validation: function(){
-                let originData = itemList.itemList.filter((item)=>(item.id==itemModal.selectedItem.id))[0];
-                return Object.entries( itemModal.selectedItem ).reduce( ( acc, cur )=>{ return acc || (originData[cur[0]]!=cur[1]) }, false )
-            }
+                if( !this.validation() ){ $('#teamModal').modal("hide"); }
+            },
+            validation: function(){
+                let originData = Lists['teams'].itemList.filter((item)=>(item.id==modalList['teams'].selectedItem.id))[0];
+                return (originData == null ) ?
+                    false : Object.entries( modalList['teams'].selectedItem ).reduce( ( acc, cur )=>{ return acc || (originData[cur[0]]!=cur[1]) }, false )
+            },
+            placeHandler: function (){
+                this.placeList.filter(item=>item.name==this.selectedPlace)?.map(item=>{
+                    modalList['teams'].selectedItem.placeId = item.id;
+                    modalList['teams'].address = item.address;
+                    modalList['teams'].addressDetail = item.addressDetail;
+                })
+            },
+            departmentHandler: function (){
+                this.departmentList.filter(item=>item.name==this.selectedDepartment)?.map(item=>{
+                    console.log( "item.id : ",item.id )
+                    modalList['teams'].selectedItem.depId = item.id;
+                })
+            },
         },mounted: function( ) {
             // 등록일 datepicker 처리
             $('#modalRegisterDate').datepicker({
@@ -480,7 +601,7 @@
 
 
     // 위치 리스트
-    let addressList = new Vue({
+    let addressList         = new Vue({
         el : '#addressList',
         data : {
             showPage         : false,
@@ -508,16 +629,11 @@
 
             },
             itemRowHandler      : function( event, item ){
-                addressModal.mode          = 1;
-                addressModal.pageMode      = 1;
-                addressModal.selectedItem  = $.extend(true, {}, item );
-                // addressModal.selectedItem  = new Object( item );
-                // addressModal.categories    = new Object( this.itemList.categories );
-
-                console.log("addressModal.selectedItem :",addressModal.selectedItem )
+                modalList['places'].mode          = 1;
+                modalList['places'].pageMode      = 1;
+                modalList['places'].selectedItem  = $.extend(true, {}, item );
 
                 $('#addressModal').modal()
-
             },
             handlerCheckBox     : function( event ){
                 console.log("handlerCheckBox")
@@ -544,7 +660,7 @@
         }
     });
     // 페이징 처리 데이터
-    let addressPagination = {
+    let addressPagination   = {
         totalPages         :  0,       // 전체 페이지수
         totalElements      :  0,       // 전체 데이터수
         currentPage        :  0,       // 현재 페이지수
@@ -552,28 +668,66 @@
         amountPerPage      :  10,
     };
     // 페이지 정보
-    let addressShowPage = new Vue({
+    let addressShowPage     = new Vue({
         el : '#addressShowPage',
         data : {
             totalElements       : 0,
             currentPage         : 0,
             selectedElements    : 0,    // 현재 조건 중 선택된 값들의 수
-        },methods:{
+        },
+        methods:{
             createHandler : function( evnet ){
-                addressModal.mode         = 0;
-                addressModal.selectedItem = { }
+                modalList['places'].mode         = 0;
+                modalList['places'].selectedItem = { }
                 $("#addressModal").modal().off()
             },
             updateHandler : function( evnet ){
                 $("#addressModal").modal().off()
             },
             deleteHandler : function( evnet ){
+                window.evnetevnet = evnet
+                let IDs = Object.keys(addressList.selectedItemList);
 
+                let result = {
+                    total           :   IDs.length,
+                    results         :   [],
+                    alertHandler    :   function (){
+                        if( this.total == this.results.length ) {
+                            search(0, window.registerUser, 'places');
+                            let wait = alert( 'delete done' );
+                            if(!wait) $('#addressModal').modal("hide");
+                            this.results    = [];
+
+                            Object.keys( showPages['places']._data ).map( (key)=>{ console.log("key : ",key);showPages['places'][key]=0;} )
+                        }
+                    },
+                    createHandler   :   function ( temp ){
+                        this.results.push(temp['type']='done');
+                    },
+                    errorHandler   :   function ( temp ){
+                        this.results.push(temp['type']='error');
+                    }
+                }
+
+                IDs.map((id)=>{
+                    $.ajax({
+                        type: 'DELETE',
+                        url: '/api/place/'+id,
+                        success : function(data) {
+                            result.createHandler( data );
+                            result.alertHandler( );
+                        },
+                        error   : function(data) {
+                            result.errorHandler(data );
+                            result.alertHandler( );
+                        },
+                    });
+                });
             },
         }
     });
     // 페이지 버튼 리스트
-    let addressPageBtnList = new Vue({
+    let addressPageBtnList  = new Vue({
         el : '#addressPageBtn',
         data : {
             btnList : {}
@@ -603,72 +757,64 @@
         }
     });
     // address modal
-    let addressModal = new Vue({
+    let addressModal        = new Vue({
         el: '#addressModal',
         data: {
             mode                : 0, // 0 : create / 1 : update
             pageMode            : 0,    // modal type 지정  0:create / 1:update
             selectedItem        : {},
         },methods: {
-            createItem : function ( registerUser ){
-                Object.entries(this._data.selectedItem).map((t)=>{console.log("T : ",t)});
+            createItem : function ( event, registerUser ){
 
-                console.log( "validation : "+this.validation() )
+                window.testEvent = event;
 
-                let postBody = Object.entries(this._data.selectedItem)
+                let postBody = Object.entries(this.selectedItem)
                     .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
                     .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
 
-
                 postBody['updateUser']      = registerUser;
                 postBody['registerUser']    = registerUser
-
-                console.log("postBody : ",postBody)
 
                 $.ajax({
                     type: 'POST',
                     url: '/api/place',
                     data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
-                    success: function(data) { alert('data: ' + data); },function(response){
-                        console.log( "response : ",response)
+                    success: function(data) {
+                        search(0, window.registerUser, 'places');
+                        let wait = alert('data: ' + data);
+                        if(!wait) $('#addressModal').modal("hide");
                     },
                     contentType: "application/json",
                     dataType: 'json'
                 });
             },
-            updateItem  : function ( updateUser ) {
-                Object.entries(this._data.selectedItem).map((t)=>{console.log("T : ",t)});
-
-                console.log( "validation : "+this.validation() )
-
-                let postBody = Object.entries(this._data.selectedItem)
+            updateItem  : function ( event, updateUser ) {
+                let postBody = Object.entries(this.selectedItem)
                     .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
                     .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
 
-                Object.defineProperty(postBody, 'updateUser', { value : updateUser})
+                postBody['updateUser'] = updateUser;
 
                 $.ajax({
                     type: 'PUT',
-                    url: '/api/item',
+                    url: '/api/place',
                     data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
-                    success: function(data) { alert('data: ' + data); },function(response){
-                        console.log( "response : ",response)
+                    success: function(data) {
+                        search(0, window.registerUser, 'places');
+                        let wait = alert('data: ' + data);
+                        if(!wait) $('#addressModal').modal("hide");
                     },
                     contentType: "application/json",
                     dataType: 'json'
                 });
             },
             closeHandler: function ( event ){
-                if( !this.validation() ){
-                    console.log( "not changed ")
-                    $('#addressModal').modal("hide");
-                }else{
-                    console.log( "changed ");
-                }
-            },validation: function(){
-                let originData = addressList.itemList.filter((item)=>(item.id==addressModal.selectedItem.id))[0];
+                if( !this.validation() ){ $('#addressModal').modal("hide"); }
+            },
+            validation: function(){
+                let originData = Lists['places'].itemList.filter((item)=>(item.id==modalList['places'].selectedItem.id))[0];
                 return (originData == null ) ?
-                    false : Object.entries( addressModal.selectedItem ).reduce( ( acc, cur )=>{ return acc || (originData[cur[0]]!=cur[1]) }, false )
+                    false : Object.entries( modalList['places'].selectedItem ).reduce( ( acc, cur )=>{ return acc || (originData[cur[0]]!=cur[1]) }, false )
             }
         },mounted: function( ) {
             // 등록일 datepicker 처리
@@ -685,19 +831,19 @@
     })
 
 
-    const showPages = {
+    const showPages      = {
         "departments"    : departmentShowPage,
         "teams"          : teamShowPage,
         "places"         : addressShowPage
     };
 
-    const Lists = {
+    const Lists          = {
         "departments"    : departmentList,
         "teams"          : teamList,
         "places"         : addressList
     };
 
-    const pageBtnList = {
+    const pageBtnList    = {
         "departments"    : departmentPageBtnList,
         "teams"          : teamPageBtnList,
         "places"         : addressPageBtnList
@@ -709,6 +855,12 @@
         "places"         : addressPagination
     };
 
+    const modalList      = {
+        "departments"    : departmentModal,
+        "teams"          : teamModal,
+        "places"         : addressModal
+    };
+
 
     // for test
     window.Lists            = Lists;
@@ -717,6 +869,7 @@
     window.paginationList   = paginationList;
     window.registerUser     = 1;
     window.updateUser       = 1;
+    window.modalList        = modalList;
 
 
 })(jQuery);

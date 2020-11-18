@@ -7,7 +7,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="closeHandler"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">주소정보수정</h4>
+                <h4 class="modal-title" v-if="!mode">주소정보등록</h4>
+                <h4 class="modal-title" v-if="mode" >주소정보수정</h4>
             </div>
             <div class="modal-body">
                 <form id="itemModalForm" >
@@ -61,8 +62,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" v-if="!mode" v-on:click="createItem( window.registerUser)" >Create</button>
-                <button type="button" class="btn btn-primary" v-if="mode"  v-on:click="updateItem( window.updateUser)" >Save changes</button>
+                <button type="button" class="btn btn-primary" v-if="!mode" v-on:click="createItem( event, window.registerUser)" >Create</button>
+                <button type="button" class="btn btn-primary" v-if="mode"  v-on:click="updateItem( event, window.updateUser)" >Save changes</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal" v-on:click="closeHandler">Close</button>
             </div>
         </div><!-- /.modal-content -->

@@ -38,7 +38,7 @@ public class CategoryRepositoryTest extends RMSApplicationTests {
 
     @Test
     public void read(){
-        Optional<Category> dep = cateRepo.findById( new CategoryPK("HW","컴퓨터","노트북") );
+        Optional<Category> dep = cateRepo.findById( 1L );
 
         dep.ifPresent(test ->{
             System.out.println("test:" + test);
