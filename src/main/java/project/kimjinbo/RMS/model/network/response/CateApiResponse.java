@@ -20,7 +20,8 @@ public class CateApiResponse {
     private String      subCateFirst;
     private String      subCateSecond;
 
-    private LocalDate   expireDate;
+    private LocalDate   regsterDate;
+    private Long        expireDate;
 
 }
 

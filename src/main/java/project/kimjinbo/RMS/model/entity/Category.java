@@ -26,7 +26,7 @@ public class Category {
     private Long        updateUser;
     private LocalDate   registerDate;
     private LocalDate   updateDate;
-    private LocalDate   expireDate;
+    private Long        expireDate;
     
 }
 

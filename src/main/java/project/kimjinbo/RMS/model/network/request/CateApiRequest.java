@@ -20,7 +20,7 @@ public class CateApiRequest {
     private String      registerDate;
     private Long        updateUser;
     private String      updateDate;
-    
-    private String      expireDate;
+
+    private Long        expireDate;
 
 }

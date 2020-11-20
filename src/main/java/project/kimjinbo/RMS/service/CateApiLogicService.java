@@ -51,7 +51,7 @@ public class CateApiLogicService implements CrudInterface<CateApiRequest, CateAp
                 .updateDate( date )
                 .registerUser( cateApiRequest.getRegisterUser() )
                 .updateUser( cateApiRequest.getRegisterUser() )
-                .expireDate( (cateApiRequest.getExpireDate()==null)? null : LocalDate.parse(cateApiRequest.getExpireDate(), DateTimeFormatter.ISO_DATE) )
+                .expireDate( cateApiRequest.getExpireDate() )
                 .build();
 
         Category newCategory = categoryRepository.save( category);
@@ -77,9 +77,10 @@ public class CateApiLogicService implements CrudInterface<CateApiRequest, CateAp
             item
             .setUpdateDate( date )
             .setUpdateUser( cateApiRequest.getUpdateUser() )
-            .setExpireDate( (cateApiRequest.getExpireDate() == null)? null : LocalDate.parse( cateApiRequest.getExpireDate() , DateTimeFormatter.ISO_DATE) )
+            .setExpireDate( cateApiRequest.getExpireDate() )
             .setSuperCate( cateApiRequest.getSuperCate() )
-            .setSubCateFirst( cateApiRequest.getSubCateSecond() );
+            .setSubCateFirst( cateApiRequest.getSubCateFirst() )
+            .setSubCateSecond( cateApiRequest.getSubCateSecond() );
 
             return item;
         })
@@ -140,6 +141,7 @@ public class CateApiLogicService implements CrudInterface<CateApiRequest, CateAp
                 .superCate( category.getSuperCate() )
                 .subCateFirst( category.getSubCateFirst() )
                 .subCateSecond(category.getSubCateSecond() )
+                .regsterDate(category.getRegisterDate() )
                 .expireDate(category.getExpireDate() )
                 .build();
 
