@@ -22,6 +22,6 @@ public class TeamApiRequest {
     private String      fax;
 
     private Long        head;
-    private Long        depId;
+    private Integer     depId;
     private Integer     placeId;
 }

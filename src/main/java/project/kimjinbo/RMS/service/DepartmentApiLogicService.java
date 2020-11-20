@@ -139,7 +139,10 @@ public class DepartmentApiLogicService implements CrudInterface<DepartmentApiReq
                 .phone( department.getPhone() )
                 .fax( department.getFax() )
                 .head( (department.getHeadPserson()==null) ? null :department.getHeadPserson().getName() )
+                .placeId( (department.getPlace()==null) ? null :department.getPlace().getId() )
                 .address( (department.getPlace()==null) ? null :department.getPlace().getAddress() )
+                .addressName( (department.getPlace()==null) ? null :department.getPlace().getName() )
+                .addressDetail( (department.getPlace()==null) ? null :department.getPlace().getAddressDetail() )
                 .build();
     }
 

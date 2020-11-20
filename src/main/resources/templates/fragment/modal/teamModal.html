@@ -11,14 +11,14 @@
                 <h4 class="modal-title" v-if="mode" >팀정보수정</h4>
             </div>
             <div class="modal-body">
-                <form id="itemModalForm" >
+                <form id="teamModalForm" >
 
                     <div class="col-sm-12 md-4">
                         <div class="form-group row row-center text-center">
                             <label class="col-sm-2 col-form-label">팀명</label>
                             <div class="col-sm-5">
-                                <label class="sr-only" for="id">id</label>
-                                <input  type="text" class="form-control" id="id" placeholder="팀명" v-model="selectedItem.name">
+                                <label class="sr-only" for="idTeam">id</label>
+                                <input  type="text" class="form-control" id="idTeam" placeholder="팀명" v-model="item.name">
                             </div>
                             <div class="col-sm-7"></div>
                         </div>
@@ -28,13 +28,13 @@
                         <div class="form-group row row-center text-center">
                             <label class="col-sm-2 col-form-label">팀장</label>
                             <div class="col-sm-5">
-                                <label class="sr-only" for="head">head</label>
-                                <input disabled type="text" class="form-control" id="head" placeholder="팀장" v-model="selectedItem.head">
+                                <label class="sr-only" for="headTeam">head</label>
+                                <input disabled type="text" class="form-control" id="headTeam" placeholder="팀장" v-model="item.head">
                             </div>
                             <label class="col-sm-2 col-form-label">임명일</label>
                             <div class="col-sm-5">
-                                <label class="sr-only" for="headDate">headDate</label>
-                                <input type="text" class="form-control" id="headDate" placeholder="임명일" v-model="selectedItem.headDate">
+                                <label class="sr-only" for="headDateTeam">headDate</label>
+                                <input disabled type="text" class="form-control" id="headDateTeam" placeholder="임명일" v-model="item.headDate">
                             </div>
                         </div>
                     </div>
@@ -43,13 +43,13 @@
                         <div class="form-group row row-center text-center">
                             <label class="col-sm-2 col-form-label">대표번호</label>
                             <div class="col-sm-5">
-                                <label class="sr-only" for="phone">phone</label>
-                                <input  type="text" class="form-control" id="phone" placeholder="대표번호" v-model="selectedItem.phone">
+                                <label class="sr-only" for="phoneTeam">phone</label>
+                                <input  type="text" class="form-control" id="phoneTeam" placeholder="대표번호" v-model="item.phone">
                             </div>
                             <label class="col-sm-2 col-form-label">Fax번호</label>
                             <div class="col-sm-5">
-                                <label class="sr-only" for="fax">fax</label>
-                                <input type="text" class="form-control" id="fax" placeholder="Fax번호" v-model="selectedItem.fax">
+                                <label class="sr-only" for="faxTeam">fax</label>
+                                <input type="text" class="form-control" id="faxTeam" placeholder="Fax번호" v-model="item.fax">
                             </div>
                         </div>
                     </div>
@@ -58,7 +58,7 @@
                         <div class="form-group row row-center text-center">
                             <label class="col-sm-2 col-form-label">부서</label>
                             <div class="col-sm-12">
-                                <select class="form-control" v-model="selectedDepartment" v-on:change="departmentHandler">
+                                <select class="form-control" v-model="departmentName" v-on:change="departmentHandler">
                                     <option value="">선택</option>
                                     <option v-for="state in departmentList" >{{state.name}}</option>
                                 </select>
@@ -71,7 +71,7 @@
                         <div class="form-group row row-center text-center">
                             <label class="col-sm-2 col-form-label">주소명칭</label>
                             <div class="col-sm-12">
-                                <select id="itemState" class="form-control" v-model="selectedPlace" v-on:change="placeHandler">
+                                <select id="itemStateTeam" class="form-control" v-model="addressName" v-on:change="addressHandler">
                                     <option value="">선택</option>
                                     <option v-for="state in placeList" >{{state.name}}</option>
                                 </select>
@@ -84,8 +84,8 @@
                         <div class="form-group row row-center text-center">
                             <label class="col-sm-2 col-form-label">주소</label>
                             <div class="col-sm-12">
-                                <label class="sr-only" for="address">address</label>
-                                <input disabled type="text" class="form-control" id="address" placeholder="주소" v-model="address">
+                                <label class="sr-only" for="addressTeam">address</label>
+                                <input disabled type="text" class="form-control" id="addressTeam" placeholder="주소" v-model="address">
                             </div>
                         </div>
                     </div>
@@ -94,8 +94,8 @@
                         <div class="form-group row row-center text-center">
                             <label class="col-sm-2 col-form-label">상세주소</label>
                             <div class="col-sm-12">
-                                <label class="sr-only" for="addressDetail">addressDetail</label>
-                                <input disabled type="text" class="form-control" id="addressDetail" placeholder="상세주소" v-model="addressDetail">
+                                <label class="sr-only" for="addressDetailTeam">addressDetail</label>
+                                <input disabled type="text" class="form-control" id="addressDetailTeam" placeholder="상세주소" v-model="addressDetail">
                             </div>
                         </div>
                     </div>
@@ -103,8 +103,9 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" v-if="!mode" v-on:click="createItem( window.registerUser)" >Create</button>
-                <button type="button" class="btn btn-primary" v-if="mode"  v-on:click="updateItem( window.updateUser)" >Save changes</button>
+                <button id="createTeamButton" type="button" class="btn btn-primary" v-if="!mode" v-on:click="createItem( window.registerUser)" >Create</button>
+                <button id="updateTeamButton" type="button" class="btn btn-primary" v-if="mode"  v-on:click="updateItem( window.updateUser)" >Save changes</button>
+                <button id="deleteTeamButton" v-if="mode" type="button" class="btn btn-danger" v-on:click="deleteItem" > Delete</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal" v-on:click="closeHandler">Close</button>
             </div>
         </div><!-- /.modal-content -->

@@ -20,8 +20,16 @@ public class TeamApiResponse {
     private Long        headId;
     private String      headDate;
     private String      updateDate;
-    private String      address;
-    private Integer     placeId;
-    private String      phone;
     private String      fax;
+    private String      phone;
+
+    private Integer     departmentId;
+    private String      departmentName;
+
+    private Integer     placeId;
+    private String      address;
+    private String      addressName;
+    private String      addressDetail;
+
+
 }

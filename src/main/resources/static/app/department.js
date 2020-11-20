@@ -2,63 +2,33 @@
 
     let indexBtn    = [];             // 인덱스 버튼
     let maxBtnSize  = 7;              // 검색 하단 최대 범위
-    let placeList   = [];
 
-    // 초기 설정 받아오기
-    function getSetting( ) {
-        $.get("/api/placeList", function(response){
-            console.log("response.data : ",response.data)
-            modalList['teams'].placeList        = response.data;
-            modalList['departments'].placeList  = response.data ;
-        });
 
+    //*** condition vue *** //
+    // 데이터 받아오기
+    function getDepartmentList( ) {
         $.get("/api/departmentList", function(response){
-            console.log("response.data : ",response.data)
             modalList['teams'].departmentList   = response.data;
         });
     }
-
-    $(document).ready(function () {
-        search(0, window.registerUser, 'teams');
-        search(0, window.registerUser, 'places');
-        search(0, window.registerUser, 'departments');
-        getSetting( );
-
-        // address에 모두 선택 처리
-        $('#selectAllAddress').click(function(e){
-            let table= $(e.target).closest('table');
-            $('td input:checkbox',table).prop('checked',e.target.checked);
-
-            console.log("Lists['places'] : ",Lists['places'])
-
-            if(e.target.checked){
-                Lists['places'].itemList.map( (element) =>{
-                    Object.defineProperty( Lists['places'].selectedItemList, element.id, { value: element, configurable:true, enumerable:true } );
-                })
-            }else{
-                Lists['places'].itemList.map( (element) =>{
-                    delete Lists['places'].selectedItemList[element.id]
-                })
-            }
-
-            showPages['places'].selectedElements = Object.entries( Lists['places'].selectedItemList ).length
-
-            Lists['places'].amountSelect = 10;
+    function getAddressList( ) {
+        $.get("/api/placeList", function(response){
+            modalList['teams'].placeList        = response.data;
+            modalList['departments'].placeList  = response.data ;
         });
-        
-    });
-
-    // 데이터 받아오기
+    }
     function search( index, registerUser, tabName ) {
         $.get("/api/"+tabName+"?page="+index+"&registerUser="+registerUser, function (response) {
-            /* 데이터 셋팅 */
+
             // 페이징 처리 데이터
             indexBtn = [];
             paginationList[tabName] = response.pagination;
 
             //전체 페이지
-            showPages[tabName].totalElements      = paginationList[tabName].currentElements;
-            showPages[tabName].currentPage        = paginationList[tabName].currentPage+1;
+            showPages[tabName].totalPages       = paginationList[tabName].totalPages;
+            showPages[tabName].totalElements    = paginationList[tabName].totalElements;
+            showPages[tabName].currentElements  = paginationList[tabName].currentElements;
+            showPages[tabName].currentPage      = paginationList[tabName].currentPage+1;
 
             // 검색 데이터
             Lists[tabName].setItemList( response.data );
@@ -96,32 +66,86 @@
             },50)
         });
     }
-
-    // Date 객체를 format에 맞는 string으로 변환
     function dateString( date ){
         return date.getFullYear()+ '-' + date.getMonth().toString().padStart(2,'0') + '-' + date.getDate().toString().padStart(2,'0')
     }
 
+    $(document).ready(function () {
+        search(0, window.registerUser, 'teams');
+        search(0, window.registerUser, 'places');
+        search(0, window.registerUser, 'departments');
+        getAddressList( );
+        getDepartmentList( );
 
+        // address에 모두 선택 처리
+        $('#selectAllAddress').click(function(e){
+            let table= $(e.target).closest('table');
+            $('td input:checkbox',table).prop('checked',e.target.checked);
+
+            if(e.target.checked){
+                Lists['places'].items.map( (element) =>{
+                    Object.defineProperty( Lists['places'].items, element.id, { value: element, configurable:true, enumerable:true } );
+                })
+            }else{
+                Lists['places'].items.map( (element) =>{
+                    delete Lists['places'].items[element.id]
+                })
+            }
+
+            showPages['places'].selectedElements = Object.entries( Lists['places'].items ).length
+
+            Lists['places'].amountSelect = 10;
+        });
+        
+    });
+
+    //*** grid vue *** //
     // 부서 리스트
     let departmentList = new Vue({
         el : '#departmentList',
         data : {
-            showPage         : true,
-            itemList         : {},
-            selectedItemList : {},
-            amountSelect     : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
+            items        : {},
+            selectedItem : {},
+            amountSelect : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
         },methods:{
             setItemList         : function( itemList ){
                 this.disableAllCheckBox( );
-                this.itemList = itemList;
+                this.items   = itemList;
                 setTimeout( ()=>{
                     this.denoteCheckBox( )
                 },50);
             },
+            rowHandler          : function( event, item ){
+                modalList['departments'].mode           = 1;
+                modalList['departments'].item           = $.extend(true, {}, item );
+
+                modalList['departments'].item.placeId   = item.placeId;
+                modalList['departments'].addressName    = item.addressName;
+                modalList['departments'].address        = item.address;
+                modalList['departments'].addressDetail  = item.addressDetail;
+
+                $('#departmentModal').modal()
+            },
+            CheckHandler        : function( event ){
+                event.stopImmediatePropagation();
+
+                let seletedItem = this.items?.[ parseInt( event.target.getAttribute("index") ) ];
+
+                if(event.target.checked){
+                    Object.defineProperty( this.selectedItem, seletedItem.id, { value: seletedItem, configurable:true, enumerable:true } );
+                    this.amountSelect += 1;
+                }else{
+                    delete this.selectedItem[seletedItem.id];
+                    this.amountSelect -= 1;
+                }
+
+                showPages['departments'].selectedElements = Object.entries( this.selectedItem ).length
+
+                $('#selectAll input').prop('checked',(this.amountSelect==10)? true : false );
+            },
             denoteCheckBox      : function( ){
                 let items = $("#items_table").find( "td input:checkbox" ).toArray()
-                    .filter(element=>( this.selectedItemList.hasOwnProperty( element.getAttribute("itemId"))) )
+                    .filter(element=>( this.selectedItem.hasOwnProperty( element.getAttribute("itemId"))) )
                     .map( (element)=>{
                         element.checked = true;
                     })
@@ -130,34 +154,6 @@
 
                 $('#selectAll input').prop('checked',(items.length==10)? true : false );
 
-            },
-            itemRowHandler      : function( event, item ){
-                modalList['departments'].mode          = 1;
-                modalList['departments'].pageMode      = 1;
-                modalList['departments'].selectedItem  = $.extend(true, {}, item );
-
-                modalList['departments'].selectedItem.placeId = item.id;
-                modalList['departments'].address = item.address;
-                modalList['departments'].addressDetail = item.addressDetail;
-
-                $('#departmentModal').modal()
-            },
-            handlerCheckBox     : function( event ){
-                 event.stopImmediatePropagation();
-
-                let seletedItem = this.itemList[ parseInt( event.target.getAttribute("index") ) ];
-
-                if(event.target.checked){
-                    Object.defineProperty( this.selectedItemList, seletedItem.id, { value: seletedItem, configurable:true, enumerable:true } );
-                    this.amountSelect += 1;
-                }else{
-                    delete this.selectedItemList[seletedItem.id];
-                    this.amountSelect -= 1;
-                }
-
-                showPages['departments'].selectedElements = Object.entries( this.selectedItemList ).length
-
-                $('#selectAll input').prop('checked',(this.amountSelect==10)? true : false );
             },
             disableAllCheckBox  : function( ){
                 $("#items_table").find( "td input:checkbox" ).prop('checked',false );
@@ -189,8 +185,8 @@
                 $("#departmentModal").modal().off()
             },
             deleteHandler : function( evnet ){
-                console.log(" departmentList.selectedItemList : ",departmentList.selectedItemList )
-                let IDs = Object.keys(departmentList.selectedItemList);
+                console.log(" departmentList.selectedItem : ",departmentList.selectedItem )
+                let IDs = Object.keys(departmentList.selectedItem);
 
                 let result = {
                     total           :   IDs.length,
@@ -263,50 +259,70 @@
     let departmentModal = new Vue({
         el: '#departmentModal',
         data: {
-            mode                : 0, // 0 : create / 1 : update
-            name                : "",
-            selectedItem        : {
-                name            : "",
-                head            : "",
-                headDate        : "",
-                phone           : "",
-                fax             : "",
-                id              : "",
-                address         : "",
-                addressDetail   : "",
-            },
+            mode            : 0, // 0 : create / 1 : update
+            name            : "",
+            item            : { },
 
-            placeList           : [],
-            selectedPlace       : "",
-            address             : "",
-            addressDetail       : "",
+            placeList       : [ ],
+            addressName     : "",
+            address         : "",
+            addressDetail   : "",
         },
         methods: {
-            createItem : function ( registerUser ){
-                let postBody = Object.entries(this.selectedItem)
-                    .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
-                    .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
-
-                postBody['updateUser']      = registerUser;
-                postBody['registerUser']    = registerUser;
-
-                console.log("postBody : ",postBody)
-
+            deleteItem  : function ( ) {
+                $('#deleteDepButton').attr('disabled', true);
                 $.ajax({
-                    type: 'POST',
-                    url: '/api/department',
-                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    type: 'DELETE',
+                    url: '/api/department/'+this.item.id,
                     success: function(data) {
-                        search(0, window.registerUser, 'departments');
-                        let wait = alert('data: ' + data);
-                        if(!wait) $('#departmentModal').modal("hide");
+                        search( paginationList['departments'].currentPage, window.registerUser, 'departments' );
+                        getDepartmentList( );
+                        alert('부서 삭제 완료.');
+                        $('#departmentModal').modal("hide");
+                        this.item = { };
+                        $('#deleteDepButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        alert('부서 삭제 실패.');
+                        $('#deleteDepButton').attr('disabled', false);
                     },
                     contentType: "application/json",
                     dataType: 'json'
                 });
             },
-            updateItem  : function ( updateUser ) {
-                let postBody = Object.entries(this.selectedItem)
+            createItem      : function ( registerUser ){
+                $('#createDepButton').attr('disabled', true);
+
+                let postBody = Object.entries(this.item)
+                    .filter( (v)=>( (v[1]!="")&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
+                    .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
+
+                postBody['updateUser']      = registerUser;
+                postBody['registerUser']    = registerUser;
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/department',
+                    data: JSON.stringify({'data':postBody}),
+                    success: function(data) {
+                        search( paginationList['departments'].currentPage, window.registerUser, 'departments' );
+                        getDepartmentList( );
+                        alert('부서 등록 완료.');
+                        $('#departmentModal').modal("hide");
+                        this.item = { };
+                        $('#createDepButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        alert('부서 등록 실패.');
+                        $('#createDepButton').attr('disabled', false);
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
+            },
+            updateItem      : function ( updateUser ) {
+                $('#updateDepButton').attr('disabled', true);
+                let postBody = Object.entries( this.item )
                     .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
                     .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
 
@@ -315,67 +331,88 @@
                 $.ajax({
                     type: 'PUT',
                     url: '/api/department',
-                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    data: JSON.stringify({'data':postBody}),
                     success: function(data) {
-                        search(0, window.registerUser, 'departments');
-                        let wait = alert('data: ' + data);
-                        if(!wait) $('#departmentModal').modal("hide");
+                        search( paginationList['departments'].currentPage, window.registerUser, 'departments' );
+                        getDepartmentList( );
+                        alert('부서 수정 완료.');
+                        $('#departmentModal').modal("hide");
+                        this.item = { };
+                        $('#updateDepButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        alert('부서 수정 실패.');
+                        $('#updateDepButton').attr('disabled', false);
                     },
                     contentType: "application/json",
                     dataType: 'json'
                 });
             },
-            closeHandler: function ( event ){
-                if( !this.validation() ){ $('#departmentModal').modal("hide"); }
+            closeHandler    : function ( event ){
+                this.item = { };
+                $('#departmentModal').modal("hide");
             },
-            validation: function(){
-                let originData = Lists['departments'].itemList.filter((item)=>(item.id==modalList['departments'].selectedItem.id))[0];
-                return (originData == null ) ?
-                    false : Object.entries( modalList['departments'].selectedItem ).reduce( ( acc, cur )=>{ return acc || (originData[cur[0]]!=cur[1]) }, false )
-            },
-            changeHandler: function (){
-                this.placeList.filter(item=>item.name==this.selectedPlace)?.map(item=>{
-                    modalList['departments'].selectedItem.placeId = item.id;
-                    modalList['departments'].address = item.address;
-                    modalList['departments'].addressDetail = item.addressDetail;
+            addressHandler  : function ( ){
+                this.placeList.filter(item=>item.name==this.addressName)?.map(item=>{
+                    this.item.placeId   = item.id;
+                    this.addressName    = item.name;
+                    this.address        = item.address;
+                    this.addressDetail  = item.addressDetail;
                 })
             },
         },
-        mounted: function( ) {
-            // 등록일 datepicker 처리
-            $('#modalRegisterDate').datepicker({
-                format: "yyyy-mm-dd",	//데이터 포맷 형식(yyyy : 년 mm : 월 dd : 일 )
-                autoclose : true,	//사용자가 날짜를 클릭하면 자동 캘린더가 닫히는 옵션
-                startDate: '-10d',	//달력에서 선택 할 수 있는 가장 빠른 날짜. 이전으로는 선택 불가능 ( d : 일 m : 달 y : 년 w : 주)
-                language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
-            }).on('changeDate', function (event) {
-                console.log("changeDate : ")
-                itemModal.selectedItem.createDate = dateString(event.date);
-            }).unbind('change');
-        }
     })
 
 
-
+    //*** grid vue *** //
     // 팀 리스트
     let teamList        = new Vue({
         el : '#teamList',
         data : {
-            showPage         : false,
-            itemList         : {},
-            selectedItemList : {},
-            amountSelect     : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
+            items         : {},
+            selectedItem  : {},
+            amountSelect  : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
         },methods:{
             setItemList         : function( itemList ){
                 this.disableAllCheckBox( );
-                this.itemList = itemList;
+                this.items = itemList;
                 setTimeout( ()=>{
                     this.denoteCheckBox( )
                 },50);
             },
+            rowHandler          : function( event, item ){
+                modalList['teams'].mode         = 1;
+                modalList['teams'].item         = $.extend(true, {}, item );
+
+                modalList['teams'].item.placeId     = item.placeId;
+                modalList['teams'].address          = item.address;
+                modalList['teams'].addressName      = item.addressName;
+                modalList['teams'].addressDetail    = item.addressDetail;
+
+                modalList['teams'].item.depId       = item.departmentId;
+                modalList['teams'].departmentName   = item.departmentName;
+
+
+                $('#teamModal').modal().off()
+            },
+            CheckHandler        : function( event ){
+                let seletedItem = this.items?.[ parseInt( event.target.getAttribute("index") ) ];
+
+                if(event.target.checked){
+                    Object.defineProperty( this.selectedItem, seletedItem.id, { value: seletedItem, configurable:true, enumerable:true } );
+                    this.amountSelect += 1;
+                }else{
+                    delete this.selectedItem[seletedItem.id];
+                    this.amountSelect -= 1;
+                }
+
+                showPages['teams'].selectedElements = Object.entries( this.selectedItem ).length
+
+                $('#selectAll input').prop('checked',(this.amountSelect==10)? true : false );
+            },
             denoteCheckBox      : function( ){
                 let items = $("#items_table").find( "td input:checkbox" ).toArray()
-                    .filter(element=>( this.selectedItemList.hasOwnProperty( element.getAttribute("itemId"))) )
+                    .filter(element=>( this.selectedItem.hasOwnProperty( element.getAttribute("itemId"))) )
                     .map( (element)=>{
                         element.checked = true;
                     })
@@ -384,32 +421,6 @@
 
                 $('#selectAll input').prop('checked',(items.length==10)? true : false );
 
-            },
-            itemRowHandler      : function( event, item ){
-                modalList['teams'].mode          = 1;
-                modalList['teams'].pageMode      = 1;
-                modalList['teams'].selectedItem  = $.extend(true, {}, item );
-
-                $('#teamModal').modal()
-            },
-            handlerCheckBox     : function( event ){
-                console.log("handlerCheckBox")
-
-                event.stopImmediatePropagation();
-
-                let seletedItem = this.itemList[ parseInt( event.target.getAttribute("index") ) ];
-
-                if(event.target.checked){
-                    Object.defineProperty( this.selectedItemList, seletedItem.id, { value: seletedItem, configurable:true, enumerable:true } );
-                    this.amountSelect += 1;
-                }else{
-                    delete this.selectedItemList[seletedItem.id];
-                    this.amountSelect -= 1;
-                }
-
-                showPages['teams'].selectedElements = Object.entries( this.selectedItemList ).length
-
-                $('#selectAll input').prop('checked',(this.amountSelect==10)? true : false );
             },
             disableAllCheckBox  : function( ){
                 $("#items_table").find( "td input:checkbox" ).prop('checked',false );
@@ -442,8 +453,7 @@
                 $("#teamModal").modal().off()
             },
             deleteHandler : function( evnet ){
-                console.log(" addressList.selectedItemList : ",addressList.selectedItemList)
-                let IDs = Object.keys(addressList.selectedItemList);
+                let IDs = Object.keys(addressList.selectedItem);
 
                 let result = {
                     total           :   IDs.length,
@@ -509,93 +519,115 @@
         el: '#teamModal',
         data: {
             mode                : 0, // 0 : create / 1 : update
-            pageMode            : 0,    // modal type 지정  0:create / 1:update
-            selectedItem        : {},
+            item                : {},
 
             placeList           : [],
-            selectedPlace       : "",
+            addressName         : "",
             address             : "",
             addressDetail       : "",
 
             departmentList      : [],
-            selectedDepartment  : [],
+            departmentName      : "",
         },
         methods: {
-            createItem : function ( registerUser ){
-                let postBody = Object.entries(this.selectedItem)
+            deleteItem  : function ( ) {
+                $('#deleteTeamButton').attr('disabled', true);
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/api/team/'+this.item.id,
+                    success: function(data) {
+                        search( paginationList['teams'].currentPage, window.registerUser, 'teams' );
+                        alert('팀 삭제 완료.');
+                        $('#teamModal').modal("hide");
+                        $('#deleteTeamButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        alert('팀 삭제 실패.');
+                        $('#deleteTeamButton').attr('disabled', false);
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
+            },
+            createItem      : function ( registerUser ){
+                $('#createTeamButton').attr('disabled', true);
+
+                let postBody = Object.entries( this.item )
                     .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
                     .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
 
                 postBody['updateUser']      = registerUser;
                 postBody['registerUser']    = registerUser
 
-                console.log("postBody : ",postBody)
+                console.log("team create postBody : ",postBody)
 
                 $.ajax({
                     type: 'POST',
                     url: '/api/team',
-                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    data: JSON.stringify({'data':postBody}),
                     success: function(data) {
-                        search(0, window.registerUser, 'teams');
-                        let wait = alert('data: ' + data);
-                        if(!wait) $('#teamModal').modal("hide");
+                        search( paginationList['teams'].currentPage, window.registerUser, 'teams' );
+                        alert('팀 등록 완료.');
+                        $('#teamModal').modal("hide");
+                        this.item = { };
+                        $('#createTeamButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        alert('팀 등록 실패.');
+                        $('#createTeamButton').attr('disabled', false);
                     },
                     contentType: "application/json",
                     dataType: 'json'
                 });
             },
-            updateItem  : function ( updateUser ) {
-                let postBody = Object.entries(this.selectedItem)
+            updateItem      : function ( updateUser ) {
+                $('#updateTeamButton').attr('disabled', false);
+
+                let postBody = Object?.entries(this.item)
                     .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
                     .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
 
                 postBody['updateUser'] = updateUser;
 
+                console.log("team update postBody : ",postBody)
+
                 $.ajax({
                     type: 'PUT',
                     url: '/api/team',
-                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    data: JSON.stringify({'data':postBody}),
                     success: function(data) {
-                        search(0, window.registerUser, 'teams');
-                        let wait = alert('data: ' + data);
-                        if(!wait) $('#teamModal').modal("hide");
+                        search( paginationList['teams'].currentPage, window.updateUser, 'teams' );
+                        alert('팀 수정 완료.');
+                        $('#teamModal').modal("hide");
+                        this.item = { };
+                        $('#updateTeamButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        alert('팀 수정 실패.');
+                        $('#updateTeamButton').attr('disabled', false);
                     },
                     contentType: "application/json",
                     dataType: 'json'
                 });
             },
-            closeHandler: function ( event ){
-                if( !this.validation() ){ $('#teamModal').modal("hide"); }
+            closeHandler    : function ( event ){
+                this.item = { };
+                $('#teamModal').modal("hide");
             },
-            validation: function(){
-                let originData = Lists['teams'].itemList.filter((item)=>(item.id==modalList['teams'].selectedItem.id))[0];
-                return (originData == null ) ?
-                    false : Object.entries( modalList['teams'].selectedItem ).reduce( ( acc, cur )=>{ return acc || (originData[cur[0]]!=cur[1]) }, false )
-            },
-            placeHandler: function (){
-                this.placeList.filter(item=>item.name==this.selectedPlace)?.map(item=>{
-                    modalList['teams'].selectedItem.placeId = item.id;
-                    modalList['teams'].address = item.address;
-                    modalList['teams'].addressDetail = item.addressDetail;
+            addressHandler  : function (){
+                this.placeList.filter(item=>item.name==this.addressName)?.map(item=>{
+                    this.item.placeId     = item.id;
+                    this.address          = item.address;
+                    this.addressName      = item.name;
+                    this.addressDetail    = item.addressDetail;
                 })
             },
             departmentHandler: function (){
-                this.departmentList.filter(item=>item.name==this.selectedDepartment)?.map(item=>{
-                    console.log( "item.id : ",item.id )
-                    modalList['teams'].selectedItem.depId = item.id;
+                this.departmentList.filter(item=>item.name==this.departmentName)?.map(item=>{
+                    this.item.depId     = item.id;
+                    this.departmentName = item.name;
                 })
             },
-        },mounted: function( ) {
-            // 등록일 datepicker 처리
-            $('#modalRegisterDate').datepicker({
-                format: "yyyy-mm-dd",	//데이터 포맷 형식(yyyy : 년 mm : 월 dd : 일 )
-                autoclose : true,	//사용자가 날짜를 클릭하면 자동 캘린더가 닫히는 옵션
-                startDate: '-10d',	//달력에서 선택 할 수 있는 가장 빠른 날짜. 이전으로는 선택 불가능 ( d : 일 m : 달 y : 년 w : 주)
-                language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
-            }).on('changeDate', function (event) {
-                console.log("changeDate : ")
-                itemModal.selectedItem.createDate = dateString(event.date);
-            }).unbind('change');
         }
     })
 
@@ -604,21 +636,42 @@
     let addressList         = new Vue({
         el : '#addressList',
         data : {
-            showPage         : false,
-            itemList         : {},
-            selectedItemList : {},
-            amountSelect     : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
-        },methods:{
+            items        : {},
+            selectedItem : {},
+            amountSelect : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
+        },
+        methods:{
             setItemList         : function( itemList ){
                 this.disableAllCheckBox( );
-                this.itemList = itemList;
+                this.items  = itemList;
                 setTimeout( ()=>{
                     this.denoteCheckBox( )
                 },50);
             },
+            rowHandler          : function( event, item ){
+                modalList['places'].mode    = 1;
+                modalList['places'].item    = $.extend(true, {}, item );
+
+                $('#addressModal').modal()
+            },
+            CheckHandler        : function( event ){
+                let seletedItem = this.items[ parseInt( event.target.getAttribute("index") ) ];
+
+                if(event.target.checked){
+                    Object.defineProperty( this.selectedItem, seletedItem.id, { value: seletedItem, configurable:true, enumerable:true } );
+                    this.amountSelect += 1;
+                }else{
+                    delete this.selectedItem[seletedItem.id];
+                    this.amountSelect -= 1;
+                }
+
+                // showPages['places'].selectedElements = Object.entries( this.selectedItem ).length
+
+                $('#selectAll input').prop('checked',(this.amountSelect==10)? true : false );
+            },
             denoteCheckBox      : function( ){
                 let items = $("#items_table").find( "td input:checkbox" ).toArray()
-                    .filter(element=>( this.selectedItemList.hasOwnProperty( element.getAttribute("itemId"))) )
+                    .filter(element=>( this.selectedItem.hasOwnProperty( element.getAttribute("itemId"))) )
                     .map( (element)=>{
                         element.checked = true;
                     })
@@ -627,32 +680,6 @@
 
                 $('#selectAll input').prop('checked',(items.length==10)? true : false );
 
-            },
-            itemRowHandler      : function( event, item ){
-                modalList['places'].mode          = 1;
-                modalList['places'].pageMode      = 1;
-                modalList['places'].selectedItem  = $.extend(true, {}, item );
-
-                $('#addressModal').modal()
-            },
-            handlerCheckBox     : function( event ){
-                console.log("handlerCheckBox")
-
-                event.stopImmediatePropagation();
-
-                let seletedItem = this.itemList[ parseInt( event.target.getAttribute("index") ) ];
-
-                if(event.target.checked){
-                    Object.defineProperty( this.selectedItemList, seletedItem.id, { value: seletedItem, configurable:true, enumerable:true } );
-                    this.amountSelect += 1;
-                }else{
-                    delete this.selectedItemList[seletedItem.id];
-                    this.amountSelect -= 1;
-                }
-
-                showPages['places'].selectedElements = Object.entries( this.selectedItemList ).length
-
-                $('#selectAll input').prop('checked',(this.amountSelect==10)? true : false );
             },
             disableAllCheckBox  : function( ){
                 $("#items_table").find( "td input:checkbox" ).prop('checked',false );
@@ -677,8 +704,8 @@
         },
         methods:{
             createHandler : function( evnet ){
-                modalList['places'].mode         = 0;
-                modalList['places'].selectedItem = { }
+                modalList['places'].mode    = 0;
+                modalList['places'].item    = { }
                 $("#addressModal").modal().off()
             },
             updateHandler : function( evnet ){
@@ -686,7 +713,7 @@
             },
             deleteHandler : function( evnet ){
                 window.evnetevnet = evnet
-                let IDs = Object.keys(addressList.selectedItemList);
+                let IDs = Object.keys( addressList.selectedItem);
 
                 let result = {
                     total           :   IDs.length,
@@ -760,18 +787,38 @@
     let addressModal        = new Vue({
         el: '#addressModal',
         data: {
-            mode                : 0, // 0 : create / 1 : update
-            pageMode            : 0,    // modal type 지정  0:create / 1:update
-            selectedItem        : {},
+            mode        : 0,    // modal type 지정  0:create / 1:update
+            item        : {},
         },methods: {
+            deleteItem  : function ( ) {
+                $('#deleteAddressButton').attr('disabled', true);
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/api/place/'+this.item.id,
+                    success: function(data) {
+                        search( paginationList['places'].currentPage, window.registerUser, 'places' );
+                        getAddressList( );
+                        alert('주소 삭제 완료.');
+                        $('#addressModal').modal("hide");
+                        this.item = { };
+                        $('#deleteAddressButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        alert('주소 삭제 실패.');
+                        $('#deleteAddressButton').attr('disabled', false);
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
+            },
             createItem : function ( event, registerUser ){
+                $('#createAddressButton').attr('disabled', true);
 
-                window.testEvent = event;
-
-                let postBody = Object.entries(this.selectedItem)
+                let postBody = Object.entries(this.item)
                     .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
                     .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
 
+                // update user 등록 부분
                 postBody['updateUser']      = registerUser;
                 postBody['registerUser']    = registerUser
 
@@ -780,19 +827,28 @@
                     url: '/api/place',
                     data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
                     success: function(data) {
-                        search(0, window.registerUser, 'places');
-                        let wait = alert('data: ' + data);
-                        if(!wait) $('#addressModal').modal("hide");
+                        search( paginationList['places'].currentPage, window.registerUser, 'places' );
+                        getAddressList( );
+                        alert('주소 등록 완료.');
+                        $('#addressModal').modal("hide");
+                        this.item = { };
+                        $('#createAddressButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        alert('주소 등록 실패.');
+                        $('#createAddressButton').attr('disabled', false);
                     },
                     contentType: "application/json",
                     dataType: 'json'
                 });
             },
             updateItem  : function ( event, updateUser ) {
-                let postBody = Object.entries(this.selectedItem)
+                $('#updateAddressButton').attr('disabled', true);
+                let postBody = Object.entries(this.item)
                     .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
                     .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
 
+                // update user 등록 부분
                 postBody['updateUser'] = updateUser;
 
                 $.ajax({
@@ -800,33 +856,25 @@
                     url: '/api/place',
                     data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
                     success: function(data) {
-                        search(0, window.registerUser, 'places');
-                        let wait = alert('data: ' + data);
-                        if(!wait) $('#addressModal').modal("hide");
+                        search( paginationList['places'].currentPage, window.registerUser, 'places' );
+                        getAddressList( );
+                        alert('주소 수정 완료.');
+                        $('#addressModal').modal("hide");
+                        this.item = { };
+                        $('#updateAddressButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        alert('주소 수정 실패.');
+                        $('#updateAddressButton').attr('disabled', false);
                     },
                     contentType: "application/json",
                     dataType: 'json'
                 });
             },
             closeHandler: function ( event ){
-                if( !this.validation() ){ $('#addressModal').modal("hide"); }
-            },
-            validation: function(){
-                let originData = Lists['places'].itemList.filter((item)=>(item.id==modalList['places'].selectedItem.id))[0];
-                return (originData == null ) ?
-                    false : Object.entries( modalList['places'].selectedItem ).reduce( ( acc, cur )=>{ return acc || (originData[cur[0]]!=cur[1]) }, false )
+                this. item = { };
+                $('#addressModal').modal("hide");
             }
-        },mounted: function( ) {
-            // 등록일 datepicker 처리
-            $('#modalRegisterDate').datepicker({
-                format: "yyyy-mm-dd",	//데이터 포맷 형식(yyyy : 년 mm : 월 dd : 일 )
-                autoclose : true,	//사용자가 날짜를 클릭하면 자동 캘린더가 닫히는 옵션
-                startDate: '-10d',	//달력에서 선택 할 수 있는 가장 빠른 날짜. 이전으로는 선택 불가능 ( d : 일 m : 달 y : 년 w : 주)
-                language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
-            }).on('changeDate', function (event) {
-                console.log("changeDate : ")
-                itemModal.selectedItem.createDate = dateString(event.date);
-            }).unbind('change');
         }
     })
 

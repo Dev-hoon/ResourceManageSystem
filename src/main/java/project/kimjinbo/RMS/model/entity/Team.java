@@ -34,7 +34,7 @@ public class Team {
     private Integer     placeId;
 
     @Column(name="dep_id")
-    private Long        depId;
+    private Integer     depId;
 
     @OneToOne
     @JoinColumn(name="head", insertable = false, updatable = false)

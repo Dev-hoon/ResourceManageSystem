@@ -18,11 +18,15 @@ public class DepartmentApiResponse {
     private String      name;
     private String      head;
     private String      headDate;
-    private String      address;
     private String      phone;
     private String      fax;
 
-    private Integer     placeId;
     private String      updateDate;
+
+    private Integer     placeId;
+    private String      address;
+    private String      addressName;
+    private String      addressDetail;
+
 }
 

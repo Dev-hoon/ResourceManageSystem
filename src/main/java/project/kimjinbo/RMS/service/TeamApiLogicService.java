@@ -77,6 +77,7 @@ public class TeamApiLogicService implements CrudInterface<TeamApiRequest, TeamAp
             .setUpdateUser( teamApiRequest.getUpdateUser() )
             .setId( teamApiRequest.getId() )
             .setName( teamApiRequest.getName() )
+            .setDepId( teamApiRequest.getDepId() )
             .setPlaceId( teamApiRequest.getPlaceId() )
             .setPhone( teamApiRequest.getPhone() )
             .setFax( teamApiRequest.getFax() );
@@ -129,7 +130,12 @@ public class TeamApiLogicService implements CrudInterface<TeamApiRequest, TeamAp
                 .phone( team.getPhone() )
                 .fax( team.getFax() )
                 .head( ( team.getHeadPserson() == null )? null:team.getHeadPserson().getName() )
+                .placeId( ( team.getPlace() == null )? null:team.getPlace().getId() )
                 .address( ( team.getPlace() == null )? null:team.getPlace().getAddress() )
+                .addressName( (team.getPlace()==null) ? null :team.getPlace().getName() )
+                .addressDetail( (team.getPlace()==null) ? null :team.getPlace().getAddressDetail() )
+                .departmentName( ( team.getDepartment() == null )? null:team.getDepartment().getName() )
+                .departmentId( ( team.getDepartment() == null )? null:team.getDepartment().getId() )
                 .build();
     }
 }

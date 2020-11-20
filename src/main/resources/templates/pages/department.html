@@ -86,14 +86,14 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody id="departmentList">
-                                                <tr role="row" class="odd item" v-for="(dto, idx) in itemList" >
-                                                    <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="handlerCheckBox"> </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.name}}            </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.head}}            </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.headDate}}        </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.address}}         </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.phone}}           </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.fax}}             </td>
+                                                <tr role="row" class="odd item" v-for="(dto, idx) in items" >
+                                                    <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="CheckHandler"> </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.name}}            </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.head}}            </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.headDate}}        </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.address}}         </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.phone}}           </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.fax}}             </td>
                                                 </tr>
                                                 </tbody>
                                             </table>
@@ -102,7 +102,7 @@
                                     <div id="departmentShowPage" class="row">
                                         <div class="col-sm-6">
                                         <span  class="dataTables_info" role="status" aria-live="polite">
-                                            Showing {{currentPage}} to 10 of {{totalElements}} entries
+                                            Showing {{currentPage}} to {{totalPages}} of {{currentElements}} entries
                                         </span>
                                             <span v-if="selectedElements != 0">
                                             / selected item(s) {{selectedElements}}
@@ -171,15 +171,15 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody id="teamList">
-                                                <tr role="row" class="odd item" v-for="(dto, idx) in itemList" >
-                                                    <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="handlerCheckBox"> </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.department}}      </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.name}}            </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.head}}            </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.headDate}}        </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.address}}         </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.phone}}           </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.fax}}             </td>
+                                                <tr role="row" class="odd item" v-for="(dto, idx) in items" >
+                                                    <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="CheckHandler"> </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.departmentName}}  </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.name}}            </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.head}}            </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.headDate}}        </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.address}}         </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.phone}}           </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.fax}}             </td>
                                                 </tr>
                                                 </tbody>
                                             </table>
@@ -188,7 +188,7 @@
                                     <div id="teamShowPage" class="row">
                                         <div class="col-sm-6">
                                         <span  class="dataTables_info" role="status" aria-live="polite">
-                                            Showing {{currentPage}} to 10 of {{totalElements}} entries
+                                            Showing {{currentPage}} to {{totalPages}} of {{currentElements}} entries
                                         </span>
                                             <span v-if="selectedElements != 0">
                                             / selected item(s) {{selectedElements}}
@@ -251,13 +251,13 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody id="addressList">
-                                                <tr role="row" class="odd item" v-for="(dto, idx) in itemList" >
-                                                    <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="handlerCheckBox"> </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.name}}            </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.address}}         </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.addressDetail}}   </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.phone}}           </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.fax}}             </td>
+                                                <tr role="row" class="odd item" v-for="(dto, idx) in items" >
+                                                    <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="CheckHandler"> </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.name}}            </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.address}}         </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.addressDetail}}   </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.phone}}           </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.fax}}             </td>
                                                 </tr>
                                                 </tbody>
                                             </table>
@@ -266,7 +266,7 @@
                                     <div id="addressShowPage" class="row">
                                         <div class="col-sm-6">
                                         <span  class="dataTables_info" role="status" aria-live="polite">
-                                            Showing {{currentPage}} to 10 of {{totalElements}} entries
+                                            Showing {{currentPage}} to {{totalPages}} of {{currentElements}} entries
                                         </span>
                                             <span v-if="selectedElements != 0">
                                             / selected item(s) {{selectedElements}}

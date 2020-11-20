@@ -31,18 +31,12 @@
 
             pagination = response.pagination;
 
-            console.log('pagination : ',pagination)
-            console.log('response.pagination : ',response.pagination)
-
-            console.log('showPage : ',showPage._data)
-
             //전체 페이지
             showPage.totalPages         = pagination.totalPages;
             showPage.totalElements      = pagination.totalElements;
             showPage.currentElements    = pagination.currentElements;
             showPage.currentPage        = pagination.currentPage+1;
 
-            console.log('showPage\'\'\' : ',showPage._data)
             // 검색 데이터
             itemList.setItemList( response.data );
 
@@ -78,7 +72,6 @@
                 $('li[btn_id='+(pagination.currentPage+1)+']').addClass( "active" );
             },50)
 
-            console.log('pagination\'\'\' : ',pagination)
         });
     }
 
@@ -239,9 +232,22 @@
             amountSelect: 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
         },
         methods:{
-            CheckHandler: function(event){
-                // event.stopImmediatePropagation();
+            setItemList: function( items ){
+                this.disableAllCheckBox( );
+                this.item   = items;
+                setTimeout( ()=>{
+                    this.denoteCheckBox( )
+                },50);
+            },
+            rowHandler : function( event, item ){
+                categoryModal.pageMode          = 1;
+                categoryModal.item              = $.extend(true, {}, item );
+                categoryModal.categories        = new Object( categoryForm.categories );
+                categoryModal.initCategory( );
 
+                $('#categoryModal').modal().off()
+            },
+            CheckHandler: function(event){
                 let seletedItem = this.item?.[ parseInt( event.target.getAttribute("index") ) ];
 
                 if(event.target.checked){
@@ -271,21 +277,7 @@
             disableAllCheckBox: function( ){
                 $("#items_table").find( "td input:checkbox" ).prop('checked',false );
             },
-            setItemList: function( items ){
-                this.disableAllCheckBox( );
-                this.item   = items;
-                setTimeout( ()=>{
-                    this.denoteCheckBox( )
-                },50);
-            },
-            rowHandler : function( event, item ){
-                categoryModal.pageMode          = 1;
-                categoryModal.item              = $.extend(true, {}, item );
-                categoryModal.categories        = new Object( categoryForm.categories );
-                categoryModal.initCategory( );
 
-                $('#categoryModal').modal().off()
-            },
         }
         ,mounted: function(){
             $('#selectAll').click(function(e){
@@ -328,7 +320,6 @@
                 this.selectCate02  = Object.keys( this.categories[this.item.superCate] )
                 this.selectCate03  = this.categories[this.item.superCate][this.item.subCateFirst];
 
-                this.isChange  =  false;
             },
             handleCate01: function ( ) {
                 if( this.categories.hasOwnProperty( this.item.superCate) ) {
@@ -372,9 +363,6 @@
                 // update user 등록 부분
                 Object.defineProperty( postBody, 'updateUser', { value : updateUser} )
 
-
-                console.log( "Update postBody : ",postBody );
-
                 $.ajax({
                     type: 'PUT',
                     url: '/api/category',
@@ -403,8 +391,5 @@
             }
         }
     })
-
-    window.showPage     = showPage
-    window.pagination   = pagination
 
 })(jQuery);

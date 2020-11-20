@@ -23,16 +23,16 @@ public class TeamController implements CrudInterface<TeamApiRequest, TeamApiResp
     // 조건 사용 가능  localhost:8080/api/items
     @GetMapping("/teams")
     @ResponseBody
-    public Header<List<TeamApiResponse>> readTeams(@PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable, TeamApiRequest teamApiRequest) {
-        System.out.println("request : "+teamApiRequest);
-        return teamApiLogicService.search( pageable, teamApiRequest );
+    public Header<List<TeamApiResponse>> readTeams(@PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable, TeamApiRequest request) {
+        System.out.println("Team GET request : "+request);
+        return teamApiLogicService.search( pageable, request );
     }
 
 
     @Override
     @PostMapping("/team")
     public Header<TeamApiResponse> create(@RequestBody Header<TeamApiRequest> request) {
-        System.out.println("controller request : "+request);
+        System.out.println("Team POST request : "+request);
         return teamApiLogicService.create( request );
     }
 
@@ -46,6 +46,7 @@ public class TeamController implements CrudInterface<TeamApiRequest, TeamApiResp
     @Override
     @PutMapping("/team")
     public Header<TeamApiResponse> update(@RequestBody Header<TeamApiRequest> request) {
+        System.out.println("Team POST request : "+request);
         return teamApiLogicService.update( request );
     }
 
