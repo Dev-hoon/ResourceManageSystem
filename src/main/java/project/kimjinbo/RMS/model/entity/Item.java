@@ -33,12 +33,18 @@ public class Item {
     private String      detail;
     private LocalDate   expireDate;
     private Integer     itemState;
+
+    @Column(name="place_state")
     private Integer     placeState;
     private Integer     rentalState;
     private String      cdKey;
     private String      licence;
     private Long        cost;
     private Long        purchaseCost;
+
+    @OneToOne
+    @JoinColumn(name="place_state", insertable = false, updatable = false)
+    Place place;
 
 
 }

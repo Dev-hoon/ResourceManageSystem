@@ -18,15 +18,17 @@ public class ItemApiRequest {
 
     private Long        registerUser;
     private String      registerDate;
+    private Long        updateUser;
     private String      expireDate;
 
     private String      name;
     private String      memo;
+    private String      detail;
     private Long        cost;
     private Long        purchaseCost;
-    private String      itemState;
+    private Integer     itemState;
     private Integer     placeState;
-    private String      rentalState;
+    private Integer     rentalState;
 
     private String      cdKey;
     private String      licence;

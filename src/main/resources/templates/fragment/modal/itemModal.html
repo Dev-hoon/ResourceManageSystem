@@ -1,0 +1,139 @@
+<html lang="ko"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org/" xmlns:v-on="http://www.w3.org/1999/xhtml">
+
+<div id="itemModal" class="modal fade" tabindex="-1" role="dialog"  th:fragment="itemModal"  >
+    <div class="modal-dialog modal-lg" role="document" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="closeHandler"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">자산 정보 수정</h4>
+            </div>
+            <div class="modal-body">
+                <form id="itemModalForm" >
+                    <div class="form-group row row-center text-center md-4">
+                        <label class="col-sm-2 col-form-label">자산ID</label>
+                        <div class="col-sm-5">
+                            <label class="sr-only" for="modalItemId">superCate</label>
+                            <input disabled type="text" class="form-control" id="modalItemId" placeholder="자산ID" v-model="item.id">
+                        </div>
+                        <label class="col-sm-2 col-form-label">자산이름</label>
+                        <div class="col-sm-5">
+                            <label class="sr-only" for="itemModalName">superCate</label>
+                            <input type="text" class="form-control" id="itemModalName" placeholder="자산이름" v-model="item.name">
+                        </div>
+                    </div>
+
+                    <div class="form-group row row-center text-center md-4">
+                        <label class="col-sm-2 col-form-label">등록일</label>
+                        <div class="col-sm-5">
+                            <input  type="text" id="modalRegisterDate" class="form-control col-sm-3" placeholder="등록일" v-model="item.registerDate">
+                        </div>
+
+                        <label class="col-sm-2 col-form-label">만료일</label>
+                        <div class="col-sm-5">
+                            <input type="text" id="modalExpireDate" class="form-control col-sm-3" placeholder="만료일" v-model="item.expireDate" >
+                        </div>
+                    </div>
+
+                    <div class="form-group row row-center text-center">
+                        <label class="col-sm-2 col-form-label">분류정보</label>
+                        <div class="col-sm-4">
+                            <label for="modalSuperCate">대분류</label>
+                            <select id="modalSuperCate" class="form-control" v-model="item.superCate" v-on:change="handleCate01">
+                                <option value="">선택</option>
+                                <option v-for="category in selectCate01" >{{category}}</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <label for="modalSubCateFirst">소분류 1</label>
+                            <select id="modalSubCateFirst" class="form-control" v-model="item.subCateFirst" v-on:change="handleCate02">
+                                <option value="">선택</option>
+                                <option v-for="category in selectCate02" >{{category}}</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <label for="modalSubCateSecond">소분류 2</label>
+                            <select id="modalSubCateSecond" class="form-control" v-model="item.subCateSecond" >
+                                <option value="">선택</option>
+                                <option v-for="category in selectCate03" >{{category}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row row-center text-center md-4">
+                        <label class="col-sm-2 col-form-label">분류정보</label>
+                        <div class="col-sm-4">
+                            <label for="ModalItemState">자산상태</label>
+                            <select id="ModalItemState" class="form-control" v-model="itemState" v-on:change="itemHandler">
+                                <option value="">선택</option>
+                                <option v-for="state in itemList" >{{state}}</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <label for="modalRentalState">대여상태</label>
+                            <select id="modalRentalState" class="form-control" v-model="rentalState" v-on:change="rentalHandler">
+                                <option value="">선택</option>
+                                <option v-for="state in rentalList" >{{state}}</option>
+                            </select>
+
+                        </div>
+
+                        <div class="col-sm-4">
+                            <label for="modalPlaceState">위치상태</label>
+                            <select id="modalPlaceState" class="form-control" v-model="placeState" v-on:change="placeHandler">
+                                <option value="">선택</option>
+                                <option v-for="place in placeList" >{{place.name}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- SW인 경우에만 사용 -->
+                    <div v-if="item.superCate=='SW'" class="form-group row row-center text-center md-4">
+                        <label class="col-sm-2 col-form-label">SW정보</label>
+                        <div class="col-sm-5">
+                            <input type="text" id="cdKey" class="form-control col-sm-3" placeholder="CD Key" v-model="item.cdKey">
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="col-sm-5 pr-0">
+                                <input  v-if="!licences.includes(item.licence)&&item.licence!=''" disabled type="text" class="form-control"  v-model="item.licence">
+                                <select v-else class="form-control" id="licenceSelect" v-model="item.licence">
+                                    <option value="">선택</option>
+                                    <!-- <option v-for="licence in licences" >{{licence}}</option> -->
+                                </select>
+                            </div><!-- /input-group -->
+                            <div class="col-sm-7 pl-0">
+                                <input type="text" class="form-control" id="licenceText" placeholder="라이센스" v-model="item.licence">
+                            </div><!-- /input-group -->
+                        </div>
+                    </div>
+
+                    <div class="form-group row row-center text-center md-4">
+                        <label class="col-sm-2 col-form-label">자산상세정보</label>
+                        <div class="col-sm-12">
+                            <textarea type="text" class="form-control" aria-label="..." rows="5" v-model="item.detail" ></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group row row-center text-center md-4">
+                        <label class="col-sm-2 col-form-label">메모</label>
+                        <div class="col-sm-12">
+                            <textarea type="text" class="form-control" aria-label="..." rows="5" v-model="item.memo"></textarea>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="updateItemButton" type="button" class="btn btn-primary" v-on:click="updateItem( window.updateUser)" >Save changes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" v-on:click="closeHandler">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+</html>
+

@@ -25,8 +25,8 @@ public class PlaceController implements CrudInterface<PlaceApiRequest, PlaceApiR
 
     @GetMapping("/placeList")
     @ResponseBody
-    public Header<List<PlaceListApiResponse>> readPlaceList(@PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable, PlaceApiRequest placeApiRequest) {
-        return placeApiLogicService.searchList( placeApiRequest );
+    public Header<List<PlaceListApiResponse>> readPlaceList( ) {
+        return placeApiLogicService.searchList(  );
     }
 
     // 조건 사용 가능  localhost:8080/api/items

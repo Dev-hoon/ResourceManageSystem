@@ -37,13 +37,14 @@
 
             <div class="row">
                 <div class="col-xs-12">
-                    <div id="itemData" class="box">
+                    <div id="itemList" class="box">
                         <div class="box-header md-1 mt-1">
                             <h3 class="box-title">신규 등록</h3>
                             <div class="form-group pull-right md-0">
-                                <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initItem"> 초기화 </button>
-                                <button type="button" class="btn btn-sm btn-primary dark" v-on:click="createTempItem"> 임시department </button>
-                                <button type="button" class="btn btn-sm btn-primary dark"> 신규등록 </button>
+                                <button id="initButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="initItem"> 초기화 </button>
+                                <button id="tempButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="registerTemp"> 임시 </button>
+                                <button id="registerButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="registerItem"> 등록 </button>
+                                <button id="excelButton" type="button" class="btn btn-sm btn-primary dark"> 엑셀업로드 </button>
                             </div>
 
                         </div>
@@ -56,13 +57,13 @@
                                         <label class="col-sm-2 col-form-label">자산ID</label>
                                         <div class="col-sm-5">
                                             <label class="sr-only" for="itemId">superCate</label>
-                                            <input type="text" class="form-control" id="itemId" placeholder="자산ID" v-model="id" v-on:change="onlyNumber">
+                                            <input disabled type="text" class="form-control" id="itemId" placeholder="자산ID" v-model="item.id" v-on:change="onlyNumber">
                                         </div>
 
                                         <label class="col-sm-2 col-form-label" >자산이름</label>
                                         <div class="col-sm-5">
                                             <label class="sr-only" for="itemId">superCate</label>
-                                            <input type="text" class="form-control" id="itemName" placeholder="자산이름" v-model="name">
+                                            <input type="text" class="form-control" id="itemName" placeholder="자산이름" v-model="item.name">
                                         </div>
 
                                     </div>
@@ -71,12 +72,12 @@
                                     <div class="form-group row row-center text-center md-3">
                                         <label class="col-sm-2 col-form-label">등록일</label>
                                         <div class="col-sm-5">
-                                            <input type="text" id="registerDate" class="form-control col-sm-3" placeholder="등록일" v-model="registerDate">
+                                            <input type="text" id="registerDate" class="form-control col-sm-3" placeholder="등록일" v-model="item.registerDate">
                                         </div>
 
                                         <label class="col-sm-2 col-form-label">만료일</label>
                                         <div class="col-sm-5">
-                                            <input type="text" id="expireDate" class="form-control col-sm-3" placeholder="만료일" v-model="expireDate">
+                                            <input type="text" id="expireDate" class="form-control col-sm-3" placeholder="만료일" v-model="item.expireDate">
                                         </div>
 
                                     </div>
@@ -86,14 +87,14 @@
                                         <label class="col-sm-2 col-form-label">분류정보</label>
                                         <div class="col-sm-4">
                                             <label for="superCate">대분류</label>
-                                            <select id="superCate" class="form-control" v-model="superCate" v-on:change="handleCate01">
+                                            <select id="superCate" class="form-control" v-model="item.superCate" v-on:change="handleCate01">
                                                 <option value="">선택</option>
                                                 <option v-for="category in selectCate01" >{{category}}</option>
                                             </select>
                                         </div>
                                         <div class="col-sm-4">
                                             <label for="subCateFirst">소분류 1</label>
-                                            <select id="subCateFirst" class="form-control" v-model="subCateFirst" v-on:change="handleCate02">
+                                            <select id="subCateFirst" class="form-control" v-model="item.subCateFirst" v-on:change="handleCate02">
                                                 <option value="">선택</option>
                                                 <option v-for="category in selectCate02" >{{category}}</option>
                                             </select>
@@ -101,7 +102,7 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <label for="subCateSecond">소분류 2</label>
-                                            <select id="subCateSecond" class="form-control" v-model="subCateSecond">
+                                            <select id="subCateSecond" class="form-control" v-model="item.subCateSecond">
                                                 <option value="">선택</option>
                                                 <option v-for="category in selectCate03" >{{category}}</option>
                                             </select>
@@ -110,30 +111,63 @@
                                     </div>
 
                                     <!-- 자산상태 / 대여상태 / 장소상태 -->
-                                    <div class="form-group row row-center text-center md-3">
+                                    <div class="form-group row row-center text-center md-4">
                                         <label class="col-sm-2 col-form-label">상태정보</label>
                                         <div class="col-sm-4">
                                             <label for="itemState">자산상태</label>
-                                            <select id="itemState" class="form-control" v-model="itemState">
+                                            <select id="itemState" class="form-control" v-model="itemState" v-on:change="itemHandler">
                                                 <option value="">선택</option>
-                                                <option v-for="state in selectItem" >{{state}}</option>
+                                                <option v-for="state in itemList" >{{state}}</option>
                                             </select>
                                         </div>
                                         <div class="col-sm-4">
                                             <label for="rentalState">대여상태</label>
-                                            <select id="rentalState" class="form-control" v-model="rentalState">
+                                            <select id="rentalState" class="form-control" v-model="rentalState" v-on:change="rentalHandler">
                                                 <option value="">선택</option>
-                                                <option v-for="state in selectRental" >{{state}}</option>
+                                                <option v-for="state in rentalList" >{{state}}</option>
                                             </select>
 
                                         </div>
                                         <div class="col-sm-4">
                                             <label for="placeState">위치상태</label>
-                                            <select id="placeState" class="form-control" v-model="placeState">
+                                            <select id="placeState" class="form-control" v-model="placeState" v-on:change="placeHandler">
                                                 <option value="">선택</option>
-                                                <option>...</option>
+                                                <option v-for="place in placeList" >{{place.name}}</option>
                                             </select>
 
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row row-center text-center md-3">
+                                        <label class="col-sm-2 col-form-label">원가</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" id="cost" class="form-control col-sm-3" placeholder="원가" v-model="item.cost">
+                                        </div>
+
+                                        <label class="col-sm-2 col-form-label">구입비용</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" id="purchaseCost" class="form-control col-sm-3" placeholder="구입비용" v-model="item.purchaseCost">
+                                        </div>
+
+                                    </div>
+
+                                    <!-- SW인 경우에만 사용 -->
+                                    <div v-if="item.superCate=='SW'" class="form-group row row-center text-center md-4">
+                                        <label class="col-sm-2 col-form-label">SW정보</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" id="cdKey" class="form-control col-sm-3" placeholder="CD Key" v-model="item.cdKey">
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="col-sm-5 pr-0">
+                                                <input  v-if="!licences.includes(item.licence)&&item.licence!=''" disabled type="text" class="form-control"  v-model="item.licence">
+                                                <select v-else class="form-control" id="licenceSelect" v-model="item.licence">
+                                                    <option value="">선택</option>
+                                                    <!-- <option v-for="licence in licences" >{{licence}}</option> -->
+                                                </select>
+                                            </div><!-- /input-group -->
+                                            <div class="col-sm-7 pl-0">
+                                                <input type="text" class="form-control" id="licenceText" placeholder="라이센스" v-model="item.licence">
+                                            </div><!-- /input-group -->
                                         </div>
                                     </div>
 
@@ -141,7 +175,7 @@
                                     <div class="form-group row row-center text-center md-3">
                                         <label class="col-sm-2 col-form-label">자산상세정보</label>
                                         <div class="col-sm-12">
-                                            <textarea type="text" class="form-control" aria-label="..." rows="5" v-model="detail"></textarea>
+                                            <textarea type="text" class="form-control" aria-label="..." rows="5" v-model="item.detail"></textarea>
                                         </div>
                                     </div>
 
@@ -149,7 +183,7 @@
                                     <div class="form-group row row-center text-center md-3">
                                         <label class="col-sm-2 col-form-label">메모</label>
                                         <div class="col-sm-12">
-                                            <textarea type="text" class="form-control" aria-label="..." rows="5" v-model="memo"></textarea>
+                                            <textarea type="text" class="form-control" aria-label="..." rows="5" v-model="item.memo"></textarea>
                                         </div>
                                     </div>
 

@@ -129,13 +129,19 @@ public class PlaceApiLogicService implements CrudInterface<PlaceApiRequest, Plac
         return Header.OK( placeApiResponseList, pagination );
     }
 
-    public Header<List<PlaceListApiResponse>> searchList(PlaceApiRequest request) {
+    public Header<List<PlaceListApiResponse>> searchList( ) {
 
         List<Place> places = placeRepository.findAll();
 
         List<PlaceListApiResponse> placeApiResponseList = places.stream()
-                .map(item -> PlaceListApiResponse.builder().id(item.getId()).name( item.getName() )
-                        .address( item.getAddress() ).addressDetail( item.getAddressDetail()).build() )
+                .map(item ->
+                    PlaceListApiResponse.builder()
+                        .id(item.getId())
+                        .name( item.getName() )
+                        .address( item.getAddress() )
+                        .addressDetail( item.getAddressDetail())
+                        .build()
+                )
                 .collect(Collectors.toList());
 
         return Header.OK( placeApiResponseList );

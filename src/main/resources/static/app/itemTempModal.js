@@ -142,10 +142,10 @@
                 // return queryString.join("&");
             },
             setRegisterDate     : function ( date ) {
-                this.registerDate = date;
+                this.item.registerDate = date;
             },
             setExpireDate       : function ( date ) {
-                this.expireDate = date;
+                this.item.expireDate = date;
             },
             onlyNumber: function( event ){ this.id = Object.values(/(?<year>[0-9]{0,4})[-]*(?<month>[0-9]{0,2})[-]*(?<days>[0-9]{0,2})/.exec(this.id).groups ).filter(item=>item!="").join("-") },
         }

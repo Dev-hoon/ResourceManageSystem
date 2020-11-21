@@ -38,6 +38,9 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest, ItemAp
     @Autowired
     private ItemTempApiLogicService itemTempApiLogicService;
 
+    @Autowired
+    private PlaceApiLogicService placeApiLogicService;
+
     @Override
     public Header<ItemApiResponse> create( Header<ItemApiRequest> request ) {
         LocalDate date = LocalDate.now();
@@ -55,14 +58,17 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest, ItemAp
                 .updateDate( date )
                 .registerUser( itemApiRequest.getRegisterUser() )
                 .updateUser( itemApiRequest.getRegisterUser() )
-                .expireDate( LocalDate.parse(itemApiRequest.getExpireDate(), DateTimeFormatter.ISO_DATE) )
+                .expireDate( (itemApiRequest.getExpireDate()==null)? null : LocalDate.parse(itemApiRequest.getExpireDate(), DateTimeFormatter.ISO_DATE) )
                 .name( itemApiRequest.getName() )
                 .cost( itemApiRequest.getCost() )
                 .purchaseCost( itemApiRequest.getPurchaseCost() )
+                .cdKey( itemApiRequest.getCdKey() )
+                .licence( itemApiRequest.getLicence() )
                 .memo( itemApiRequest.getMemo() )
-                .itemState( ItemState.idOf(itemApiRequest.getItemState()) )
-                .rentalState( RentalState.idOf(itemApiRequest.getRentalState()) )
+                .detail( itemApiRequest.getDetail() )
+                .itemState( itemApiRequest.getItemState() )
                 .placeState( itemApiRequest.getPlaceState() )
+                .rentalState( itemApiRequest.getRentalState() )
                 .build();
 
         Item newItem = itemRepository.save(item);
@@ -88,6 +94,8 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest, ItemAp
         // 2. id -> user 데이터 를 찾고
         Optional<Item> optional = itemRepository.findById( itemApiRequest.getId() );
 
+
+        System.out.println("ITEM update itemApiRequest : "+itemApiRequest);
         // 3. data -> update   id
         return optional.map( item -> {
             item
@@ -96,15 +104,18 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest, ItemAp
             .setSubCateFirst( itemApiRequest.getSubCateFirst() )
             .setSubCateSecond(itemApiRequest.getSubCateSecond() )
             .setUpdateDate( date )
-            .setUpdateUser( itemApiRequest.getRegisterUser() )
-            .setExpireDate( LocalDate.parse(itemApiRequest.getExpireDate(), DateTimeFormatter.ISO_DATE)  )
+            .setUpdateUser( itemApiRequest.getUpdateUser() )
+            .setExpireDate( (itemApiRequest.getExpireDate()==null)? null : LocalDate.parse(itemApiRequest.getExpireDate(), DateTimeFormatter.ISO_DATE)  )
             .setName( itemApiRequest.getName() )
             .setCost( itemApiRequest.getCost() )
             .setPurchaseCost( itemApiRequest.getPurchaseCost() )
+            .setCdKey( itemApiRequest.getCdKey() )
+            .setLicence( itemApiRequest.getLicence() )
             .setMemo( itemApiRequest.getMemo() )
-            .setItemState( ItemState.idOf(itemApiRequest.getItemState()) )
+            .setDetail( itemApiRequest.getDetail() )
+            .setItemState( itemApiRequest.getItemState() )
             .setPlaceState( itemApiRequest.getPlaceState() )
-            .setRentalState(  RentalState.idOf(itemApiRequest.getRentalState()));
+            .setRentalState( itemApiRequest.getRentalState() );
             return item;
         })
         .map(item -> itemRepository.save(item) )             // update -> newUser
@@ -132,8 +143,8 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest, ItemAp
                 ItemSpecs.expireDate(request.getExpireDate())).and(
                 ItemSpecs.registerDate(request.getRegisterDate())).and(
                 ItemSpecs.name( request.getName())).and(
-                ItemSpecs.itemState( ItemState.idOf(request.getItemState()) )).and(
-                ItemSpecs.rentalState( RentalState.idOf(request.getRentalState()) ))
+                ItemSpecs.itemState( request.getItemState() )).and(
+                ItemSpecs.rentalState( request.getRentalState() ))
                 ,pageable);
 
         List<ItemApiResponse> itemApiResponseList = items.stream()
@@ -163,10 +174,17 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest, ItemAp
                 .cost( item.getCost() )
                 .purchaseCost( item.getPurchaseCost() )
                 .memo( item.getMemo() )
-                .itemState( ItemState.titleOf( item.getItemState()) )
+                .detail( item.getDetail() )
                 .placeState( item.getPlaceState() )
-                .rentalState( RentalState.titleOf(item.getRentalState()) )
+                .placeName((item.getPlace()==null)? null : item.getPlace().getName() )
+                .itemState( (item.getItemState()==null)? null : ItemState.titleOf( item.getItemState()) )
+                .rentalState( (item.getRentalState()==null)? null : RentalState.titleOf(item.getRentalState()) )
                 .build();
+
+
+        if( itemApiResponse.getSuperCate()=="SW" ){
+            itemApiResponse.setCdKey( item.getCdKey() ).setLicence( item.getLicence() );
+        }
 
         return itemApiResponse;
     }
@@ -174,28 +192,14 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest, ItemAp
     public Header<Object> setting(){
         Map settings = new HashMap<String,Object>();
 
-        settings.put( "itemState"       , Stream.of( ItemState.values() ).map(ItemState::getTitle).collect(Collectors.toList()) );
-        settings.put( "rentalState"     , Stream.of( RentalState.values() ).map(RentalState::getTitle).collect(Collectors.toList()) );
+        System.out.println("ItemState: "+ItemState.getObject());
+
+        settings.put( "itemList"        , ItemState.getObject() );
+        settings.put( "rentalList"      , RentalState.getObject() );
         settings.put( "categories"      , cateApiLogicService.readCategories().getData() );
+        settings.put( "placeList"       , placeApiLogicService.searchList( ).getData() );
 
         return Header.OK( settings );
     }
 
 }
-
-/*
-     public Header<ItemApiResponse> readWhere(Header<ItemApiRequest> request) {
-        LocalDate date = LocalDate.now();
-
-        ItemApiRequest req = request.getData();
-
-        List<ItemApiResponse> items = itemRepository.findAll(
-                ItemSpecs.superCate(  req.getSuperCate() ).and(
-                        ItemSpecs.subCateFirst(req.getSubCateFirst()) ).and(
-                        ItemSpecs.subCateSecond(req.getSubCateSecond())
-                )
-        ).stream().map( el-> ( response(el) ) ).collect(Collectors.toList());
-
-        return Header.OK( items.get(0) );
-    }
- */

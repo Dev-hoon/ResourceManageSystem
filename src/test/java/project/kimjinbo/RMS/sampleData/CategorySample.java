@@ -24,7 +24,7 @@ public class CategorySample extends RMSApplicationTests {
 
         for(int i = 0; i < category01.size(); i++){
             Category create = Category.builder().superCate(category01.get(i)).subCateFirst(category02.get(i)).subCateSecond(category03.get(i))
-                    .registerDate( date ).registerUser( 0L ).updateDate( date ).updateUser( 0L ).build();
+                    .registerDate( date ).registerUser( 1L ).updateDate( date ).updateUser( 1L ).build();
             categoryRepository.save(create);
         }
 

@@ -17,7 +17,11 @@
             modalList['departments'].placeList  = response.data ;
         });
     }
-    function search( index, registerUser, tabName ) {
+    function search( index, tabName ) {
+
+        //for test
+        let registerUser = 1;
+
         $.get("/api/"+tabName+"?page="+index+"&registerUser="+registerUser, function (response) {
 
             // 페이징 처리 데이터
@@ -71,9 +75,9 @@
     }
 
     $(document).ready(function () {
-        search(0, window.registerUser, 'teams');
-        search(0, window.registerUser, 'places');
-        search(0, window.registerUser, 'departments');
+        search(0, 'teams');
+        search(0, 'places');
+        search(0, 'departments');
         getAddressList( );
         getDepartmentList( );
 
@@ -172,8 +176,10 @@
     let departmentShowPage = new Vue({
         el : '#departmentShowPage',
         data : {
+            totalPages          : 0,
             totalElements       : 0,
             currentPage         : 0,
+            currentElements     : 0,
             selectedElements    : 0,    // 현재 조건 중 선택된 값들의 수
         },methods:{
             createHandler : function( evnet ){
@@ -193,7 +199,7 @@
                     results         :   [],
                     alertHandler    :   function (){
                         if( this.total == this.results.length ) {
-                            search(0, window.registerUser, 'departments');
+                            search(0, 'departments');
                             let wait = alert( 'delete done' );
                             if(!wait) $('#departmentModal').modal("hide");
                             this.results    = [];
@@ -234,16 +240,16 @@
         methods: {
             indexClick: function (event) {
                 let id = parseInt( event.target.getAttribute("btn_id") );
-                search(id-1, window.registerUser, "department" );;
+                search(id-1, "department" );;
             },
             previousClick:function (event) {
                 if(departmentPagination.currentPage !== 0){
-                    search(departmentPagination.currentPage-1, window.registerUser, "department" );
+                    search(departmentPagination.currentPage-1, "department" );
                 }
             },
             nextClick:function (event) {
                 if(departmentPagination.currentPage !== departmentPagination.totalPages-1){
-                    search(departmentPagination.currentPage+1, window.registerUser, "department" );
+                    search(departmentPagination.currentPage+1, "department" );
                 }
             }
         },
@@ -264,8 +270,8 @@
             item            : { },
 
             placeList       : [ ],
-            addressName     : "",
             address         : "",
+            addressName     : "",
             addressDetail   : "",
         },
         methods: {
@@ -275,7 +281,7 @@
                     type: 'DELETE',
                     url: '/api/department/'+this.item.id,
                     success: function(data) {
-                        search( paginationList['departments'].currentPage, window.registerUser, 'departments' );
+                        search( paginationList['departments'].currentPage, 'departments' );
                         getDepartmentList( );
                         alert('부서 삭제 완료.');
                         $('#departmentModal').modal("hide");
@@ -305,7 +311,7 @@
                     url: '/api/department',
                     data: JSON.stringify({'data':postBody}),
                     success: function(data) {
-                        search( paginationList['departments'].currentPage, window.registerUser, 'departments' );
+                        search( paginationList['departments'].currentPage, 'departments' );
                         getDepartmentList( );
                         alert('부서 등록 완료.');
                         $('#departmentModal').modal("hide");
@@ -333,7 +339,7 @@
                     url: '/api/department',
                     data: JSON.stringify({'data':postBody}),
                     success: function(data) {
-                        search( paginationList['departments'].currentPage, window.registerUser, 'departments' );
+                        search( paginationList['departments'].currentPage, 'departments' );
                         getDepartmentList( );
                         alert('부서 수정 완료.');
                         $('#departmentModal').modal("hide");
@@ -439,8 +445,10 @@
     let teamShowPage    = new Vue({
         el : '#teamShowPage',
         data : {
+            totalPages          : 0,
             totalElements       : 0,
             currentPage         : 0,
+            currentElements     : 0,
             selectedElements    : 0,    // 현재 조건 중 선택된 값들의 수
         },
         methods:{
@@ -493,16 +501,16 @@
         methods: {
             indexClick: function (event) {
                 let id = parseInt( event.target.getAttribute("btn_id") );
-                search(id-1, window.registerUser, "team" );
+                search(id-1, "team" );
             },
             previousClick:function (event) {
                 if(teamPagination.currentPage !== 0){
-                    search(teamPagination.currentPage-1, window.registerUser, "team" );
+                    search(teamPagination.currentPage-1,  "team" );
                 }
             },
             nextClick:function (event) {
                 if(teamPagination.currentPage !== teamPagination.totalPages-1){
-                    search(teamPagination.currentPage+1, window.registerUser, "team" );
+                    search(teamPagination.currentPage+1, "team" );
                 }
             }
         },
@@ -536,7 +544,7 @@
                     type: 'DELETE',
                     url: '/api/team/'+this.item.id,
                     success: function(data) {
-                        search( paginationList['teams'].currentPage, window.registerUser, 'teams' );
+                        search( paginationList['teams'].currentPage, 'teams' );
                         alert('팀 삭제 완료.');
                         $('#teamModal').modal("hide");
                         $('#deleteTeamButton').attr('disabled', false);
@@ -566,7 +574,7 @@
                     url: '/api/team',
                     data: JSON.stringify({'data':postBody}),
                     success: function(data) {
-                        search( paginationList['teams'].currentPage, window.registerUser, 'teams' );
+                        search( paginationList['teams'].currentPage, 'teams' );
                         alert('팀 등록 완료.');
                         $('#teamModal').modal("hide");
                         this.item = { };
@@ -596,7 +604,7 @@
                     url: '/api/team',
                     data: JSON.stringify({'data':postBody}),
                     success: function(data) {
-                        search( paginationList['teams'].currentPage, window.updateUser, 'teams' );
+                        search( paginationList['teams'].currentPage, 'teams' );
                         alert('팀 수정 완료.');
                         $('#teamModal').modal("hide");
                         this.item = { };
@@ -698,8 +706,10 @@
     let addressShowPage     = new Vue({
         el : '#addressShowPage',
         data : {
+            totalPages          : 0,
             totalElements       : 0,
             currentPage         : 0,
+            currentElements     : 0,
             selectedElements    : 0,    // 현재 조건 중 선택된 값들의 수
         },
         methods:{
@@ -720,7 +730,7 @@
                     results         :   [],
                     alertHandler    :   function (){
                         if( this.total == this.results.length ) {
-                            search(0, window.registerUser, 'places');
+                            search(0, 'places');
                             let wait = alert( 'delete done' );
                             if(!wait) $('#addressModal').modal("hide");
                             this.results    = [];
@@ -762,16 +772,16 @@
         methods: {
             indexClick: function (event) {
                 let id = parseInt( event.target.getAttribute("btn_id") );
-                search(id-1, window.registerUser, "place" );
+                search(id-1,  "place" );
             },
             previousClick:function (event) {
                 if(addressPagination.currentPage !== 0){
-                    search(addressPagination.currentPage-1, window.registerUser, "place" );
+                    search(addressPagination.currentPage-1,  "place" );
                 }
             },
             nextClick:function (event) {
                 if(addressPagination.currentPage !== addressPagination.totalPages-1){
-                    search(addressPagination.currentPage+1, window.registerUser, "place" );
+                    search(addressPagination.currentPage+1,  "place" );
                 }
             }
         },
@@ -796,7 +806,7 @@
                     type: 'DELETE',
                     url: '/api/place/'+this.item.id,
                     success: function(data) {
-                        search( paginationList['places'].currentPage, window.registerUser, 'places' );
+                        search( paginationList['places'].currentPage, 'places' );
                         getAddressList( );
                         alert('주소 삭제 완료.');
                         $('#addressModal').modal("hide");
@@ -827,7 +837,7 @@
                     url: '/api/place',
                     data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
                     success: function(data) {
-                        search( paginationList['places'].currentPage, window.registerUser, 'places' );
+                        search( paginationList['places'].currentPage, 'places' );
                         getAddressList( );
                         alert('주소 등록 완료.');
                         $('#addressModal').modal("hide");
@@ -856,7 +866,7 @@
                     url: '/api/place',
                     data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
                     success: function(data) {
-                        search( paginationList['places'].currentPage, window.registerUser, 'places' );
+                        search( paginationList['places'].currentPage, 'places' );
                         getAddressList( );
                         alert('주소 수정 완료.');
                         $('#addressModal').modal("hide");

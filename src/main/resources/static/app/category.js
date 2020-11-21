@@ -354,22 +354,22 @@
                     dataType: 'json'
                 });
             },
-            updateItem  : function ( updateUser ) {
+            updateItem  : function ( ) {
                 $('#updateButton').attr('disabled', true);
+
                 let postBody = Object.entries(this.item)
                     .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
                     .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
 
                 // update user 등록 부분
-                Object.defineProperty( postBody, 'updateUser', { value : updateUser} )
+                postBody['updateUser'] = 1;
 
                 $.ajax({
                     type: 'PUT',
                     url: '/api/category',
-                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    data: JSON.stringify({'data':postBody}),
                     success: function(data) {
                         search( pagination.currentPage );
-                        getCategories( );
                         alert('카테고리 수정 완료.');
                         $('#categoryModal').modal("hide");
                         $('#updateButton').attr('disabled', false);

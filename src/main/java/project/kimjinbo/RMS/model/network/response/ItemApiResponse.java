@@ -27,11 +27,13 @@ public class ItemApiResponse {
 
     private String      name;
     private String      memo;
+    private String      detail;
     private Long        cost;
     private Long        purchaseCost;
-    private String      itemState;
     private Integer     placeState;
+    private String      itemState;
     private String      rentalState;
+    private String      placeName;
     private String      cdKey;
     private String      licence;
 

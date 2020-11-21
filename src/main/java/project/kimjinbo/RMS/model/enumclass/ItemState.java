@@ -4,6 +4,10 @@ import lombok.Getter;
 import lombok.AllArgsConstructor;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
@@ -29,6 +33,15 @@ public enum ItemState {
     public static Integer idOf(String title) {
         if(title==null) return null;
         return Arrays.stream(ItemState.values()).filter(item->(item.getTitle().equals(title)) ).findFirst().get().getId();
+    }
+
+    public static Map<Integer,String> getObject( ) {/*
+        return Arrays.stream( ItemState.values() ).map( item->{
+            return new HashMap<Integer,String>(){{ put(item.getId(),item.getTitle()); }};
+        }).collect( Collectors.toList() );*/
+
+        return Arrays.stream( ItemState.values() ).collect( Collectors.toMap(ItemState::getId,ItemState::getTitle) );
+
     }
 
 }

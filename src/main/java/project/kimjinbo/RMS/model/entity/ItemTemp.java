@@ -25,12 +25,14 @@ public class ItemTemp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long        id;
+
     private Long        registerUser;
     private LocalDate   registerDate;
     private String      superCate;
     private String      subCateFirst;
     private String      subCateSecond;
     private LocalDate   updateDate;
+    private Long        updateUser;
     private String      name;
     private String      memo;
     private String      detail;

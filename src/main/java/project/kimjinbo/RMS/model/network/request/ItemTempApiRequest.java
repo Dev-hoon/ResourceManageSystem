@@ -13,23 +13,24 @@ import javax.persistence.Id;
 @AllArgsConstructor
 public class ItemTempApiRequest {
     private Long        id;
-    private Long        registerUser;
-    private String      registerDate;
-    private String      updateDate;
 
     private String      superCate;
     private String      subCateFirst;
     private String      subCateSecond;
 
+    private Long        registerUser;
+    private String      registerDate;
+    private String      expireDate;
+
     private String      name;
-    private String      detail;
     private String      memo;
+    private String      detail;
     private Long        cost;
     private Long        purchaseCost;
-    private String      expireDate;
-    private String      itemState;
+    private Integer     itemState;
     private Integer     placeState;
-    private String      rentalState;
+    private Integer     rentalState;
+
     private String      cdKey;
     private String      licence;
 
