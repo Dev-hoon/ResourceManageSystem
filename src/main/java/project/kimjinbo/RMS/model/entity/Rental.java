@@ -5,40 +5,43 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
 
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Accessors(chain=true)
-@IdClass(BookmarkPK.class)
+@IdClass(RentalPK.class)
 @EqualsAndHashCode(callSuper=false)
-public class Bookmark extends BookmarkPK {
-
+public class Rental {
     @Id
     @Column(name="item_id")
     private Long        itemId;
-    @Id
-    @Column(name="register_user")
-    private Long        registerUser;
 
-    private Long        updateUser;
+    @Id
+    @Column(name="emp_id")
+    private Long        empId;
+
+    @Id
+    private LocalDate   startDate;
+
+    private Long        registerUser;
     private LocalDate   registerDate;
     private LocalDate   updateDate;
-    private String      memo;
+    private Long        updateUser;
+    private String      rentalCode;
 
-    @Id
-    @ManyToOne
+    private LocalDate   endDate;
+    private String      reason;
+    private Integer     state;
+
+    @OneToOne
     @JoinColumn(name="item_id", insertable = false, updatable = false)
     Item item;
 
-    @Id
-    @ManyToOne
-    @JoinColumn(name="register_user", insertable = false, updatable = false)
+    @OneToOne
+    @JoinColumn(name="emp_id", insertable = false, updatable = false)
     Employee employee;
 
 }

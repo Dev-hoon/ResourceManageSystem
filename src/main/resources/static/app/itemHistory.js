@@ -26,56 +26,70 @@
 
             itemList.amountSelect = 10;
         });
-
-        // 등록일 datepicker 처리
-        $('#createDate').datepicker({
-            format: "yyyy-mm-dd",	//데이터 포맷 형식(yyyy : 년 mm : 월 dd : 일 )
-            autoclose : true,	//사용자가 날짜를 클릭하면 자동 캘린더가 닫히는 옵션
-            startDate: '-10d',	//달력에서 선택 할 수 있는 가장 빠른 날짜. 이전으로는 선택 불가능 ( d : 일 m : 달 y : 년 w : 주)
-            language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
-        }).on('changeDate', function (event) {
-            conditions.setCreateDate( dateString(event.date) )
-        });
-
-        // 만료일 datepicker 처리
-        $('#expireDate').datepicker({
-            format: "yyyy-mm-dd",	//데이터 포맷 형식(yyyy : 년 mm : 월 dd : 일 )
-            autoclose : true,	//사용자가 날짜를 클릭하면 자동 캘린더가 닫히는 옵션
-            startDate: '-10d',	//달력에서 선택 할 수 있는 가장 빠른 날짜. 이전으로는 선택 불가능 ( d : 일 m : 달 y : 년 w : 주)
-            language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
-        }).on('changeDate', function (event) {
-            conditions.setExpireDate( dateString(event.date) )
-        });
     });
 
-    // Date 객체를 format에 맞는 string으로 변환
-    function dateString( date ){
-        date =  [date.getFullYear(),date.getMonth().toString().padStart(2,'0'),date.getDate().toString().padStart(2,'0')].join("-")
-        date = /(?<DateFormat>[0-9]{4}-[0-9]{2}-[0-9]{2})/.exec(date);
-        return ( date )? date.groups['DateFormat'] : null ;
-    }
-
+    //*** condition vue *** //
     // 초기 설정 받아오기
     function getSetting( ) {
         $.get("/api/item/setting", function(response){
-            conditions.selectItem   = response.data.itemState;
-            conditions.selectRental = response.data.rentalState;
-            conditions.categories   = response.data.categories;
-            conditions.selectCate01 = Object.keys(conditions.categories)
+
+            console.log("response : ",response.data)
+
+            conditions.itemState      = "";
+            conditions.itemList       = response.data.itemList;
+
+            conditions.rentalState    = "";
+            conditions.rentalList     = response.data.rentalList;
+
+            conditions.placeState     = ""
+            conditions.placeList      = response.data.placeList;
+
+            conditions.categories     = response.data.categories;
+            conditions.selectCate01   = Object.keys( response.data.categories );
+
+
+            itemModal.itemState       = "";
+            itemModal.itemList        = response.data.itemList;
+
+            itemModal.rentalState     = "";
+            itemModal.rentalList      = response.data.rentalList;
+
+            itemModal.placeState      = ""
+            itemModal.placeList       = response.data.placeList;
+
+            itemModal.categories      = response.data.categories;
+            itemModal.selectCate01    = Object.keys( response.data.categories );
+
+
         });
     }
-
+    // Date 객체를 format에 맞는 string으로 변환
+    function dateString( date ){
+        return date.getFullYear()+ '-' + (date.getMonth()+1).toString().padStart(2,'0') + '-' + date.getDate().toString().padStart(2,'0')
+    }
     // 데이터 받아오기
-    function search(index,conditions) {
-        $.get(["/api/items?page="+index,conditions].join('&'), function (response) {
+    function search(index, param, collapse ) {
+        let Parameter;
+        if( param ){
+            Parameter = Object.entries( param )
+                .filter( (item)=>(item[1]!=null)&&(item[1]!="") )
+                .map( item=>item.join("=") )
+        }
+
+        $.get( ["/api/items?page="+index].concat(Parameter).join('&'), function (response) {
             /* 데이터 셋팅 */
             // 페이징 처리 데이터
             indexBtn = [];
             pagination = response.pagination;
 
             //전체 페이지
-            showPage.totalElements      = pagination.currentElements;
+            showPage.totalPages         = pagination.totalPages;
+            showPage.totalElements      = pagination.totalElements;
+            showPage.currentElements    = pagination.currentElements;
             showPage.currentPage        = pagination.currentPage+1;
+
+            console.log("showPage._data : ",showPage._data)
+
             // 검색 데이터
             itemList.setItemList( response.data );
 
@@ -110,6 +124,9 @@
                 $('li[btn_id]').removeClass( "active" );
                 $('li[btn_id='+(pagination.currentPage+1)+']').addClass( "active" );
             },50)
+
+            if(collapse) $('#conditionBox').boxWidget('collapse');
+
         });
     }
 
@@ -117,16 +134,20 @@
     let conditions = new Vue({
         el : '#queryConditions',
         data : {
-            id              :   "",
-            name            :   "",
-            createDate      :   "",
-            expireDate      :   "",
-            superCate       :   "",
-            subCateFirst    :   "",
-            subCateSecond   :   "",
-            itemState       :   "",
-            rentalState     :   "",
-            placeState      :   "",
+            item : {
+                id              :   "",
+                name            :   "",
+                createDate      :   "",
+                expireDate      :   "",
+                superCate       :   "",
+                subCateFirst    :   "",
+                subCateSecond   :   "",
+                itemState       :   "",
+                rentalState     :   "",
+                placeState      :   "",
+                cdKey           :   "",
+                licence         :   "",
+            },
 
             categories      :   [],
             selectCate01    :   [],
@@ -136,61 +157,107 @@
             selectItem      :   [],
             selectRental    :   [],
 
-        },methods: {
-            initConditions: function (e) {
-                this.id              =   "";
-                this.name            =   "";
-                this.createDate      =   "";
-                this.expireDate      =   "";
-                this.superCate       =   "";
-                this.subCateFirst    =   "";
-                this.subCateSecond   =   "";
-                this.itemState       =   "";
-                this.rentalState     =   "";
-                this.placeState      =   "";
+            itemList        :   [],
+            itemState       :   "",
 
-                this.selectCate01    =   Object.keys(this.categories);
+            rentalList      :   [],
+            rentalState     :   "",
+
+            placeList       :   [],
+            placeState      :   "",
+
+        },methods: {
+            initConditions  : function ( ) {
+                this.item = {
+                    id              :   "",
+                    name            :   "",
+                    createDate      :   "",
+                    expireDate      :   "",
+                    superCate       :   "",
+                    subCateFirst    :   "",
+                    subCateSecond   :   "",
+                    itemState       :   "",
+                    rentalState     :   "",
+                    placeState      :   "",
+                    cdKey           :   "",
+                    licence         :   "",
+                },
+
+                    this.selectCate01    =   Object.keys(this.categories);
                 this.selectCate02    =   [];
                 this.selectCate03    =   [];
 
+                this.itemState       =   ""
+                this.placeState      =   ""
+                this.rentalState     =   ""
 
             },
-            handleCate01: function (e) {
-                if(this.categories.hasOwnProperty(this.superCate)){
-                    this.selectCate02 = Object.keys( this.categories[this.superCate] );
-                    this.subCateFirst = ""
-                    this.subCateSecond = ""
+            handleCate01    : function ( ) {
+                if(this.categories.hasOwnProperty(this.item.superCate)){
+                    this.selectCate02 = Object.keys( this.categories[this.item.superCate] );
+                    this.item.subCateFirst = ""
+                    this.item.subCateSecond = ""
                 }
             },
-            handleCate02: function (e) {
-                if(this.categories[this.superCate].hasOwnProperty(this.subCateFirst)){
-                    this.selectCate03 = this.categories[this.superCate][this.subCateFirst];
-                    this.subCateSecond = ""
+            handleCate02    : function ( ) {
+                if(this.categories[this.item.superCate].hasOwnProperty(this.item.subCateFirst)){
+                    this.selectCate03 = this.categories[this.item.superCate][this.item.subCateFirst];
+                    this.item.subCateSecond = ""
                 }
             },
-            getParameter: function () {
-                let queryString = [];
-                Object.entries(this._data)
-                    .filter( (item)=>( (item[1].constructor == String) && ( item[1] != "" ) ))
-                    .map((item)=>{ queryString.push( [item[0],item[1]].join("=") ) })
-                return queryString.join("&");
-            },
-            searchItems : function () {
-                search(0, this.getParameter() );
+            searchItems     : function ( ) {
+                search(0, conditions.item, true );
 
-                itemList.amountSelect       = 0;
-                itemList.selectedItemList   = {};
+                conditions.amountSelect       = 0;
+                conditions.selectedItemList   = {};
 
             },
-            createItem  : function () {
-              location.href = "/pages/item/enroll"
+            createItem      : function ( ) {
+                location.href = "/pages/item/enroll"
             },
-            setCreateDate:function ( date ) {
-                this.createDate = date;
+            itemHandler     : function ( ){
+                Object.entries( this.itemList ).filter(item=>item[1]==this.itemState)
+                    ?.map(item=>{
+                        this.item.itemState  = item[0];
+                    })
             },
-            setExpireDate:function ( date ) {
-                this.expireDate = date;
+            rentalHandler   : function ( ){
+                Object.entries( this.rentalList ).filter(item=>item[1]==this.rentalState)
+                    ?.map(item=>{
+                        this.item.rentalState   = item[0];
+                    })
             },
+            placeHandler    : function ( ){
+                this.placeList.filter(item=>item.name==this.placeState)?.map(item=>{
+                    this.item.placeState   = item.id;
+                })
+            },
+            setCreateDate   : function ( date ) {
+                this.item.createDate = date;
+            },
+            setExpireDate   : function ( date ) {
+                this.item.expireDate = date;
+            },
+        },mounted: function( ){
+            // 등록일 datepicker 처리
+            $('#createDate').datepicker({
+                format: "yyyy-mm-dd",
+                autoclose : true,
+                startDate: '-10d',
+                language : "ko"
+            }).on('changeDate', function (event) {
+                conditions.item.createDate = dateString(event.date);
+            });
+
+            // 만료일 datepicker 처리
+            $('#expireDate').datepicker({
+                format: "yyyy-mm-dd",	//데이터 포맷 형식(yyyy : 년 mm : 월 dd : 일 )
+                autoclose : true,	//사용자가 날짜를 클릭하면 자동 캘린더가 닫히는 옵션
+                startDate: '-10d',	//달력에서 선택 할 수 있는 가장 빠른 날짜. 이전으로는 선택 불가능 ( d : 일 m : 달 y : 년 w : 주)
+                language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
+            }).on('changeDate', function (event) {
+                conditions.item.expireDate = dateString(event.date);
+            });
         }
     });
 
@@ -202,17 +269,47 @@
         currentElements    :  0,        // 현재 데이터수
         amountPerPage      :  10,
     };
-
     // 페이지 정보
     let showPage = new Vue({
         el : '#showPage',
         data : {
-            totalElements       : {},
-            currentPage         : {},
-            selectedElements    : 0,    // 현재 조건 중 선택된 값들의 수
+            totalPages       : 0,
+            currentElements  : 0,
+            totalElements    : 0,
+            currentPage      : 0,
+            selectedElements : 0,    // 현재 조건 중 선택된 값들의 수
         }
     });
-
+    // 페이지 버튼 리스트
+    let pageBtnList = new Vue({
+        el : '#pageBtn',
+        data : {
+            btnList : {}
+        },
+        methods: {
+            indexClick: function (event) {
+                let id = parseInt( event.target.getAttribute("btn_id") );
+                search(id-1, conditions.item );
+            },
+            previousClick:function (event) {
+                if(pagination.currentPage !== 0){
+                    search(pagination.currentPage-1, conditions.item );
+                }
+            },
+            nextClick:function (event) {
+                if(pagination.currentPage !== pagination.totalPages-1){
+                    search(pagination.currentPage+1, conditions.item );
+                }
+            }
+        },
+        mounted:function () {
+            // 제일 처음 랜더링 후 색상 처리
+            setTimeout(function () {
+                $('li[btn_id]').removeClass( "active" );
+                $('li[btn_id='+(pagination.currentPage+1)+']').addClass( "active" );
+            },50)
+        }
+    });
     // 데이터 리스트
     let itemList = new Vue({
         el : '#itemList',
@@ -220,7 +317,8 @@
             itemList         : {},
             selectedItemList : {},
             amountSelect     : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
-        },methods:{
+        },
+        methods:{
             handlerCheckBox: function(event){
                 event.stopImmediatePropagation();
 
@@ -260,47 +358,25 @@
                     this.denoteCheckBox( )
                 },50);
             },
-            itemRowHandler : function( event, item ){
-                itemModal.pageMode      = 1;
-                itemModal.selectedItem  = $.extend(true, {}, item );
-                itemModal.categories    = new Object( conditions.categories );
+            rowHandler : function( event, item ){
+                itemModal.mode              = 1;
+                itemModal.item              = $.extend(true, {}, item );
                 itemModal.initCategory( );
-                itemModal.modalSelectItem    = conditions.selectItem;
-                itemModal.modalSelectRental  = conditions.selectRental;
 
-                $('#itemModal').modal().off()
-            },
-        }
-    });
+                itemModal.itemState         = (item.itemState)?item.itemState:"";
+                itemModal.rentalState       = (item.rentalState)?item.rentalState:"";
+                itemModal.placeState        = (item.placeState)?item.placeState:"";;
 
-    // 페이지 버튼 리스트
-    let pageBtnList = new Vue({
-        el : '#pageBtn',
-        data : {
-            btnList : {}
-        },
-        methods: {
-            indexClick: function (event) {
-                let id = parseInt( event.target.getAttribute("btn_id") );
-                search(id-1, conditions.getParameter());
+                itemModal.itemHandler( );
+                itemModal.rentalHandler( );
+                itemModal.placeHandler( );
+
+                console.log("itemModal.item : ",itemModal.item)
+
+                $('#itemModal').modal()
+
+                $('#itemBox').boxWidget('collapse')
             },
-            previousClick:function (event) {
-                if(pagination.currentPage !== 0){
-                    search(pagination.currentPage-1, conditions.getParameter() );
-                }
-            },
-            nextClick:function (event) {
-                if(pagination.currentPage !== pagination.totalPages-1){
-                    search(pagination.currentPage+1, conditions.getParameter() );
-                }
-            }
-        },
-        mounted:function () {
-            // 제일 처음 랜더링 후 색상 처리
-            setTimeout(function () {
-                $('li[btn_id]').removeClass( "active" );
-                $('li[btn_id='+(pagination.currentPage+1)+']').addClass( "active" );
-            },50)
         }
     });
 
@@ -308,75 +384,117 @@
     let itemModal = new Vue({
         el: '#itemModal',
         data: {
-            pageMode            : 0,    // modal type 지정  0:create / 1:update
-            selectedItem        : {},
-            categories          : {},
+            mode                : 0,    // modal type 지정  0:create / 1:update
+            item : {
+                id              :   "",
+                name            :   "",
+                createDate      :   "",
+                expireDate      :   "",
+                superCate       :   "",
+                subCateFirst    :   "",
+                subCateSecond   :   "",
+                itemState       :   "",
+                rentalState     :   "",
+                placeState      :   "",
+                cdKey           :   "",
+                licence         :   "",
+            },
 
-            modalSelectItem     : [],
+            selectedItem        : {},
             modalSelectRental   : [],
 
-            selectCate01        : [],
-            selectCate02        : [],
-            selectCate03        : [],
+            categories          :   [],
+            selectCate01        :   [],
+            selectCate02        :   [],
+            selectCate03        :   [],
+
+            itemList            :   [],
+            itemState           :   "",
+
+            rentalList          :   [],
+            rentalState         :   "",
+
+            placeList           :   [],
+            placeState          :   "",
+
+            licences        :   [],
 
         },methods: {
-            initCategory: function( ){
+            initCategory    : function ( ){
                 this.selectCate01  = Object.keys( this.categories );
-                this.selectCate02  = Object.keys( this.categories[this.selectedItem.superCate] )
-                this.selectCate03  = this.categories[this.selectedItem.superCate][this.selectedItem.subCateFirst];
-
-                this.isChange  =  false;
+                this.selectCate02  = Object.keys( this.categories[this.item.superCate] )
+                this.selectCate03  = this.categories[this.item.superCate][this.item.subCateFirst];
             },
-            handleCate01: function () {
-                if( this.categories.hasOwnProperty( this.selectedItem.superCate) ) {
-                    this.selectCate02 = Object.keys(this.categories[this.selectedItem.superCate]);
-                    this.selectedItem.subCateFirst = ""
-                    this.selectedItem.subCateSecond = ""
+            handleCate01    : function ( ){
+                if( this.categories.hasOwnProperty( this.item.superCate) ) {
+                    this.selectCate02 = Object.keys(this.categories[this.item.superCate]);
+                    this.item.subCateFirst = ""
+                    this.item.subCateSecond = ""
                 }
             },
-            handleCate02: function () {
-                if (this.categories[this.selectedItem.superCate].hasOwnProperty(this.selectedItem.subCateFirst)) {
-                    this.selectCate03 = this.categories[this.selectedItem.superCate][this.selectedItem.subCateFirst];
-                    this.selectedItem.subCateSecond = ""
+            handleCate02    : function ( ){
+                if (this.categories[this.item.superCate].hasOwnProperty(this.item.subCateFirst)) {
+                    this.selectCate03 = this.categories[this.item.superCate][this.item.subCateFirst];
+                    this.item.subCateSecond = ""
                 }
             },
-            updateItem  : function ( updateUser ) {
-                Object.entries(this._data.selectedItem).map((t)=>{console.log("T : ",t)});
+            itemHandler     : function ( ){
+                Object.entries( this.itemList ).filter(item=>item[1]==this.itemState)
+                    ?.map(item=>{
+                        this.item.itemState  = item[0];
+                    })
+            },
+            rentalHandler   : function ( ){
+                Object.entries( this.rentalList ).filter(item=>item[1]==this.rentalState)
+                    ?.map(item=>{
+                        this.item.rentalState   = item[0];
+                    })
+            },
+            placeHandler    : function ( ){
+                this.placeList.filter(item=>item.name==this.placeState)?.map(item=>{
+                    this.item.placeState   = item.id;
+                })
+            },
+            updateItem      : function ( updateUser ) {
+                $('#updateItemButton').attr('disabled', true);
 
-                console.log( "validation : "+this.validation() )
-
-                let postBody = Object.entries(this._data.selectedItem)
-                    .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
+                let postBody = Object.entries(this.item)
+                    .filter( (v)=>( (v[1]!=null)&&(v[1]!="") ))
                     .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
 
-                Object.defineProperty(postBody, 'updateUser', { value : updateUser})
+                // update user 등록 부분
+                postBody['updateUser'] = 1;
+
+                console.log("ITEM updateItem postBody : ",postBody)
 
                 $.ajax({
                     type: 'PUT',
                     url: '/api/item',
                     data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
-                    success: function(data) { alert('data: ' + data); },function(response){
-                        console.log( "response : ",response)
+                    success: function(data) {
+                        search( pagination.currentPage, conditions.item  );
+                        alert('자산 수정 완료.');
+                        $('#itemModal').modal("hide");
+                        this.item = { };
+                        $('#updateItemButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        alert('자산 수정 실패.');
+                        $('#updateItemButton').attr('disabled', false);
                     },
                     contentType: "application/json",
                     dataType: 'json'
                 });
             },
-            closeHandler: function ( event ){
-                if( !this.validation() ){
-                    console.log( "not changed ")
-                    $('#itemModal').modal("hide");
-                }else{
-                    console.log( "changed ");
-
-                }
-
-
+            closeHandler    : function ( event ){
+                this.item = { };
+                $('#itemModal').modal("hide");
             },validation: function(){
-                let originData = itemList.itemList.filter((item)=>(item.id==itemModal.selectedItem.id))[0];
-                return Object.entries( itemModal.selectedItem ).reduce( ( acc, cur )=>{ return acc || (originData[cur[0]]!=cur[1]) }, false )
+                let originData = itemList.itemList.filter((item)=>(item.id==itemModal.item.id))[0];
+                return Object.entries( itemModal.item ).reduce( ( acc, cur )=>{ return acc || (originData[cur[0]]!=cur[1]) }, false )
             }
         },mounted: function( ) {
+
             // 등록일 datepicker 처리
             $('#modalRegisterDate').datepicker({
                 format: "yyyy-mm-dd",	//데이터 포맷 형식(yyyy : 년 mm : 월 dd : 일 )
@@ -384,9 +502,8 @@
                 startDate: '-10d',	//달력에서 선택 할 수 있는 가장 빠른 날짜. 이전으로는 선택 불가능 ( d : 일 m : 달 y : 년 w : 주)
                 language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
             }).on('changeDate', function (event) {
-                console.log("changeDate : ")
-                itemModal.selectedItem.createDate = dateString(event.date);
-            }).unbind('change');
+                itemModal.item.createDate = dateString(event.date);
+            })
 
             // 만료일 datepicker 처리
             $('#modalExpireDate').datepicker({
@@ -395,14 +512,10 @@
                 startDate: '-10d',	//달력에서 선택 할 수 있는 가장 빠른 날짜. 이전으로는 선택 불가능 ( d : 일 m : 달 y : 년 w : 주)
                 language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
             }).on('changeDate', function (event) {
-                itemModal.selectedItem.exprieDate =  dateString(event.date);
-            }).unbind('change');
+                itemModal.item.expireDate =  dateString(event.date);
+            })
         }
     })
 
-    // for test
-    window.updateUser   = 1;
-    window.itemList     = itemList;
-    window.itemModal    = itemModal;
 
 })(jQuery);

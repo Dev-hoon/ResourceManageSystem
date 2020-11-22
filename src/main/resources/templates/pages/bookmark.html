@@ -46,7 +46,7 @@
                         <!-- /.box-body -->
                         <div class="box-body">
                             <div id="items_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
-                                <div class="row">
+                                <div id="bookmarkList" class="row">
                                     <div class="col-sm-12">
                                         <table id="items_table" class="table table-bordered table-hover dataTable font-14"
                                                role="grid" aria-describedby="example2_info">
@@ -54,9 +54,6 @@
                                             <tr role="row">
                                                 <th id="selectAll" class="text-center bg-dark-blue-gradient table-middle" tabindex="0" rowspan="1" colspan="1">
                                                     <input type="checkbox" id="rowID" aria-label="Checkbox for following text input">
-                                                </th>
-                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    자산번호
                                                 </th>
                                                 <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
                                                     자산명칭
@@ -77,35 +74,29 @@
                                                     만료일
                                                 </th>
                                                 <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    상세정보
-                                                </th>
-                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
                                                     메모
                                                 </th>
                                             </tr>
                                             </thead>
-                                            <tbody id="itemList">
-                                            <tr role="row" class="odd item" v-for="(dto, idx) in itemList" >
-                                                <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="handlerCheckBox"> </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.id}}              </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.name}}            </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.superCate}}       </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.subCateFirst}}    </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.subCateSecond}}   </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.registerDate}}    </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.expireDate}}      </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.detail}}          </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.memo}}            </td>
+                                            <tbody>
+                                            <tr role="row" class="odd item" v-for="(dto, idx) in items" >
+                                                <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input"  v-bind:itemId="dto.id" v-on:click="checkHandler(event,dto)" > </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.name}}            </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.superCate}}       </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.subCateFirst}}    </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.subCateSecond}}   </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.registerDate}}    </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.expireDate}}      </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.memo}}            </td>
                                             </tr>
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
-
                                 <div class="row">
                                     <div id="showPage" class="col-sm-6">
                                         <span  class="dataTables_info" role="status" aria-live="polite">
-                                            Showing {{currentPage}} to 10 of {{totalElements}} entries
+                                            Showing {{currentPage}} to {{totalPages}} of {{currentElements}} entries
                                         </span>
                                         <span v-if="selectedElements != 0">
                                             / selected item(s) {{selectedElements}}
@@ -114,13 +105,12 @@
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group pull-right">
-                                            <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 신청 </button>
-                                            <button type="button" class="btn btn-sm btn-warning" v-on:click="initConditions"> 수정 </button>
-                                            <button type="button" class="btn btn-sm btn-danger" v-on:click="initConditions"> 삭제 </button>
+                                            <button id="rentalButton" type="button" class="btn btn-sm btn-primary dark"  v-on:click="rentalHandler"> 대여신청   </button>
+                                            <button id="deleteBtton"  type="button" class="btn btn-sm btn-danger" v-on:click="deleteHandler">  장바구니제거     </button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row text-center col-sm-12">
+                                <div class="row text-center">
                                     <div class="dataTables_paginate paging_simple_numbers" id="pageBtn">
                                         <ul class="pagination">
                                             <li class="paginate_button previous" id="previousBtn">
@@ -156,11 +146,11 @@
     <div th:replace="fragment/controlSidebar :: controlSidebar"></div>
     <!-- controlSidebar End -->
 
-    <div class="control-sidebar-bg"></div>
+    <!-- rentalModal Start -->
+    <div th:replace="fragment/modal/bookmarkModal :: bookmarkModal"></div>
+    <!-- rentalModal End -->
 
-    <!-- itemModal Start -->
-    <div th:replace="fragment/itemModal :: itemModal"></div>
-    <!-- itemModal End -->
+    <div class="control-sidebar-bg"></div>
 
 </div>
 

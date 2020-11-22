@@ -27,10 +27,16 @@ public class Employee {
     private String      email;
     private String      phone;
     private Integer     depId;
+    @Column(name="team_id")
     private Integer     teamId;
     private String      position;
     private String      auth;
     private String      memo;
     private String      passwd;
     private String      empNum;
+
+    @OneToOne
+    @JoinColumn(name="team_id", insertable = false, updatable = false)
+    Team team;
+
 }

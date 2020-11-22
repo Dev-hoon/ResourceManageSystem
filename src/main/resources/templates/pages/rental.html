@@ -49,23 +49,23 @@
                                 <li role="presentation" class="active"><a data-toggle="tab" href="#request">대여신청</a></li>
                                 <li role="presentation"><a data-toggle="tab" href="#overdue">반납연체</a></li>
                             </ul>
+
                             <div class="tab-content mt-1">
-                                <!--  <div id="request" class="dataTables_wrapper form-inline dt-bootstrap">  -->
                                 <div id="request" class="tab-pane fade in active">
                                     <div class="row">
                                         <div class="col-sm-12">
-                                            <table id="items_table" class="table table-bordered table-hover dataTable font-14"
+                                            <table id="requestItems" class="table table-bordered table-hover dataTable font-14"
                                                    role="grid" aria-describedby="example2_info">
                                                 <thead>
                                                 <tr role="row">
-                                                    <th id="selectAll" class="text-center bg-dark-blue-gradient table-middle" tabindex="0" rowspan="1" colspan="1">
-                                                        <input type="checkbox" id="rowID" aria-label="Checkbox for following text input">
+                                                    <th id="requestSelectAll" class="text-center bg-dark-blue-gradient table-middle" tabindex="0" rowspan="1" colspan="1">
+                                                        <input type="checkbox" id="requestRow" aria-label="Checkbox for following text input">
                                                     </th>
                                                     <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                        신청인
+                                                        대여인
                                                     </th>
                                                     <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                        신청팀
+                                                        대여팀
                                                     </th>
                                                     <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
                                                         자산번호
@@ -90,26 +90,25 @@
                                                     </th>
                                                 </tr>
                                                 </thead>
-                                                <tbody id="itemList">
-                                                <tr role="row" class="odd item" v-for="(dto, idx) in itemList" >
-                                                    <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="handlerCheckBox"> </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.user}}            </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.team}}            </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.id}}              </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.name}}            </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.superCate}}       </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.subCateFirst}}    </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.subCateSecond}}   </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.startDate}}       </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.endDate}}         </td>
-
+                                                <tbody id="requestList">
+                                                <tr role="row" class="odd item" v-for="(dto, idx) in items" >
+                                                    <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="checkHandler( event, dto )   "> </td>
+                                                    <td class="text-center" >{{dto.userName}}        </td>
+                                                    <td class="text-center" >{{dto.teamName}}        </td>
+                                                    <td class="text-center" >{{dto.itemId}}          </td>
+                                                    <td class="text-center" >{{dto.itemName}}        </td>
+                                                    <td class="text-center" >{{dto.superCate}}       </td>
+                                                    <td class="text-center" >{{dto.subCateFirst}}    </td>
+                                                    <td class="text-center" >{{dto.subCateSecond}}   </td>
+                                                    <td class="text-center" >{{dto.startDate}}       </td>
+                                                    <td class="text-center" >{{dto.endDate}}         </td>
                                                 </tr>
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div id="showPage" class="col-sm-6">
+                                    <div id="requestShowPage" class="row">
+                                        <div class="col-sm-6">
                                         <span  class="dataTables_info" role="status" aria-live="polite">
                                             Showing {{currentPage}} to 10 of {{totalElements}} entries
                                         </span>
@@ -120,16 +119,15 @@
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group pull-right">
-                                                <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 승인 </button>
-                                                <button type="button" class="btn btn-sm btn-warning" v-on:click="initConditions"> 보류 </button>
-                                                <button type="button" class="btn btn-sm btn-danger" v-on:click="initConditions"> 반려 </button>
+                                                <button id="acceptButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="acceptHandler"> 승인 </button>
+                                                <button id="denyButton"   type="button" class="btn btn-sm btn-danger"       v-on:click="denyHandler">   반려 </button>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row text-center col-sm-12">
-                                        <div class="dataTables_paginate paging_simple_numbers" id="pageBtn">
+                                        <div class="dataTables_paginate paging_simple_numbers" id="requestPageBtn">
                                             <ul class="pagination">
-                                                <li class="paginate_button previous" id="previousBtn">
+                                                <li class="paginate_button previous" id="requestPreviousBtn">
                                                     <a href="javascript:;" v-on:click="previousClick">이전</a>
                                                 </li>
 
@@ -137,13 +135,16 @@
                                                     <a href="javascript:;" aria-controls="example2" v-bind:btn_id="btn">{{btn}}</a>
                                                 </li>
 
-                                                <li class="paginate_button next" id="nextBtn">
+                                                <li class="paginate_button next" id="requestNextBtn">
                                                     <a href="javascript:;" v-on:click="nextClick">다음</a>
                                                 </li>
                                             </ul>
                                         </div>
                                     </div>
                                 </div>
+
+
+
                                 <div id="overdue" class="tab-pane fade">
                                     <div class="row">
                                         <div class="col-sm-12">
@@ -151,7 +152,7 @@
                                                    role="grid" aria-describedby="example2_info">
                                                 <thead>
                                                 <tr role="row">
-                                                    <th id="selectAllOverdue" class="text-center bg-dark-blue-gradient table-middle" tabindex="0" rowspan="1" colspan="1">
+                                                    <th id="overdueSelectAll" class="text-center bg-dark-blue-gradient table-middle" tabindex="0" rowspan="1" colspan="1">
                                                         <input type="checkbox" id="rowID" aria-label="Checkbox for following text input">
                                                     </th>
                                                     <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
@@ -183,60 +184,60 @@
                                                     </th>
                                                 </tr>
                                                 </thead>
-                                                <tbody id="itemList">
-                                                <tr role="row" class="odd item" v-for="(dto, idx) in itemList" >
-                                                    <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="handlerCheckBox"> </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.user}}            </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.team}}            </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.id}}              </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.name}}            </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.superCate}}       </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.subCateFirst}}    </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.subCateSecond}}   </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.startDate}}       </td>
-                                                    <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.endDate}}         </td>
+                                                <tbody id="overdueList">
+                                                <tr role="row" class="odd item" v-for="(dto, idx) in items" >
+                                                    <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="checkHandler( event, dto )"> </td>
+                                                    <td class="text-center" >{{dto.userName}}        </td>
+                                                    <td class="text-center" >{{dto.teamName}}        </td>
+                                                    <td class="text-center" >{{dto.itemId}}          </td>
+                                                    <td class="text-center" >{{dto.itemName}}        </td>
+                                                    <td class="text-center" >{{dto.superCate}}       </td>
+                                                    <td class="text-center" >{{dto.subCateFirst}}    </td>
+                                                    <td class="text-center" >{{dto.subCateSecond}}   </td>
+                                                    <td class="text-center" >{{dto.startDate}}       </td>
+                                                    <td class="text-center" >{{dto.endDate}}         </td>
 
                                                 </tr>
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div id="showPage" class="col-sm-6">
-                                        <span  class="dataTables_info" role="status" aria-live="polite">
-                                            Showing {{currentPage}} to 10 of {{totalElements}} entries
-                                        </span>
-                                            <span v-if="selectedElements != 0">
-                                            / selected item(s) {{selectedElements}}
-                                        </span>
-
+                                    <div id="overdueShowPage" class="row">
+                                        <div class="col-sm-6">
+                                            <span class="dataTables_info" role="status" aria-live="polite">
+                                                Showing {{currentPage}} to 10 of {{totalElements}} entries
+                                            </span>
+                                                <span v-if="selectedElements != 0">
+                                                / selected item(s) {{selectedElements}}
+                                            </span>
                                         </div>
+
                                         <div class="col-sm-6">
                                             <div class="form-group pull-right">
-                                                <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 승인 </button>
-                                                <button type="button" class="btn btn-sm btn-warning" v-on:click="initConditions"> 보류 </button>
-                                                <button type="button" class="btn btn-sm btn-danger" v-on:click="initConditions"> 반려 </button>
+                                                <button id="acceptButton1" type="button" class="btn btn-sm btn-primary dark" onclick="acceptHandler"> 승인 </button>
+                                                <button id="denyButton1"   type="button" class="btn btn-sm btn-danger"       onclick="denyHandler"> 반려 </button>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row text-center col-sm-12">
-                                        <div class="dataTables_paginate paging_simple_numbers" id="pageBtn">
+                                        <div class="dataTables_paginate paging_simple_numbers" id="overduePageBtn">
                                             <ul class="pagination">
-                                                <li class="paginate_button previous" id="previousBtn">
+                                                <li class="paginate_button previous" id="overduePreviousBtn">
                                                     <a href="javascript:;" v-on:click="previousClick">이전</a>
                                                 </li>
-
                                                 <li class="paginate_button" v-for="btn in btnList" v-bind:btn_id="btn" v-on:click="indexClick">
                                                     <a href="javascript:;" aria-controls="example2" v-bind:btn_id="btn">{{btn}}</a>
                                                 </li>
 
-                                                <li class="paginate_button next" id="nextBtn">
+                                                <li class="paginate_button next" id="overdueNextBtn">
                                                     <a href="javascript:;" v-on:click="nextClick">다음</a>
                                                 </li>
                                             </ul>
                                         </div>
                                     </div>
                                 </div>
+
+
                             </div>
 
                         </div>
@@ -259,12 +260,12 @@
     <div class="control-sidebar-bg"></div>
 
     <!-- itemModal Start -->
-    <div th:replace="fragment/itemModal :: itemModal"></div>
+    <div th:replace="fragment/modal/rentalModal :: rentalModal"></div>
     <!-- itemModal End -->
 
 </div>
 
 
-<script src="/app/bookmark.js"></script>
+<script src="/app/rental.js"></script>
 </body>
 </html>

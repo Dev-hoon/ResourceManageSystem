@@ -202,8 +202,8 @@
                                     </div>
                                 </div>
 
-                                <div class="row">
-                                    <div id="showPage" class="col-sm-6">
+                                <div id="showPage" class="row">
+                                    <div class="col-sm-6">
                                         <span  class="dataTables_info" role="status" aria-live="polite">
                                             Showing {{currentPage}} to {{totalPages}} of {{currentElements}} entries
                                         </span>
@@ -212,11 +212,11 @@
                                         </span>
 
                                     </div>
-                                    <div class="col-sm-12">
+                                    <div class="col-sm-6">
                                         <div class="form-group pull-right">
-                                            <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 장바구니 담기 </button>
-                                            <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 장바구니 열기 </button>
-                                            <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 대여 신청    </button>
+                                            <button id="bookmarkButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="bookmarkHandler"> 장바구니 담기 </button>
+                                            <button type="button" class="btn btn-sm btn-primary dark" v-on:click="openBookmark">    장바구니 열기 </button>
+                                            <button id="rentalButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="rentalHandler">  대여 신청    </button>
                                         </div>
                                     </div>
                                 </div>

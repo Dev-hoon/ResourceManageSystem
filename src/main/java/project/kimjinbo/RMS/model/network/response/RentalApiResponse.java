@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
 import java.time.LocalDate;
 
 @Data
@@ -13,25 +15,18 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain=true)
-public class BookmarkApiResponse {
+public class RentalApiResponse {
     private Long        itemId;
-    private Long        userId;
-
-    private LocalDate   registerDate;
+    private Long        empId;
+    private String      userName;
+    private String      teamName;
+    private String      itemName;
     private String      superCate;
     private String      subCateFirst;
     private String      subCateSecond;
-
-    private String      name;
-    private String      detail;
-    private String      memo;
-    private Long        cost;
-    private Long        purchaseCost;
-    private LocalDate   expireDate;
-
-    private String      itemState;
-    private Integer     placeState;
-    private String      rentalState;
+    private LocalDate   startDate;
+    private LocalDate   endDate;
+    private Integer     state;
 
 }
 

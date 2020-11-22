@@ -921,13 +921,8 @@
 
 
     // for test
-    window.Lists            = Lists;
-    window.pageBtnList      = pageBtnList;
-    window.showPages        = showPages;
-    window.paginationList   = paginationList;
     window.registerUser     = 1;
     window.updateUser       = 1;
-    window.modalList        = modalList;
 
 
 })(jQuery);

@@ -35,13 +35,15 @@
         </section>
 
         <section class="content">
-
             <div class="row">
                 <div class="col-xs-12">
-                    <div class="box">
+                    <div id="conditionBox" class="box">
                         <div class="box-header">
                             <h3 class="box-title">자산상세정보</h3>
-                        </div>
+                            <div class="box-tools pull-right">
+                                <button class="btn btn-box-tools" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div><!-- /.box-tools -->
+                        </div><!-- /.box-header -->
                         <!-- /.box-header -->
                         <div class="box-body">
                             <form id="queryConditions" >
@@ -50,22 +52,22 @@
                                         <label class="col-sm-1 col-form-label">자산ID</label>
                                         <div class="col-sm-2">
                                             <label class="sr-only" for="itemId">superCate</label>
-                                            <input type="text" class="form-control" id="itemId" placeholder="자산ID" v-model="id">
+                                            <input type="text" class="form-control" id="itemId" placeholder="자산ID" v-model="item.id">
                                         </div>
                                         <label class="col-sm-1 col-form-label">자산이름</label>
                                         <div class="col-sm-2">
                                             <label class="sr-only" for="itemId">superCate</label>
-                                            <input type="text" class="form-control" id="itemName" placeholder="자산이름" v-model="name">
+                                            <input type="text" class="form-control" id="itemName" placeholder="자산이름" v-model="item.name">
                                         </div>
 
                                         <label class="col-sm-1 col-form-label">등록일</label>
                                         <div class="col-sm-2">
-                                            <input type="text" id="createDate" class="form-control col-sm-3" placeholder="등록일" v-model="createDate" >
+                                            <input type="text" id="createDate" class="form-control col-sm-3" placeholder="등록일" v-model="item.createDate" >
                                         </div>
 
                                         <label class="col-sm-1 col-form-label">만료일</label>
                                         <div class="col-sm-2">
-                                            <input type="text" id="expireDate" class="form-control col-sm-3" placeholder="만료일" v-model="expireDate">
+                                            <input type="text" id="expireDate" class="form-control col-sm-3" placeholder="만료일" v-model="item.expireDate">
                                         </div>
 
                                     </div>
@@ -74,14 +76,14 @@
                                         <label class="col-sm-1 col-form-label">분류정보</label>
                                         <div class="col-sm-4">
                                             <label for="superCate">대분류</label>
-                                            <select id="superCate" class="form-control" v-model="superCate" v-on:change="handleCate01">
+                                            <select id="superCate" class="form-control" v-model="item.superCate" v-on:change="handleCate01">
                                                 <option value="">선택</option>
                                                 <option v-for="category in selectCate01" >{{category}}</option>
                                             </select>
                                         </div>
                                         <div class="col-sm-4">
                                             <label for="subCateFirst">소분류 1</label>
-                                            <select id="subCateFirst" class="form-control" v-model="subCateFirst" v-on:change="handleCate02">
+                                            <select id="subCateFirst" class="form-control" v-model="item.subCateFirst" v-on:change="handleCate02">
                                                 <option value="">선택</option>
                                                 <option v-for="category in selectCate02" >{{category}}</option>
                                             </select>
@@ -89,7 +91,7 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <label for="subCateSecond">소분류 2</label>
-                                            <select id="subCateSecond" class="form-control" v-model="subCateSecond">
+                                            <select id="subCateSecond" class="form-control" v-model="item.subCateSecond">
                                                 <option value="">선택</option>
                                                 <option v-for="category in selectCate03" >{{category}}</option>
                                             </select>
@@ -101,24 +103,24 @@
                                         <label class="col-sm-1 col-form-label">상태정보</label>
                                         <div class="col-sm-4">
                                             <label for="itemState">자산상태</label>
-                                            <select id="itemState" class="form-control" v-model="itemState">
+                                            <select id="itemState" class="form-control" v-model="itemState" v-on:change="itemHandler">
                                                 <option value="">선택</option>
-                                                <option v-for="state in selectItem" >{{state}}</option>
+                                                <option v-for="state in itemList" >{{state}}</option>
                                             </select>
                                         </div>
                                         <div class="col-sm-4">
                                             <label for="rentalState">대여상태</label>
-                                            <select id="rentalState" class="form-control" v-model="rentalState">
+                                            <select id="rentalState" class="form-control" v-model="rentalState" v-on:change="rentalHandler">
                                                 <option value="">선택</option>
-                                                <option v-for="state in selectRental" >{{state}}</option>
+                                                <option v-for="state in rentalList" >{{state}}</option>
                                             </select>
 
                                         </div>
                                         <div class="col-sm-4">
                                             <label for="placeState">위치상태</label>
-                                            <select id="placeState" class="form-control" v-model="placeState">
+                                            <select id="placeState" class="form-control" v-model="placeState" v-on:change="placeHandler">
                                                 <option value="">선택</option>
-                                                <option>...</option>
+                                                <option v-for="place in placeList" >{{place.name}}</option>
                                             </select>
 
                                         </div>
@@ -128,7 +130,6 @@
                                         <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 초기화 </button>
                                         <button type="button" class="btn btn-sm btn-primary dark" v-on:click="searchItems"> 조회 </button>
                                         <button type="button" class="btn btn-sm btn-primary dark" v-on:click="createItem"> 등록 </button>
-                                        <button type="button" class="btn btn-sm btn-primary dark"> 카테고리등록 </button>
                                     </div>
                                 </div>
                             </form>
@@ -137,10 +138,15 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div  class="row">
                 <div class="col-xs-12">
-                    <div class="box">
-                        <!-- /.box-header -->
+                    <div id="itemBox" class="box">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">자산조회목록</h3>
+                            <div class="box-tools pull-right">
+                                <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div><!-- /.box-tools -->
+                        </div><!-- /.box-header -->
                         <div class="box-body">
                             <div id="items_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
                                 <div class="row">
@@ -151,12 +157,6 @@
                                             <tr role="row">
                                                 <th id="selectAll" class="text-center bg-dark-blue-gradient table-middle" tabindex="0" rowspan="1" colspan="1">
                                                     <input type="checkbox" id="rowID" aria-label="Checkbox for following text input">
-                                                </th>
-                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    대여인
-                                                </th>
-                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    대여팀
                                                 </th>
                                                 <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
                                                     자산번호
@@ -174,26 +174,35 @@
                                                     소분류 2
                                                 </th>
                                                 <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    시작일
+                                                    등록일
                                                 </th>
                                                 <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    종료일
+                                                    만료일
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    자산상태
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대여상태
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    자산위치
                                                 </th>
                                             </tr>
                                             </thead>
                                             <tbody id="itemList">
                                             <tr role="row" class="odd item" v-for="(dto, idx) in itemList" >
                                                 <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="handlerCheckBox"> </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.id}}              </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.name}}            </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.superCate}}       </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.subCateFirst}}    </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.subCateSecond}}   </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.registerDate}}    </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.expireDate}}      </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.itemState}}       </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.rentalState}}     </td>
-                                                <td class="text-center" v-on:click="itemRowHandler(event, dto)">{{dto.placeState}}      </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.id}}              </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.name}}            </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.superCate}}       </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.subCateFirst}}    </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.subCateSecond}}   </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.registerDate}}    </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.expireDate}}      </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.itemState}}       </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.rentalState}}     </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.placeState}}      </td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -203,14 +212,14 @@
                                 <div class="row">
                                     <div id="showPage" class="col-sm-6">
                                         <span  class="dataTables_info" role="status" aria-live="polite">
-                                            Showing {{currentPage}} to 10 of {{totalElements}} entries
+                                            Showing {{currentPage}} to {{totalPages}} of {{currentElements}} entries
                                         </span>
                                         <span v-if="selectedElements != 0">
                                             / selected item(s) {{selectedElements}}
                                         </span>
 
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-12">
                                         <div class="form-group pull-right">
                                             <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 장바구니 담기 </button>
                                             <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 장바구니 열기 </button>
@@ -242,6 +251,104 @@
                 </div>
             </div>
 
+            <div  class="row">
+                <div class="col-xs-12">
+                    <div id="historyBox" class="box">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">자산기록</h3>
+                            <div class="box-tools pull-right">
+                                <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div><!-- /.box-tools -->
+                        </div><!-- /.box-header -->
+                        <div class="box-body">
+                            <div id="history_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <table id="history_table" class="table table-bordered table-hover dataTable font-14"
+                                               role="grid" aria-describedby="example2_info">
+                                            <thead>
+                                            <tr role="row">
+                                                <th id="selectAll" class="text-center bg-dark-blue-gradient table-middle" tabindex="0" rowspan="1" colspan="1">
+                                                    <input type="checkbox" id="rowID" aria-label="Checkbox for following text input">
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대여인
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대여부서
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대여팀
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대여시작일
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대여종료일
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대여사유
+                                                </th>
+
+                                            </tr>
+                                            </thead>
+                                            <tbody id="historyList">
+                                            <tr role="row" class="odd item" v-for="(dto, idx) in itemList" >
+                                                <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="handlerCheckBox"> </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.id}}              </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.name}}            </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.superCate}}       </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.subCateFirst}}    </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.subCateSecond}}   </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.registerDate}}    </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div id="historyShowPage" class="col-sm-6">
+                                        <span  class="dataTables_info" role="status" aria-live="polite">
+                                            Showing {{currentPage}} to {{totalPages}} of {{currentElements}} entries
+                                        </span>
+                                        <span v-if="selectedElements != 0">
+                                            / selected item(s) {{selectedElements}}
+                                        </span>
+
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="form-group pull-right">
+                                            <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 장바구니 담기 </button>
+                                            <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 장바구니 열기 </button>
+                                            <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 대여 신청    </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row text-center col-sm-12">
+                                    <div class="dataTables_paginate paging_simple_numbers" id="historyPageBtn">
+                                        <ul class="pagination">
+                                            <li class="paginate_button previous" id="historyPreviousBtn">
+                                                <a href="javascript:;" v-on:click="previousClick">이전</a>
+                                            </li>
+
+                                            <li class="paginate_button" v-for="btn in btnList" v-bind:btn_id="btn" v-on:click="indexClick">
+                                                <a href="javascript:;" aria-controls="example2" v-bind:btn_id="btn">{{btn}}</a>
+                                            </li>
+
+                                            <li class="paginate_button next" id="historyNextBtn">
+                                                <a href="javascript:;" v-on:click="nextClick">다음</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </section>
     </div>
     <!-- Content End -->
@@ -257,7 +364,7 @@
     <div class="control-sidebar-bg"></div>
 
     <!-- itemModal Start -->
-    <div th:replace="fragment/itemModal :: itemModal"></div>
+    <div th:replace="fragment/modal/itemModal :: itemModal"></div>
     <!-- itemModal End -->
 
 </div>

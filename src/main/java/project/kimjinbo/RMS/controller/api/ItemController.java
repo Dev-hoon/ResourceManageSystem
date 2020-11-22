@@ -21,36 +21,27 @@ public class ItemController implements CrudInterface<ItemApiRequest, ItemApiResp
     @Autowired
     private ItemApiLogicService itemApiLogicService;
 
-    // 조건 사용 가능  localhost:8080/api/items
     @GetMapping("/items")
     @ResponseBody
     public Header<List<ItemApiResponse>> readItems(@PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable, ItemApiRequest itemApiRequest) {
-        System.out.println("request : "+itemApiRequest);
         return itemApiLogicService.search( pageable, itemApiRequest );
     }
 
     @Override
     @PostMapping("/item")
     public Header<ItemApiResponse> create(@RequestBody Header<ItemApiRequest> request) {
-        System.out.println("controller request : "+request);
         return itemApiLogicService.create( request );
     }
 
-
-    // /api/item?id={id}
     @Override
     @GetMapping("/item")
     public Header<ItemApiResponse> read(@RequestParam(name = "id") Long id) {
         return itemApiLogicService.read(id);
     }
 
-
     @Override
     @PutMapping("/item")
-    public Header<ItemApiResponse> update(@RequestBody Header<ItemApiRequest> request) {
-        return itemApiLogicService.update( request );
-    }
-
+    public Header<ItemApiResponse> update(@RequestBody Header<ItemApiRequest> request) { return itemApiLogicService.update( request ); }
 
     @Override
     @DeleteMapping("/item/{id}")
@@ -65,17 +56,3 @@ public class ItemController implements CrudInterface<ItemApiRequest, ItemApiResp
     }
 
 }
-
-/*
-    @GetMapping("/items") // localhost:8080/api/items
-    @ResponseBody
-    public Header<ItemApiResponse> readItems(ItemApiRequest itemApiRequest) {
-        System.out.println("request : "+itemApiRequest);
-        return itemApiLogicService.readWhere( new Header<ItemApiRequest>(itemApiRequest) );
-    }
-
-    @PostMapping("/items") // localhost:8080/api/items
-    public void readItems(@RequestBody Header<ItemApiRequest> request) {
-        itemApiLogicService.readWhere( request );
-    }
- */

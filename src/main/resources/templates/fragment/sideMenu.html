@@ -5,33 +5,30 @@
 <aside class="main-sidebar" th:fragment="sideMenu(code,menuList)">
     <section class="sidebar">
         <ul class="sidebar-menu" data-widget="tree">
-            <th:block th:each="entry : ${menuList}">
-
-                <li th:if="${entry.mode=='header'}" class="header">
-                    <i class="fa fa-link"></i>
-                    <span th:text="${entry.title}"></span>
-                </li>
-
-                <li th:unless="${entry.mode=='header'}" th:class="${entry.code == code ? 'active':''}">
-                    <a th:href="${entry.url}">
-                        <i class="fa fa-link"></i>
-                        <span th:text="${entry.title}"></span>
+            <th:block th:each="entry:${menuList}">
+                <li th:if="${entry.title==title}" class="treeview active" >
+                    <a><span th:text="${entry.title}"></span>
+                        <span class="pull-right-container"> <i class="fa fa-angle-left pull-right"></i> </span>
                     </a>
+                    <ul class="treeview-menu">
+                    <th:block th:each="item : ${entry.child}">
+                        <li class="menu-item">  <a th:href="${item.url}"> <span th:text="${item.title}"></span> </a> </li>
+
+                    </th:block>
+                    </ul>
                 </li>
+                <li th:unless="${entry.title==title}" class="treeview" >
+                    <a><span th:text="${entry.title}"></span>
+                        <span class="pull-right-container"> <i class="fa fa-angle-left pull-right"></i> </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <th:block th:each="item : ${entry.child}">
+                            <li class="menu-item">  <a th:href="${item.url}"> <span th:text="${item.title}"></span> </a> </li>
 
+                        </th:block>
+                    </ul>
+                </li>
             </th:block>
-
-            <!--<li class="treeview">
-                <a href="#"><i class="fa fa-link"></i> <span>Multilevel</span>
-                    <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
-              </span>
-                </a>
-                <ul class="treeview-menu">
-                    <li><a href="#">Link in level 2</a></li>
-                    <li><a href="#">Link in level 2</a></li>
-                </ul>
-            </li>-->
         </ul>
     </section>
 </aside>

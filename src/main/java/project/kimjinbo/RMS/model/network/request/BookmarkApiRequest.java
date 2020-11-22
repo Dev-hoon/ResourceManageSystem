@@ -15,6 +15,7 @@ import java.time.LocalDate;
 public class BookmarkApiRequest {
     private Long        itemId;
     private Long        registerUser;
+    private Long        updateUser;
 
     private LocalDate   registerDate;
     private LocalDate   updateDate;

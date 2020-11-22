@@ -1,62 +1,41 @@
 (function ($) {
 
-    $(document).ready(function () {
-        search(0,window.registerUser);
-        getSetting();
+    let maxBtnSize = 7;              // 검색 하단 최대 범위
+    let indexBtn = [];               // 인덱스 버튼
 
-        // table에 모두 선택 처리
+    $(document).ready(function () {
+        search(0 );
+
         $('#selectAll').click(function(e){
             let table= $(e.target).closest('table');
             $('td input:checkbox',table).prop('checked',e.target.checked);
 
             if(e.target.checked){
-                itemList.itemList.map( (element) =>{
-                    Object.defineProperty( itemList.selectedItemList, element.id, { value: element, configurable:true, enumerable:true } );
+                bookmarkList.items?.map( (element) =>{
+                    Object.defineProperty( bookmarkList.selectedItem, element.userId+"-"+element.itemId, { value: element, configurable:true, enumerable:true } );
                 })
             }else{
-                itemList.itemList.map( (element) =>{
-                    delete itemList.selectedItemList[element.id]
+                bookmarkList.items?.map( (element) =>{
+                    delete bookmarkList.selectedItem[element.userId+"-"+element.itemId]
                 })
             }
 
-            showPage.selectedElements = Object.entries( itemList.selectedItemList ).length
+            showPage.selectedElements = Object.entries( bookmarkList.selectedItem ).length
 
-            itemList.amountSelect = 10;
-        });
-
-        // 등록일 datepicker 처리
-        $('#registerDate').datepicker({
-            format: "yyyy-mm-dd",	//데이터 포맷 형식(yyyy : 년 mm : 월 dd : 일 )
-            autoclose : true,	//사용자가 날짜를 클릭하면 자동 캘린더가 닫히는 옵션
-            startDate: '-10d',	//달력에서 선택 할 수 있는 가장 빠른 날짜. 이전으로는 선택 불가능 ( d : 일 m : 달 y : 년 w : 주)
-            language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
-        }).on('changeDate', function (event) {
-            itemList.setRegisterDate( dateString(event.date) );
-        });
-
-        // 만료일 datepicker 처리
-        $('#expireDate').datepicker({
-            format: "yyyy-mm-dd",	//데이터 포맷 형식(yyyy : 년 mm : 월 dd : 일 )
-            autoclose : true,	//사용자가 날짜를 클릭하면 자동 캘린더가 닫히는 옵션
-            startDate: '-10d',	//달력에서 선택 할 수 있는 가장 빠른 날짜. 이전으로는 선택 불가능 ( d : 일 m : 달 y : 년 w : 주)
-            language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
-        }).on('changeDate', function (event) {
-            itemList.setExpireDate( dateString(event.date) );
+            bookmarkList.amountSelect = showPage.currentElements;
         });
     });
 
-    // 초기 설정 받아오기
-    function getSetting( ) {
-        $.get("/api/item/setting", function(response){
-            itemList.selectItem     = response.data.itemState;
-            itemList.selectRental   = response.data.rentalState;
-            itemList.categories     = response.data.categories;
-            itemList.selectCate01   = Object.keys( itemList.categories );
-        });
-    }
 
+    //*** common functions *** //
+    // Date 객체를 format에 맞는 string으로 변환
+    function dateString( date ){
+        return date.getFullYear()+ '-' + (date.getMonth()+1).toString().padStart(2,'0') + '-' + date.getDate().toString().padStart(2,'0')
+    }
     // 데이터 받아오기
-    function search(index, registerUser) {
+    function search( index ) {
+        let registerUser = 1;
+
         $.get("/api/bookmarks?page="+index+"&registerUser="+registerUser, function (response) {
             /* 데이터 셋팅 */
             // 페이징 처리 데이터
@@ -64,10 +43,13 @@
             pagination = response.pagination;
 
             //전체 페이지
-            showPage.totalElements      = pagination.currentElements;
+            showPage.totalPages         = pagination.totalPages;
+            showPage.totalElements      = pagination.totalElements;
+            showPage.currentElements    = pagination.currentElements;
             showPage.currentPage        = pagination.currentPage+1;
+
             // 검색 데이터
-            itemList.setItemList( response.data );
+            bookmarkList.setItemList( response.data );
 
             // 이전버튼
             if(pagination.currentPage === 0){
@@ -103,11 +85,7 @@
         });
     }
 
-    // Date 객체를 format에 맞는 string으로 변환
-    function dateString( date ){
-        return date.getFullYear()+ '-' + date.getMonth().toString().padStart(2,'0') + '-' + date.getDate().toString().padStart(2,'0')
-    }
-
+    //*** grid vue *** //
     // 페이징 처리 데이터
     let pagination = {
         totalPages         :  0,       // 전체 페이지수
@@ -116,80 +94,18 @@
         currentElements    :  0,        // 현재 데이터수
         amountPerPage      :  10,
     };
-
     // 페이지 정보
     let showPage = new Vue({
         el : '#showPage',
         data : {
-            totalElements       : {},
-            currentPage         : {},
-            selectedElements    : 0,    // 현재 조건 중 선택된 값들의 수
+            totalPages          : 0,
+            currentPage         : 0,
+            totalElements       : 0,
+            currentElements     : 0,
+            selectedElements    : 0,
+            amountPerPage       : 10,
         }
     });
-
-    // 데이터 리스트
-    let itemList = new Vue({
-        el : '#itemList',
-        data : {
-            itemList         : {},
-            selectedItemList : {},
-            amountSelect     : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
-        },methods:{
-            handlerCheckBox: function(event){
-                event.stopImmediatePropagation();
-
-                let seletedItem = this.itemList[ parseInt( event.target.getAttribute("index") ) ];
-
-                if(event.target.checked){
-                    Object.defineProperty( this.selectedItemList, seletedItem.id, { value: seletedItem, configurable:true, enumerable:true } );
-                    this.amountSelect += 1;
-                }else{
-                    delete this.selectedItemList[seletedItem.id];
-                    this.amountSelect -= 1;
-                }
-
-                showPage.selectedElements = Object.entries( this.selectedItemList ).length
-
-                $('#selectAll input').prop('checked',(this.amountSelect==10)? true : false );
-            },
-            denoteCheckBox: function( ){
-                let items = $("#items_table").find( "td input:checkbox" ).toArray()
-                    .filter(element=>( this.selectedItemList.hasOwnProperty( element.getAttribute("itemId"))) )
-                    .map( (element)=>{
-                        element.checked = true;
-                    })
-
-                this.amountSelect = items.length;
-
-                $('#selectAll input').prop('checked',(items.length==10)? true : false );
-
-            },
-            disableAllCheckBox: function( ){
-                $("#items_table").find( "td input:checkbox" ).prop('checked',false );
-            },
-            setItemList: function( itemList ){
-                this.disableAllCheckBox( );
-                this.itemList = itemList;
-                setTimeout( ()=>{
-                    this.denoteCheckBox( )
-                },50);
-            },
-            itemRowHandler : function( event, item ){
-                console.log("event               : ",event);
-                console.log("itemList.categories : ",itemList.categories);
-                itemModal.pageMode      = 1;
-                itemModal.selectedItem  = $.extend(true, {}, item );
-                itemModal.categories    = new Object( itemList.categories );
-                itemModal.initCategory( );
-                itemModal.modalSelectItem    = itemList.selectItem;
-                itemModal.modalSelectRental  = itemList.selectRental;
-
-                $('#itemModal').modal()
-
-            },
-        }
-    });
-
     // 페이지 버튼 리스트
     let pageBtnList = new Vue({
         el : '#pageBtn',
@@ -199,16 +115,16 @@
         methods: {
             indexClick: function (event) {
                 let id = parseInt( event.target.getAttribute("btn_id") );
-                search(id-1, conditions.getParameter());
+                search(id-1);
             },
             previousClick:function (event) {
                 if(pagination.currentPage !== 0){
-                    search(pagination.currentPage-1, conditions.getParameter() );
+                    search(pagination.currentPage-1 );
                 }
             },
             nextClick:function (event) {
                 if(pagination.currentPage !== pagination.totalPages-1){
-                    search(pagination.currentPage+1, conditions.getParameter() );
+                    search(pagination.currentPage+1 );
                 }
             }
         },
@@ -220,105 +136,190 @@
             },50)
         }
     });
-
-    let itemModal = new Vue({
-        el: '#itemModal',
-        data: {
-            pageMode            : 0,    // modal type 지정  0:create / 1:update
-            selectedItem        : {},
-            categories          : {},
-
-            modalSelectItem     : [],
-            modalSelectRental   : [],
-
-            selectCate01        : [],
-            selectCate02        : [],
-            selectCate03        : [],
-
-        },methods: {
-            initCategory: function( ){
-                this.selectCate01  = Object.keys( this.categories );
-                this.selectCate02  = Object.keys( this.categories[this.selectedItem.superCate] )
-                this.selectCate03  = this.categories[this.selectedItem.superCate][this.selectedItem.subCateFirst];
-
-                this.isChange  =  false;
-            },
-            handleCate01: function () {
-                if( this.categories.hasOwnProperty( this.selectedItem.superCate) ) {
-                    this.selectCate02 = Object.keys(this.categories[this.selectedItem.superCate]);
-                    this.selectedItem.subCateFirst = ""
-                    this.selectedItem.subCateSecond = ""
+    // 장바구니 리스트
+    let bookmarkList = new Vue({
+        el : '#bookmarkList',
+        data : {
+            items            : {},
+            selectedItem     : {},
+            amountSelect     : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
+        },methods:{
+            checkHandler        : function( event, item ){
+                if(event.target.checked){
+                    Object.defineProperty( this.selectedItem, item.userId+"-"+item.itemId, { value: item, configurable:true, enumerable:true } );
+                    this.amountSelect += 1;
+                }else{
+                    delete this.selectedItem[item.userId+"-"+item.itemId];
+                    this.amountSelect -= 1;
                 }
-            },
-            handleCate02: function () {
-                if (this.categories[this.selectedItem.superCate].hasOwnProperty(this.selectedItem.subCateFirst)) {
-                    this.selectCate03 = this.categories[this.selectedItem.superCate][this.selectedItem.subCateFirst];
-                    this.selectedItem.subCateSecond = ""
-                }
-            },
-            updateItem  : function ( updateUser ) {
-                Object.entries(this._data.selectedItem).map((t)=>{console.log("T : ",t)});
 
-                console.log( "validation : "+this.validation() )
+                showPage.selectedElements = Object.entries( this.selectedItem ).length
 
-                let postBody = Object.entries(this._data.selectedItem)
-                    .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
+                $('#selectAll input').prop('checked',(this.amountSelect==10)? true : false );
+            },
+            denoteCheckBox      : function( ){
+                let items = $("#items_table").find( "td input:checkbox" ).toArray()
+                    .filter(element=>( this.selectedItem.hasOwnProperty( element.getAttribute("itemId"))) )
+                    .map( (element)=>{
+                        element.checked = true;
+                    })
+
+                this.amountSelect = items.length;
+
+                $('#selectAll input').prop('checked',(items.length==10)? true : false );
+
+            },
+            disableAllCheckBox  : function( ){
+                $("#items_table").find( "td input:checkbox" ).prop('checked',false );
+            },
+            setItemList         : function( itemList ){
+                this.disableAllCheckBox( );
+                this.items = itemList;
+                setTimeout( ()=>{
+                    this.denoteCheckBox( )
+                },50);
+            },
+            rowHandler          : function( event, item ){
+               /* console.log("event               : ",event);
+                console.log("itemList.categories : ",bookmarkList.categories);
+                itemModal.pageMode      = 1;
+                itemModal.selectedItem  = $.extend(true, {}, item );
+                itemModal.categories    = new Object( bookmarkList.categories );
+                itemModal.initCategory( );
+                itemModal.modalSelectItem    = bookmarkList.selectItem;
+                itemModal.modalSelectRental  = bookmarkList.selectRental;
+
+                $('#itemModal').modal()*/
+
+            },
+
+            deleteHandler       : function( event, item ) {
+                $('#delteButton').attr('disabled', true);
+                console.log("event               : ", event);
+                console.log("itemList.categories : ", bookmarkList.categories);
+                itemModal.pageMode = 1;
+                itemModal.selectedItem = $.extend(true, {}, item);
+                itemModal.categories = new Object(bookmarkList.categories);
+                itemModal.initCategory();
+                itemModal.modalSelectItem = bookmarkList.selectItem;
+                itemModal.modalSelectRental = bookmarkList.selectRental;
+
+                $('#itemModal').modal()
+            },
+            rentalHandler       : function ( ){
+
+                if( this.selectedItem.length == 0 ) return ;
+
+
+                console.log("this.selectedItem[0] : ",this.selectedItem )
+
+                bookmarkModal.item.title = Object.values( this.selectedItem )[0]['name']
+
+                if( Object.values(this.selectedItem).length > 1 )
+                    bookmarkModal.item.title = bookmarkModal.item.title+'  외 '+(Object.values(this.selectedItem).length-1) + ' 개';
+
+                $('#bookmarkModal').modal();
+                /*
+                $('#rentalButton').attr('disabled', true);
+                console.log("rentalHandler : ",this.selectedItem );
+                /*
+                Object.entries( this.rentalList ).filter(item=>item[1]==this.rentalState)
+                    ?.map(item=>{
+                        this.item.rentalState   = item[0];
+                    })*/
+
+                let postBody = Object?.entries(this.selectedItem)
+                    .filter( (v)=>( (v[1]!=null)&&(v[1]!="") ))
                     .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
 
-                Object.defineProperty(postBody, 'updateUser', { value : updateUser})
+                // update user 등록 부분
+                postBody['updateUser'] = 1;
 
-                $.ajax({
-                    type: 'PUT',
-                    url: '/api/item',
-                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
-                    success: function(data) { alert('data: ' + data); },function(response){
-                        console.log( "response : ",response)
+                console.log("ITEM updateItem postBody : ",postBody)
+
+                /*$.ajax({
+                    type: 'POST',
+                    // url: '/api/item',
+                    // data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    success: function(data) {
+                        search( pagination.currentPage, conditions.item  );
+                        alert('자산 수정 완료.');
+                        $('#itemModal').modal("hide");
+                        this.item = { };
+                        $('#rentalButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        alert('자산 수정 실패.');
+                        $('#rentalButton').attr('disabled', false);
                     },
                     contentType: "application/json",
                     dataType: 'json'
-                });
+                });*/
+
+                //$('#rentalButton').attr('disabled', false);
+
             },
-            closeHandler: function ( event ){
-                if( !this.validation() ){
-                    console.log( "not changed ")
-                    $('#itemModal').modal("hide");
-                }else{
-                    console.log( "changed ");
-
-                }
 
 
-            },validation: function(){
-                let originData = itemList.itemList.filter((item)=>(item.id==itemModal.selectedItem.id))[0];
-                return Object.entries( itemModal.selectedItem ).reduce( ( acc, cur )=>{ return acc || (originData[cur[0]]!=cur[1]) }, false )
+        }
+    });
+
+
+    let bookmarkModal = new Vue({
+        el: '#bookmarkModal',
+        data: {
+            mode            : 0,    // modal type 지정  0:create / 1:update
+            item            : {
+                title       : "",
+                startDate   : dateString( new Date( ) ),
+                endDate     : "",
+                reason      : "",
+            },
+            selectedItem    : [],
+        },methods: {
+            initItem        : function ( ){
+                this.item = {
+                    title       : "",
+                    startDate   : dateString( new Date( ) ),
+                    endDate     : "",
+                    reason      : "",
+                },
+                this.selectedItem =  []
+            },
+            rentalHandler   : function ( ){
+                Object.entries( this.rentalList ).filter(item=>item[1]==this.rentalState)
+                    ?.map(item=>{
+                        this.item.rentalState   = item[0];
+                    })
+            },
+            closeHandler    : function ( event ){
+                this.initItem( );
+                $('#itemModal').modal("hide");
             }
         },mounted: function( ) {
             // 등록일 datepicker 처리
-            $('#modalRegisterDate').datepicker({
+            $('#modalStartDate').datepicker({
                 format: "yyyy-mm-dd",	//데이터 포맷 형식(yyyy : 년 mm : 월 dd : 일 )
                 autoclose : true,	//사용자가 날짜를 클릭하면 자동 캘린더가 닫히는 옵션
                 startDate: '-10d',	//달력에서 선택 할 수 있는 가장 빠른 날짜. 이전으로는 선택 불가능 ( d : 일 m : 달 y : 년 w : 주)
                 language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
             }).on('changeDate', function (event) {
-                console.log("changeDate : ")
-                itemModal.selectedItem.createDate = dateString(event.date);
-            }).unbind('change');
+                bookmarkModal.item.startDate = dateString(event.date);
+            })
 
             // 만료일 datepicker 처리
-            $('#modalExpireDate').datepicker({
+            $('#modalEndDate').datepicker({
                 format: "yyyy-mm-dd",	//데이터 포맷 형식(yyyy : 년 mm : 월 dd : 일 )
                 autoclose : true,	//사용자가 날짜를 클릭하면 자동 캘린더가 닫히는 옵션
                 startDate: '-10d',	//달력에서 선택 할 수 있는 가장 빠른 날짜. 이전으로는 선택 불가능 ( d : 일 m : 달 y : 년 w : 주)
                 language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
             }).on('changeDate', function (event) {
-                itemModal.selectedItem.exprieDate =  dateString(event.date);
-            }).unbind('change');
+                bookmarkModal.item.endDate =  dateString(event.date);
+            })
         }
     })
 
-    // for test
-    window.itemList     = itemList;
-    window.registerUser = 1;
 
+    window.bookmarkList = bookmarkList;
 
 })(jQuery);

@@ -6,6 +6,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import project.kimjinbo.RMS.interfaces.CrudInterface;
+import project.kimjinbo.RMS.model.entity.Bookmark;
+import project.kimjinbo.RMS.model.entity.BookmarkPK;
 import project.kimjinbo.RMS.model.network.Header;
 import project.kimjinbo.RMS.model.network.request.BookmarkApiRequest;
 import project.kimjinbo.RMS.model.network.request.ItemTempApiRequest;
@@ -19,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api") //localhost:8080/api
-public class BookmarkController implements CrudInterface<ItemTempApiRequest, ItemTempApiRequest > {
+public class BookmarkController implements CrudInterface<BookmarkApiRequest, BookmarkApiRequest > {
 
     @Autowired
     private BookmarkApiLogicService bookmarkApiLogicService;
@@ -47,20 +49,23 @@ public class BookmarkController implements CrudInterface<ItemTempApiRequest, Ite
 
     @Override
     @PostMapping("/bookmark")
-    public Header create(@RequestBody Header<ItemTempApiRequest> request) {
-        return itemTempApiLogicService.create( request );
+    public Header create(@RequestBody Header<BookmarkApiRequest> request) {
+        return bookmarkApiLogicService.create( request );
     }
 
     @Override
     @PutMapping("/bookmark")
-    public Header update(@RequestBody Header<ItemTempApiRequest> request) {
-        return itemTempApiLogicService.update( request );
+    public Header update(@RequestBody Header<BookmarkApiRequest> request) {
+        return bookmarkApiLogicService.update( request );
     }
 
     @Override
-    @DeleteMapping("/bookmark/{id}")
-    public Header delete(@PathVariable(name = "id") Long id) {
-        return itemTempApiLogicService.delete(id);
+    public Header delete(Long id) { return null; }
+
+    @DeleteMapping("/bookmark")
+    @ResponseBody
+    public Header delete(Long itemId, Long userId ) {
+        return bookmarkApiLogicService.delete( new BookmarkPK(itemId,userId) );
     }
 }
 

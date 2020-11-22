@@ -8,15 +8,20 @@ import project.kimjinbo.RMS.configs.BookmarkSpecs;
 import project.kimjinbo.RMS.configs.ItemSpecs;
 import project.kimjinbo.RMS.interfaces.CrudInterface;
 import project.kimjinbo.RMS.model.entity.Bookmark;
+import project.kimjinbo.RMS.model.entity.BookmarkPK;
+import project.kimjinbo.RMS.model.entity.Category;
 import project.kimjinbo.RMS.model.entity.Item;
 import project.kimjinbo.RMS.model.enumclass.ItemState;
 import project.kimjinbo.RMS.model.enumclass.RentalState;
 import project.kimjinbo.RMS.model.network.Header;
 import project.kimjinbo.RMS.model.network.Pagination;
 import project.kimjinbo.RMS.model.network.request.BookmarkApiRequest;
+import project.kimjinbo.RMS.model.network.request.CateApiRequest;
 import project.kimjinbo.RMS.model.network.response.BookmarkApiResponse;
+import project.kimjinbo.RMS.model.network.response.BookmarkResponse;
 import project.kimjinbo.RMS.repository.BookmarkRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,11 +30,28 @@ import java.util.stream.Collectors;
 public class BookmarkApiLogicService implements CrudInterface<BookmarkApiRequest, BookmarkApiResponse> {
 
     @Autowired
-    private BookmarkRepository BookmarkRepository;
+    private BookmarkRepository bookmarkRepository;
 
     @Override
-    public Header<BookmarkApiResponse> create(Header<BookmarkApiRequest> request) {
-        return null;
+    public Header create(Header<BookmarkApiRequest> request) {
+        LocalDate date = LocalDate.now();
+
+        // 1. request data
+        BookmarkApiRequest bookmarkApiRequest = request.getData();
+
+        // 2. Cate 생성
+        Bookmark bookmark = Bookmark.builder()
+        .registerDate( date )
+        .updateDate( date )
+        .updateUser( bookmarkApiRequest.getRegisterUser() )
+        .registerUser( bookmarkApiRequest.getRegisterUser() )
+        .itemId( bookmarkApiRequest.getItemId() )
+        .memo( bookmarkApiRequest.getMemo() )
+        .build();
+
+        Bookmark newBookmark = bookmarkRepository.save( bookmark );
+
+        return Header.OK( responseBookmark(newBookmark) );
     }
 
     @Override
@@ -38,18 +60,46 @@ public class BookmarkApiLogicService implements CrudInterface<BookmarkApiRequest
     }
 
     @Override
-    public Header<BookmarkApiResponse> update(Header<BookmarkApiRequest> request) {
-        return null;
+    public Header update(Header<BookmarkApiRequest> request) {
+        LocalDate date = LocalDate.now();
+
+        BookmarkApiRequest bookmarkApiRequest = request.getData();
+
+        // 2. id -> department 데이터 를 찾고
+        Optional<Bookmark> optional = bookmarkRepository.findById( new BookmarkPK( bookmarkApiRequest )
+        );
+
+        // 3. data -> update  id
+        return optional.map( item -> {
+            item
+            .setUpdateDate( date )
+            .setUpdateUser( bookmarkApiRequest.getUpdateUser() )
+            .setMemo( bookmarkApiRequest.getMemo() );
+
+            return item;
+        })
+        .map(item -> bookmarkRepository.save(item) )             // update -> newUser
+        .map(item -> responseBookmark(item) )                        // userApiResponse
+        .map(Header::OK)
+        .orElseGet(()->Header.ERROR("데이터 없음"));
     }
 
     @Override
-    public Header delete(Long id) {
-        return null;
+    public Header delete(Long id) { return null; }
+
+    public Header delete( BookmarkPK pk ) {
+
+        Optional<Bookmark> optional = bookmarkRepository.findById( pk  );
+
+        return optional.map( category ->{
+            bookmarkRepository.delete( category );
+            return Header.OK();
+        }).orElseGet(()->Header.ERROR("데이터 없음"));
     }
 
     public Header<List<BookmarkApiResponse>> search(Pageable pageable, BookmarkApiRequest request) {
 
-        Page<Bookmark> bookmarks = BookmarkRepository.findAll( BookmarkSpecs.registerUser( request.getRegisterUser() ) , pageable);
+        Page<Bookmark> bookmarks = bookmarkRepository.findAll( BookmarkSpecs.registerUser( request.getRegisterUser() ) , pageable);
 
         List<BookmarkApiResponse> bookmarkApiResponse = bookmarks.stream()
                 .map( item -> response(item) )
@@ -62,13 +112,18 @@ public class BookmarkApiLogicService implements CrudInterface<BookmarkApiRequest
                 .currentElements(bookmarks.getNumberOfElements())
                 .build();
 
+        System.out.println("BookmarkApiResponse pagination : "+pagination);
+
         return Header.OK( bookmarkApiResponse , pagination );
     }
 
     public BookmarkApiResponse response(Bookmark bookmark){
 
+        System.out.println("bookmark response : "+bookmark);
+
         BookmarkApiResponse bookmarkApiResponse = BookmarkApiResponse.builder()
-                .id( bookmark.getItemId())
+                .itemId( bookmark.getItemId() )
+                .userId( bookmark.getRegisterUser() )
                 .registerDate(bookmark.getRegisterDate() )
                 .expireDate(bookmark.getItem().getExpireDate() )
                 .superCate( bookmark.getItem().getSuperCate() )
@@ -78,29 +133,25 @@ public class BookmarkApiLogicService implements CrudInterface<BookmarkApiRequest
                 .cost( bookmark.getItem().getCost() )
                 .purchaseCost( bookmark.getItem().getPurchaseCost() )
                 .memo( bookmark.getItem().getMemo() )
-                .itemState( ItemState.titleOf( bookmark.getItem().getItemState()) )
                 .placeState( bookmark.getItem().getPlaceState() )
-                .rentalState( RentalState.titleOf(bookmark.getItem().getRentalState()) )
+                .itemState( (bookmark.getItem().getItemState()==null)?null:ItemState.titleOf( bookmark.getItem().getItemState()) )
+                .rentalState( (bookmark.getItem().getRentalState()==null)?null:RentalState.titleOf(bookmark.getItem().getRentalState()) )
                 .build();
 
         return bookmarkApiResponse;
     }
 
-}
+    public BookmarkResponse responseBookmark(Bookmark bookmark){
 
-/*
-     public Header<ItemApiResponse> readWhere(Header<ItemApiRequest> request) {
-        LocalDate date = LocalDate.now();
+        System.out.println("bookmark responseBookmark : "+bookmark);
 
-        ItemApiRequest req = request.getData();
+        BookmarkResponse bookmarkResponse = BookmarkResponse.builder()
+                .itemId( bookmark.getItemId())
+                .userId( bookmark.getRegisterUser() )
+                .memo(  bookmark.getMemo() )
+                .build();
 
-        List<ItemApiResponse> items = itemRepository.findAll(
-                ItemSpecs.superCate(  req.getSuperCate() ).and(
-                        ItemSpecs.subCateFirst(req.getSubCateFirst()) ).and(
-                        ItemSpecs.subCateSecond(req.getSubCateSecond())
-                )
-        ).stream().map( el-> ( response(el) ) ).collect(Collectors.toList());
-
-        return Header.OK( items.get(0) );
+        return bookmarkResponse;
     }
- */
+
+}

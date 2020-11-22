@@ -275,6 +275,22 @@
             totalElements    : 0,
             currentPage      : 0,
             selectedElements : 0,    // 현재 조건 중 선택된 값들의 수
+        },methods: {
+            bookmarkHandler     : function ( ) {
+                if( Object.keys( itemList.selectedItem ).length == 0 ) return ;
+
+               
+
+
+
+            },
+            openBookmark        : function ( ) {
+                location.href = "/pages/bookmark"
+            },
+            rentalHandler       : function ( ) {
+                location.href = "/pages/item/enroll"
+            },
+
         }
     });
     // 페이지 버튼 리스트
@@ -394,7 +410,6 @@
                 cdKey           :   "",
                 licence         :   "",
              },
-
             selectedItem        : {},
             modalSelectRental   : [],
 
@@ -459,8 +474,6 @@
 
                 // update user 등록 부분
                 postBody['updateUser'] = 1;
-
-                console.log("ITEM updateItem postBody : ",postBody)
 
                 $.ajax({
                     type: 'PUT',
