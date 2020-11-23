@@ -31,6 +31,8 @@
     //*** condition vue *** //
     // 초기 설정 받아오기
     function getSetting( ) {
+
+
         $.get("/api/item/setting", function(response){
 
             console.log("response : ",response.data)

@@ -177,10 +177,6 @@
                 $('li[btn_id='+(historyPagination.currentPage+1)+']').addClass( "active" );
             },50)
 
-            /*if(collapse){
-                $('#conditionBox').boxWidget('collapse');
-                $('#itemBox').boxWidget('expand');
-            }*/
 
         });
     }

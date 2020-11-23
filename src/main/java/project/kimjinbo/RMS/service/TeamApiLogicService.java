@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.kimjinbo.RMS.interfaces.CrudInterface;
+import project.kimjinbo.RMS.model.entity.Department;
 import project.kimjinbo.RMS.model.entity.Place;
 import project.kimjinbo.RMS.model.entity.Team;
 import project.kimjinbo.RMS.model.network.Header;
@@ -17,6 +18,7 @@ import project.kimjinbo.RMS.repository.PlaceRepository;
 import project.kimjinbo.RMS.repository.TeamRepository;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -137,5 +139,15 @@ public class TeamApiLogicService implements CrudInterface<TeamApiRequest, TeamAp
                 .departmentName( ( team.getDepartment() == null )? null:team.getDepartment().getName() )
                 .departmentId( ( team.getDepartment() == null )? null:team.getDepartment().getId() )
                 .build();
+    }
+
+    public Header getList(){
+        List<Team> list = teamRepository.findAll();
+
+        return Optional.of(
+                list.stream()
+                .collect( Collectors.toMap(Team::getId,Team::getName)) )
+                .map(Header::OK)
+                .orElseGet(()->Header.ERROR("데이터 없음"));
     }
 }

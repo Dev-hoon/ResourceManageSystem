@@ -1,30 +1,26 @@
-package project.kimjinbo.RMS.model.entity;
+package project.kimjinbo.RMS.model.network.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
 
+import javax.persistence.Column;
 import java.time.LocalDate;
 
-import javax.persistence.*;
-
 @Data
-@Entity
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@Accessors(chain=true)
-public class Employee {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@AllArgsConstructor
+public class EmployeeApiRequest {
     private Long        id;
     private Long        registerUser;
     private Long        updateUser;
+
     private LocalDate   registerDate;
     private LocalDate   updateDate;
     private LocalDate   enteredDate;
+
     private String      name;
     private String      email;
     private String      phone;
@@ -33,19 +29,7 @@ public class Employee {
     private String      memo;
     private String      passwd;
     private String      empNum;
-
-    @Column(name="dep_id")
     private Integer     depId;
-
-    @Column(name="team_id")
     private Integer     teamId;
-
-    @OneToOne
-    @JoinColumn(name="dep_id", insertable = false, updatable = false)
-    Department Department;
-
-    @OneToOne
-    @JoinColumn(name="team_id", insertable = false, updatable = false)
-    Team team;
 
 }

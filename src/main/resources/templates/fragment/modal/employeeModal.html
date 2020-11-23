@@ -1,0 +1,102 @@
+<html lang="ko"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org/" xmlns:v-on="http://www.w3.org/1999/xhtml">
+
+<div id="employeeModal" class="modal fade" tabindex="-1" role="dialog"  th:fragment="employeeModal"  >
+    <div class="modal-dialog modal-lg" role="document" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">사원정보수정</h4>
+            </div>
+            <div class="modal-body">
+                <form id="employeeModalForm" >
+                    <div class="form-group row row-center text-center md-4">
+                        <label class="col-sm-2 col-form-label">사원명</label>
+                        <div class="col-sm-5">
+                            <label class="sr-only" for="name">사원명</label>
+                            <input  type="text" class="form-control" id="name" placeholder="사원명" v-model="item.name">
+                        </div>
+                        <div class="col-sm-7"></div>
+                    </div>
+
+                    <div class="form-group row row-center text-center md-4">
+                        <label class="col-sm-2 col-form-label">사원 ID</label>
+                        <div class="col-sm-5">
+                            <label class="sr-only" for="email">사원 ID</label>
+                            <input disabled type="text" class="form-control" id="id" placeholder="사원 ID" v-model="item.id">
+                        </div>
+                        <label class="col-sm-2 col-form-label">사원번호</label>
+                        <div class="col-sm-5">
+                            <label class="sr-only" for="empNum">사원번호</label>
+                            <input type="text" class="form-control" id="empNum" placeholder="사원번호" v-model="item.empNum">
+                        </div>
+                    </div>
+
+                    <div class="form-group row row-center text-center md-4">
+                        <label class="col-sm-2 col-form-label">전화번호</label>
+                        <div class="col-sm-5">
+                            <label class="sr-only" for="phone">head</label>
+                            <input type="text" class="form-control" id="phone" placeholder="전화번호" v-model="item.phone">
+                        </div>
+                        <label class="col-sm-2 col-form-label">이메일</label>
+                        <div class="col-sm-5">
+                            <label class="sr-only" for="email">headDate</label>
+                            <input type="text" class="form-control" id="email" placeholder="이메일" v-model="item.email">
+                        </div>
+                    </div>
+
+                    <div class="form-group row row-center text-center md-4">
+                        <label class="col-sm-2 col-form-label">부서정보</label>
+                        <div class="col-sm-5">
+                            <select id="department" class="col-sm-8 form-control" v-model="departmentName" v-on:change="depHandler">
+                                <option value="">선택</option>
+                                <option v-for="department in departments" >{{department}}</option>
+                            </select>
+                        </div>
+
+                        <label class="col-sm-2 col-form-label">팀정보</label>
+                        <div class="col-sm-5">
+                            <select id="team" class="col-sm-8 form-control" v-model="teamName" v-on:change="teamHandler">
+                                <option value="">선택</option>
+                                <option v-for="team in teams" >{{team}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row row-center text-center md-4">
+                        <label class="col-sm-2 col-form-label">입사일</label>
+                        <div class="col-sm-5">
+                            <label class="sr-only" for="phone">입사일</label>
+                            <input id="enteredDate" type="text" class="form-control" placeholder="입사일" v-model="item.enteredDate">
+                        </div>
+                        <label class="col-sm-2 col-form-label">직급</label>
+                        <div class="col-sm-5">
+                            <label class="sr-only" for="email">직급</label>
+                            <input type="text" class="form-control" id="position" placeholder="직급" v-model="item.position">
+                        </div>
+                    </div>
+
+                    <div class="form-group row row-center text-center">
+                        <label class="col-sm-2 col-form-label">메모</label>
+                        <div class="col-sm-12">
+                            <textarea type="text" class="form-control" aria-label="memo" rows="5" v-model="item.memo"></textarea>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button id="createButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="createItem" > 수정 </button>
+                <button id="deleteButton" type="button" class="btn btn-sm btn-danger"  v-on:click="deleteItem" > 삭제 </button>
+                <button type="Button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">   닫기 </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+</html>
+

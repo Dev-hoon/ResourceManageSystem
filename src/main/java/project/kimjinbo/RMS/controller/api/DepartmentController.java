@@ -21,7 +21,11 @@ public class DepartmentController implements CrudInterface<DepartmentApiRequest,
     @Autowired
     private DepartmentApiLogicService departmentApiLogicService;
 
-    // 조건 사용 가능  localhost:8080/api/items
+    @GetMapping("/department/list")
+    public Header departmentList( ) {
+        return departmentApiLogicService.getList( );
+    }
+
     @GetMapping("/departments")
     @ResponseBody
     public Header<List<DepartmentApiResponse>> readDepartments(@PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable, DepartmentApiRequest departmentApiRequest) {
@@ -43,7 +47,6 @@ public class DepartmentController implements CrudInterface<DepartmentApiRequest,
         return departmentApiLogicService.create( request );
     }
 
-    // /api/item?id={id}
     @Override
     @GetMapping("/department")
     public Header<DepartmentApiResponse> read(@RequestParam(name = "id") Long id) {

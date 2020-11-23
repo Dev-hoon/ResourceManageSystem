@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.kimjinbo.RMS.interfaces.CrudInterface;
 import project.kimjinbo.RMS.model.entity.Department;
+import project.kimjinbo.RMS.model.entity.Employee;
+import project.kimjinbo.RMS.model.entity.Team;
 import project.kimjinbo.RMS.model.network.Header;
 import project.kimjinbo.RMS.model.network.Pagination;
 import project.kimjinbo.RMS.model.network.request.DepartmentApiRequest;
@@ -17,6 +19,7 @@ import project.kimjinbo.RMS.repository.DepartmentRepository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -144,6 +147,16 @@ public class DepartmentApiLogicService implements CrudInterface<DepartmentApiReq
                 .addressName( (department.getPlace()==null) ? null :department.getPlace().getName() )
                 .addressDetail( (department.getPlace()==null) ? null :department.getPlace().getAddressDetail() )
                 .build();
+    }
+
+    public Header getList(){
+        List<Department> list = departmentRepository.findAll();
+
+        return Optional.of(
+                list.stream()
+                .collect( Collectors.toMap(Department::getId,Department::getName)) )
+                .map(Header::OK)
+                .orElseGet(()->Header.ERROR("데이터 없음"));
     }
 
 }

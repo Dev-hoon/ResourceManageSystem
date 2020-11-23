@@ -22,13 +22,6 @@ public class PageController {
                 ;
     }
 
-    @RequestMapping("/user")
-    public ModelAndView user() {
-        return new ModelAndView("/pages/user")
-                .addObject("menuList", adminMenuService.getAdminMenu("사원관리"))
-                .addObject("code", "user")
-                ;
-    }
 
     //***  자산관련 페이지  ***//
     @RequestMapping("/item/enroll")
@@ -111,5 +104,13 @@ public class PageController {
                 ;
     }
 
+    @RequestMapping("/user")
+    public ModelAndView user() {
+        return new ModelAndView("/pages/user")
+                .addObject("menuList", adminMenuService.getAdminMenu("사원관리"))
+                .addObject("code", "user")
+                .addObject("title", "관리")
+                ;
+    }
 
 }

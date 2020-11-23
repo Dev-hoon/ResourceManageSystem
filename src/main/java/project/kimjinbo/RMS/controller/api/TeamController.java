@@ -20,14 +20,17 @@ public class TeamController implements CrudInterface<TeamApiRequest, TeamApiResp
     @Autowired
     private TeamApiLogicService teamApiLogicService;
 
-    // 조건 사용 가능  localhost:8080/api/items
+    @GetMapping("/team/list")
+    public Header employeeList( ) {
+        return teamApiLogicService.getList( );
+    }
+
     @GetMapping("/teams")
     @ResponseBody
     public Header<List<TeamApiResponse>> readTeams(@PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable, TeamApiRequest request) {
         System.out.println("Team GET request : "+request);
         return teamApiLogicService.search( pageable, request );
     }
-
 
     @Override
     @PostMapping("/team")
