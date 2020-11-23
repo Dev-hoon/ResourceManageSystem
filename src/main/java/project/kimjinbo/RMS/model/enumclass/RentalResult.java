@@ -14,7 +14,8 @@ public enum RentalResult {
     RENTAL_WAIT     (10,"승인대기","대여승인대기"),
     RENTAL_ACCEPT   (11,"대여승인","대여승인상태"),
     RENTAL_DENY     (12,"대여반려","대여반려상태"),
-    RENTAL_HOLD     (13,"대여보류","대여보류상태");
+    RENTAL_RETURN   (13,"대여보류","대여보류상태"),
+    RENTAL_HOLD     (14,"대여보류","대여보류상태");
 
     private Integer id;
     private String title;

@@ -2,6 +2,7 @@ package project.kimjinbo.RMS.model.entity;
 
 import lombok.*;
 import project.kimjinbo.RMS.model.network.request.RentalApiRequest;
+import project.kimjinbo.RMS.model.network.request.RentalRequest;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -19,6 +20,12 @@ public class RentalPK implements Serializable {
         this.empId      = rentalApiRequest.getEmpId();
         this.itemId     = rentalApiRequest.getItemId();
         this.startDate  = rentalApiRequest.getStartDate();
+    }
+
+    public RentalPK( RentalRequest rentalRequest, Long itemId ){
+        this.empId      = rentalRequest.getUserId();
+        this.itemId     = itemId;
+        this.startDate  = LocalDate.parse(rentalRequest.getStartDate());
     }
 
     @Override

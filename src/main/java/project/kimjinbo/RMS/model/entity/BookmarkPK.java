@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import project.kimjinbo.RMS.model.network.request.BookmarkApiRequest;
+import project.kimjinbo.RMS.model.network.request.BookmarkRequest;
 
 import javax.persistence.Column;
 import java.util.Objects;

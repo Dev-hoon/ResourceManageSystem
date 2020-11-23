@@ -16,6 +16,7 @@ import project.kimjinbo.RMS.model.enumclass.RentalState;
 import project.kimjinbo.RMS.model.network.Header;
 import project.kimjinbo.RMS.model.network.Pagination;
 import project.kimjinbo.RMS.model.network.request.BookmarkApiRequest;
+import project.kimjinbo.RMS.model.network.request.BookmarkRequest;
 import project.kimjinbo.RMS.model.network.request.CateApiRequest;
 import project.kimjinbo.RMS.model.network.response.BookmarkApiResponse;
 import project.kimjinbo.RMS.model.network.response.BookmarkResponse;
@@ -87,14 +88,48 @@ public class BookmarkApiLogicService implements CrudInterface<BookmarkApiRequest
     @Override
     public Header delete(Long id) { return null; }
 
-    public Header delete( BookmarkPK pk ) {
+    public Header delete( BookmarkPK bookmarkPK ) {
 
-        Optional<Bookmark> optional = bookmarkRepository.findById( pk  );
+        Optional<Bookmark> optional = bookmarkRepository.findById( bookmarkPK );
 
         return optional.map( category ->{
             bookmarkRepository.delete( category );
             return Header.OK();
         }).orElseGet(()->Header.ERROR("데이터 없음"));
+    }
+
+    public Header createItems(Header<BookmarkRequest> request) {
+        LocalDate date = LocalDate.now();
+
+        // 1. request data
+        BookmarkRequest bookmarkRequest = request.getData();
+
+        System.out.println("request.getData() : "+request.getData());
+
+        List bookmarks = bookmarkRequest.getItems().stream().map( ( item )->{
+            try {
+                Bookmark bookmark = Bookmark.builder()
+                        .registerDate( date )
+                        .updateDate( date )
+                        .updateUser( bookmarkRequest.getUserId() )
+                        .registerUser( bookmarkRequest.getUserId() )
+                        .itemId( item )
+                        .memo( bookmarkRequest.getMemo() )
+                        .build();
+
+                System.out.println("createItems bookmark : "+bookmark);
+
+                Bookmark newBookmark = bookmarkRepository.save( bookmark );
+
+                return newBookmark;
+            } catch(Exception e) {
+                return "error";
+            }
+        }).collect(Collectors.toList());
+
+        System.out.println("bookmarks: "+bookmarks );
+
+        return Header.OK( bookmarks );
     }
 
     public Header<List<BookmarkApiResponse>> search(Pageable pageable, BookmarkApiRequest request) {

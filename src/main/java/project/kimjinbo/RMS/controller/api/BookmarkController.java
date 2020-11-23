@@ -10,6 +10,7 @@ import project.kimjinbo.RMS.model.entity.Bookmark;
 import project.kimjinbo.RMS.model.entity.BookmarkPK;
 import project.kimjinbo.RMS.model.network.Header;
 import project.kimjinbo.RMS.model.network.request.BookmarkApiRequest;
+import project.kimjinbo.RMS.model.network.request.BookmarkRequest;
 import project.kimjinbo.RMS.model.network.request.ItemTempApiRequest;
 import project.kimjinbo.RMS.model.network.response.BookmarkApiResponse;
 import project.kimjinbo.RMS.model.network.response.ItemTempApiResponse;
@@ -33,6 +34,7 @@ public class BookmarkController implements CrudInterface<BookmarkApiRequest, Boo
     @ResponseBody
     public Header<List<BookmarkApiResponse>> readItems(@PageableDefault(sort = { "item_id" }, direction = Sort.Direction.ASC) Pageable pageable, BookmarkApiRequest bookmarkApiRequest) {
         System.out.println("request : "+bookmarkApiRequest);
+        if(bookmarkApiRequest.getRegisterUser()==null) return Header.ERROR("유저 정보가 없음");
         return bookmarkApiLogicService.search( pageable, bookmarkApiRequest );
     }
 
@@ -41,6 +43,12 @@ public class BookmarkController implements CrudInterface<BookmarkApiRequest, Boo
     public Header<Long> amount(@PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable, ItemTempApiRequest ItemTempApiRequest) {
         System.out.println("request : "+ItemTempApiRequest);
         return itemTempApiLogicService.amount( pageable, ItemTempApiRequest );
+    }
+
+    @PostMapping("/bookmarks")
+    public Header createItems(@RequestBody Header<BookmarkRequest> request) {
+        System.out.println("bookmarks BookmarkRequest request : "+request);
+        return bookmarkApiLogicService.createItems( request );
     }
 
     @Override

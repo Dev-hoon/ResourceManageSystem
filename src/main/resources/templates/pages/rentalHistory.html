@@ -40,96 +40,75 @@
                 <div class="col-xs-12">
                     <div class="box">
                         <!-- /.box-header -->
-                        <div class="box-header">
+                        <div class="box-header md-1">
                             <h3 class="box-title">대여기록조회</h3>
                         </div>
                         <!-- /.box-body -->
                         <div class="box-body">
                             <form id="queryConditions" >
                                 <div class="col-sm-12">
-                                    <div class="form-group row row-center text-center">
-                                        <label class="col-sm-1 col-form-label">자산ID</label>
-                                        <div class="col-sm-2">
-                                            <label class="sr-only" for="itemId">superCate</label>
-                                            <input type="text" class="form-control" id="itemId" placeholder="자산ID" v-model="id">
-                                        </div>
-                                        <label class="col-sm-1 col-form-label">자산이름</label>
-                                        <div class="col-sm-2">
-                                            <label class="sr-only" for="itemId">superCate</label>
-                                            <input type="text" class="form-control" id="itemName" placeholder="자산이름" v-model="name">
+
+                                    <div class="row text-center md-4">
+
+                                        <div class="col-sm-4 row-center">
+                                            <label class="col-sm-3 col-form-label">대여인</label>
+                                            <div class="col-sm-9">
+                                                <label class="sr-only" for="name">대여인</label>
+                                                <input type="text" class="form-control" id="name" placeholder="대여인" v-model="name">
+                                            </div>
                                         </div>
 
-                                        <label class="col-sm-1 col-form-label">등록일</label>
-                                        <div class="col-sm-2">
-                                            <input type="text" id="createDate" class="form-control col-sm-3" placeholder="등록일" v-model="createDate" >
+
+                                        <div class="col-sm-4 row-center">
+                                            <label class="col-sm-3 col-form-label">전화번호</label>
+                                            <div class="col-sm-9">
+                                                <label class="sr-only" for="phone">전화번호</label>
+                                                <input type="text" class="form-control" id="phone" placeholder="전화번호" v-model="phone">
+                                            </div>
                                         </div>
 
-                                        <label class="col-sm-1 col-form-label">만료일</label>
-                                        <div class="col-sm-2">
-                                            <input type="text" id="expireDate" class="form-control col-sm-3" placeholder="만료일" v-model="expireDate">
+
+                                        <div class="col-sm-4 row-center">
+                                            <label class="col-sm-3 col-form-label">이메일</label>
+                                            <div class="col-sm-9">
+                                                <label class="sr-only" for="email">이메일</label>
+                                                <input type="text" class="form-control" id="email" placeholder="이메일" v-model="email">
+                                            </div>
                                         </div>
+
+
 
                                     </div>
 
-                                    <div class="form-group row row-center text-center">
-                                        <label class="col-sm-1 col-form-label">분류정보</label>
-                                        <div class="col-sm-4">
-                                            <label for="superCate">대분류</label>
-                                            <select id="superCate" class="form-control" v-model="superCate" v-on:change="handleCate01">
-                                                <option value="">선택</option>
-                                                <option v-for="category in selectCate01" >{{category}}</option>
-                                            </select>
+                                    <div class="row text-center md-4">
+                                        <div class="col-sm-4 row-center">
+                                            <label class="col-sm-3 col-form-label">부서정보</label>
+                                            <div class="col-sm-9">
+                                                <select id="department" class="col-sm-8 form-control" v-model="department">
+                                                    <option value="">선택</option>
+                                                    <option v-for="category in departments" >{{category}}</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                        <div class="col-sm-4">
-                                            <label for="subCateFirst">소분류 1</label>
-                                            <select id="subCateFirst" class="form-control" v-model="subCateFirst" v-on:change="handleCate02">
-                                                <option value="">선택</option>
-                                                <option v-for="category in selectCate02" >{{category}}</option>
-                                            </select>
 
+                                        <div class="col-sm-4 row-center">
+                                            <label class="col-sm-3 col-form-label">팀정보</label>
+                                            <div class="col-sm-9">
+                                                <select id="team" class="col-sm-8 form-control" v-model="team" >
+                                                    <option value="">선택</option>
+                                                    <option v-for="category in teams" >{{category}}</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                        <div class="col-sm-4">
-                                            <label for="subCateSecond">소분류 2</label>
-                                            <select id="subCateSecond" class="form-control" v-model="subCateSecond">
-                                                <option value="">선택</option>
-                                                <option v-for="category in selectCate03" >{{category}}</option>
-                                            </select>
 
-                                        </div>
+                                        <div class="col-sm-4"></div>
+
                                     </div>
 
-                                    <div class="form-group row row-center text-center">
-                                        <label class="col-sm-1 col-form-label">상태정보</label>
-                                        <div class="col-sm-4">
-                                            <label for="itemState">자산상태</label>
-                                            <select id="itemState" class="form-control" v-model="itemState">
-                                                <option value="">선택</option>
-                                                <option v-for="state in selectItem" >{{state}}</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <label for="rentalState">대여상태</label>
-                                            <select id="rentalState" class="form-control" v-model="rentalState">
-                                                <option value="">선택</option>
-                                                <option v-for="state in selectRental" >{{state}}</option>
-                                            </select>
-
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <label for="placeState">위치상태</label>
-                                            <select id="placeState" class="form-control" v-model="placeState">
-                                                <option value="">선택</option>
-                                                <option>...</option>
-                                            </select>
-
-                                        </div>
-                                    </div>
 
                                     <div class="form-group pull-right">
-                                        <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 초기화 </button>
-                                        <button type="button" class="btn btn-sm btn-primary dark" v-on:click="searchItems"> 조회 </button>
-                                        <button type="button" class="btn btn-sm btn-primary dark" v-on:click="createItem"> 등록 </button>
-                                        <button type="button" class="btn btn-sm btn-primary dark"> 카테고리등록 </button>
+                                        <button id="initButton"   type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 초기화 </button>
+                                        <button id="searchButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="searchItems">    조회   </button>
                                     </div>
                                 </div>
                             </form>
@@ -152,9 +131,9 @@
 
     <div class="control-sidebar-bg"></div>
 
-    <!-- itemModal Start -->
+    <!-- itemModal Start -
     <div th:replace="fragment/itemModal :: itemModal"></div>
-    <!-- itemModal End -->
+     itemModal End -->
 
 </div>
 

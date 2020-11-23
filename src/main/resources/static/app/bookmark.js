@@ -104,6 +104,24 @@
             currentElements     : 0,
             selectedElements    : 0,
             amountPerPage       : 10,
+        },methods : {
+            rentalHandler       : function ( ){
+
+                if( Object.keys(bookmarkList.selectedItem).length == 0 ) return ;
+
+
+                console.log("this.selectedItem[0] : ",bookmarkList.selectedItem )
+
+                bookmarkModal.item.title = Object.values( bookmarkList.selectedItem )[0]['name']
+
+                bookmarkModal.selectedItem  =   bookmarkList.selectedItem;
+
+                if( Object.values(bookmarkList.selectedItem).length > 1 )
+                    bookmarkModal.item.title = bookmarkModal.item.title+'  외 '+(Object.values(bookmarkModal.selectedItem).length-1) + ' 개';
+
+                $('#bookmarkModal').modal();
+                     },
+            deleteHandler       : function ( ){ }
         }
     });
     // 페이지 버튼 리스트
@@ -179,20 +197,6 @@
                     this.denoteCheckBox( )
                 },50);
             },
-            rowHandler          : function( event, item ){
-               /* console.log("event               : ",event);
-                console.log("itemList.categories : ",bookmarkList.categories);
-                itemModal.pageMode      = 1;
-                itemModal.selectedItem  = $.extend(true, {}, item );
-                itemModal.categories    = new Object( bookmarkList.categories );
-                itemModal.initCategory( );
-                itemModal.modalSelectItem    = bookmarkList.selectItem;
-                itemModal.modalSelectRental  = bookmarkList.selectRental;
-
-                $('#itemModal').modal()*/
-
-            },
-
             deleteHandler       : function( event, item ) {
                 $('#delteButton').attr('disabled', true);
                 console.log("event               : ", event);
@@ -206,59 +210,7 @@
 
                 $('#itemModal').modal()
             },
-            rentalHandler       : function ( ){
 
-                if( this.selectedItem.length == 0 ) return ;
-
-
-                console.log("this.selectedItem[0] : ",this.selectedItem )
-
-                bookmarkModal.item.title = Object.values( this.selectedItem )[0]['name']
-
-                if( Object.values(this.selectedItem).length > 1 )
-                    bookmarkModal.item.title = bookmarkModal.item.title+'  외 '+(Object.values(this.selectedItem).length-1) + ' 개';
-
-                $('#bookmarkModal').modal();
-                /*
-                $('#rentalButton').attr('disabled', true);
-                console.log("rentalHandler : ",this.selectedItem );
-                /*
-                Object.entries( this.rentalList ).filter(item=>item[1]==this.rentalState)
-                    ?.map(item=>{
-                        this.item.rentalState   = item[0];
-                    })*/
-
-                let postBody = Object?.entries(this.selectedItem)
-                    .filter( (v)=>( (v[1]!=null)&&(v[1]!="") ))
-                    .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
-
-                // update user 등록 부분
-                postBody['updateUser'] = 1;
-
-                console.log("ITEM updateItem postBody : ",postBody)
-
-                /*$.ajax({
-                    type: 'POST',
-                    // url: '/api/item',
-                    // data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
-                    success: function(data) {
-                        search( pagination.currentPage, conditions.item  );
-                        alert('자산 수정 완료.');
-                        $('#itemModal').modal("hide");
-                        this.item = { };
-                        $('#rentalButton').attr('disabled', false);
-                    },
-                    error: function( ){
-                        alert('자산 수정 실패.');
-                        $('#rentalButton').attr('disabled', false);
-                    },
-                    contentType: "application/json",
-                    dataType: 'json'
-                });*/
-
-                //$('#rentalButton').attr('disabled', false);
-
-            },
 
 
         }
@@ -286,11 +238,45 @@
                 },
                 this.selectedItem =  []
             },
-            rentalHandler   : function ( ){
-                Object.entries( this.rentalList ).filter(item=>item[1]==this.rentalState)
-                    ?.map(item=>{
-                        this.item.rentalState   = item[0];
-                    })
+            updateItem       : function ( ){
+
+                if( Object.keys(this.selectedItem).length == 0 ) return ;
+
+                $('#updateItemButton').attr('disabled', true);
+
+                let postBody = Object.entries(this.item)
+                    .filter( (v)=>( (v[1]!=null)&&(v[1].constructor!=Object)&&(v[1].constructor!=Array) ))
+                    .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
+
+                console.log("this.selectedItem : ",this.selectedItem );
+
+                postBody["items"] = Object.entries(  this.selectedItem )
+                        .filter( (v)=>( (v[1]!=null)&&(v[1]!="") ))
+                        .reduce( (acc,cur)=>{ acc.push( cur[1].itemId ); return acc; }, [] );
+
+                // update user 등록 부분
+                postBody['userId'] = 1;
+
+                console.log("ITEM updateItem postBody : ",postBody )
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/rentals',
+                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    success: function( data ) {
+                        search( pagination.currentPage );
+                        toastr.success('대여 신청 완료')
+                        $('#updateItemButton').attr('disabled', false);
+                        $('#bookmarkModal').modal('hide');
+                    },
+                    error: function( ){
+                        toastr.error('대여 수정 실패')
+                        $('#updateItemButton').attr('disabled', false);
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
+
             },
             closeHandler    : function ( event ){
                 this.initItem( );

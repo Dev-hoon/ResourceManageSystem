@@ -135,40 +135,74 @@
             amountPerPage       : 10,
         },methods:{
             acceptHandler   : function  ( ){
+
+                if( Object.keys(requestList.selectedItem).length == 0 ) return ;
+
                 $('#acceptButton').attr('disabled', true);
+
                 console.log("requestList.selectItem : ",requestList.selectedItem )
 
-                let requestAmount = Object.keys( requestList.selectedItem ).length
+                // update user 등록 부분
+                let updateUser = 1;
 
-                Object.entries( requestList.selectedItem ).map( (item)=>{
+                let postBody =  Object.values( requestList.selectedItem ).map((item)=>(
+                        { 'itemId' : item.itemId, 'empId' : item.empId, 'startDate' : item.startDate,'endDate' : item.endDate, 'updateUser' : updateUser  }
+                    ) );
 
-                    let postBody = Object.entries( item )
-                        .filter( (v)=>( (v[1]!=null)&&(v[1]!="") ))
-                        .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
+                console.log("RENTAL ACCEPT postBody\' : ",postBody)
 
-                    // update user 등록 부분
-                    postBody['updateUser'] = 1;
+                $.ajax({
+                    type: 'PUT',
+                    url: '/api/rentals/accept',
+                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    success: function( data ) {
+                        search( paginationList['requests'].currentPage, 'requests');
+                        toastr.success('대여 승인 완료')
+                        $('#acceptButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        toastr.error('대여 승인 실패')
+                        $('#acceptButton').attr('disabled', false);
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
 
-                    console.log("RENTAL ACCEPT postBody : ",postBody)
 
-                    $.ajax({
-                        type: 'PUT',
-                        url: '/api/rental',
-                        data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
-                        success: function(data) {
-
-                        },
-                        error: function( ){
-
-                        },
-                        contentType: "application/json",
-                        dataType: 'json'
-                    });
-                })
 
             },
             denyHandler     : function  ( ){
-                console.log("denyHandler")
+                if( Object.keys(requestList.selectedItem).length == 0 ) return ;
+
+                $('#denyButton').attr('disabled', true);
+
+                console.log("requestList.selectItem : ",requestList.selectedItem )
+
+                // update user 등록 부분
+                let updateUser = 1;
+
+                let postBody =  Object.values( requestList.selectedItem ).map((item)=>(
+                    { 'itemId' : item.itemId, 'empId' : item.empId, 'startDate' : item.startDate,'endDate' : item.endDate, 'updateUser' : updateUser  }
+                ) );
+
+                console.log("RENTAL ACCEPT postBody\' : ",postBody)
+
+                $.ajax({
+                    type: 'PUT',
+                    url: '/api/rentals/deny',
+                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    success: function( data ) {
+                        search( paginationList['requests'].currentPage , 'requests');
+                        toastr.success('대여 반려 완료')
+                        $('#denyButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        toastr.error('대여 반려 실패')
+                        $('#denyButton').attr('disabled', false);
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
             }
         }
     });
@@ -245,7 +279,6 @@
                     this.denoteCheckBox( )
                 },50);
             },
-
             deleteHandler       : function( event, item ) {
                 $('#delteButton').attr('disabled', true);
                 console.log("event               : ", event);
@@ -392,6 +425,40 @@
             currentElements     : 0,
             selectedElements    : 0,
             amountPerPage       : 10,
+        }, methods : {
+            returnHandler       : function( ){
+                if( Object.keys(overdueList.selectedItem).length == 0 ) return ;
+
+                $('#denyButton').attr('disabled', true);
+
+                console.log("overdueList.selectItem : ",overdueList.selectedItem )
+
+                // update user 등록 부분
+                let updateUser = 1;
+
+                let postBody =  Object.values( overdueList.selectedItem ).map((item)=>(
+                    { 'itemId' : item.itemId, 'empId' : item.empId, 'startDate' : item.startDate,'endDate' : item.endDate, 'updateUser' : updateUser  }
+                ) );
+
+                console.log("RENTAL ACCEPT postBody\' : ",postBody)
+
+                $.ajax({
+                    type: 'PUT',
+                    url: '/api/rentals/return',
+                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    success: function( data ) {
+                        search( paginationList['overdue'].currentPage , 'overdue');
+                        toastr.success('대여 반려 완료')
+                        $('#denyButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        toastr.error('대여 반려 실패')
+                        $('#denyButton').attr('disabled', false);
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
+            }
         }
     });
     // 페이지 버튼 리스트
@@ -406,13 +473,13 @@
                 search(id-1);
             },
             previousClick:function (event) {
-                if(paginationList['requests'].currentPage !== 0){
-                    search(paginationList['requests'].currentPage-1 );
+                if(paginationList['overdue'].currentPage !== 0){
+                    search(paginationList['overdue'].currentPage-1 );
                 }
             },
             nextClick:function (event) {
-                if(paginationList['requests'].currentPage !== paginationList['requests'].totalPages-1){
-                    search(paginationList['requests'].currentPage+1 );
+                if(paginationList['overdue'].currentPage !== paginationList['overdue'].totalPages-1){
+                    search(paginationList['overdue'].currentPage+1 );
                 }
             }
         },
@@ -420,7 +487,7 @@
             // 제일 처음 랜더링 후 색상 처리
             setTimeout(function () {
                 $('li[btn_id]').removeClass( "active" );
-                $('li[btn_id='+(paginationList['requests'].currentPage+1)+']').addClass( "active" );
+                $('li[btn_id='+(paginationList['overdue'].currentPage+1)+']').addClass( "active" );
             },50)
         }
     });

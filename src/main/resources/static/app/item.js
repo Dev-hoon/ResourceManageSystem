@@ -277,9 +277,38 @@
             selectedElements : 0,    // 현재 조건 중 선택된 값들의 수
         },methods: {
             bookmarkHandler     : function ( ) {
-                if( Object.keys( itemList.selectedItem ).length == 0 ) return ;
+                if( Object.keys( itemList.selectedItemList ).length == 0 ) return ;
 
-               
+                $('#bookmarkButton').attr('disabled', true);
+
+                let postBody = {
+                    "items" : Object.entries(  itemList.selectedItemList )
+                        .filter( (v)=>( (v[1]!=null)&&(v[1]!="") ))
+                        .reduce( (acc,cur)=>{ acc.push( cur[1].id ); return acc; }, [] )
+                };
+
+                // update user 등록 부분
+                postBody['userId'] = 1;
+
+                console.log("postBody : ", postBody )
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/bookmarks',
+                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    success: function( data ) {
+                        search( pagination.currentPage, conditions.item  );
+                        toastr.success('자산 수정 완료')
+                        $('#bookmarkButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        toastr.error('자산 수정 실패')
+                        $('#bookmarkButton').attr('disabled', false);
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
+
 
 
 

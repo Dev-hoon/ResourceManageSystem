@@ -4,28 +4,12 @@
     let indexBtn = [];               // 인덱스 버튼
 
     $(document).ready(function () {
-        search(0)
+        search(0,[], false)
         getSetting();
+        $('#itemBox').boxWidget('expand');
 
-        // table에 모두 선택 처리
-        $('#selectAll').click(function(e){
-            let table= $(e.target).closest('table');
-            $('td input:checkbox',table).prop('checked',e.target.checked);
 
-            if(e.target.checked){
-                itemList.itemList.map( (element) =>{
-                    Object.defineProperty( itemList.selectedItemList, element.id, { value: element, configurable:true, enumerable:true } );
-                })
-            }else{
-                itemList.itemList.map( (element) =>{
-                    delete itemList.selectedItemList[element.id]
-                })
-            }
 
-            showPage.selectedElements = Object.entries( itemList.selectedItemList ).length
-
-            itemList.amountSelect = 10;
-        });
     });
 
     //*** condition vue *** //
@@ -125,10 +109,82 @@
                 $('li[btn_id='+(pagination.currentPage+1)+']').addClass( "active" );
             },50)
 
-            if(collapse) $('#conditionBox').boxWidget('collapse');
+            if(collapse){
+                $('#conditionBox').boxWidget('collapse');
+                $('#itemBox').boxWidget('expand');
+                $('#historyBox').boxWidget('collapse');
+            }
 
         });
     }
+    // 데이터 받아오기
+    function searchHistory(index, param, collapse ) {
+        let updateUser = 1;
+        let URL = "/api/rental/history?page="+index;
+
+        if( param ){
+            URL = URL + '&itemId=' + param.id
+        }
+
+        historyList.item = param;
+
+        $.get( URL , function (response) {
+            /* 데이터 셋팅 */
+            // 페이징 처리 데이터
+            indexBtn = [];
+            historyPagination = response.pagination;
+
+            //전체 페이지
+            historyShowPage.totalPages         = historyPagination.totalPages;
+            historyShowPage.totalElements      = historyPagination.totalElements;
+            historyShowPage.currentElements    = historyPagination.currentElements;
+            historyShowPage.currentPage        = historyPagination.currentPage+1;
+
+            // 검색 데이터
+            historyList.setItemList( response.data );
+
+
+
+            // 이전버튼
+            if(historyPagination.currentPage === 0){
+                $('#previousBtn').addClass("disabled")
+            }else{
+                $('#previousBtn').removeClass("disabled")
+            }
+            // 다음버튼
+            if(historyPagination.currentPage === historyPagination.totalPages-1){
+                $('#nextBtn').addClass("disabled")
+            }else{
+                $('#nextBtn').removeClass("disabled")
+            }
+
+            // 페이징 버튼 처리
+            var temp = Math.floor(historyPagination.currentPage / maxBtnSize);
+            for(var i = 1; i <= maxBtnSize; i++){
+                var value = i+(temp*maxBtnSize);
+
+                if(value <= historyPagination.totalPages){
+                    indexBtn.push(value)
+                }
+            }
+
+            // 페이지 버튼 셋팅
+            historyPageBtnList.btnList = indexBtn;
+
+            // 색상처리
+            setTimeout(function () {
+                $('li[btn_id]').removeClass( "active" );
+                $('li[btn_id='+(historyPagination.currentPage+1)+']').addClass( "active" );
+            },50)
+
+            /*if(collapse){
+                $('#conditionBox').boxWidget('collapse');
+                $('#itemBox').boxWidget('expand');
+            }*/
+
+        });
+    }
+
 
     // 상세 조회 처리 데이터
     let conditions = new Vue({
@@ -166,7 +222,8 @@
             placeList       :   [],
             placeState      :   "",
 
-        },methods: {
+        },
+        methods: {
             initConditions  : function ( ) {
                 this.item = {
                     id              :   "",
@@ -238,7 +295,8 @@
             setExpireDate   : function ( date ) {
                 this.item.expireDate = date;
             },
-        },mounted: function( ){
+        }
+        ,mounted: function( ){
             // 등록일 datepicker 처리
             $('#createDate').datepicker({
                 format: "yyyy-mm-dd",
@@ -261,6 +319,8 @@
         }
     });
 
+
+    //*** grid vue *** //
     // 페이징 처리 데이터
     let pagination = {
         totalPages         :  0,       // 전체 페이지수
@@ -319,6 +379,80 @@
             amountSelect     : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
         },
         methods:{
+            setItemList: function( itemList ){
+                this.itemList = itemList;
+            },
+            rowHandler : function( event, item ){
+                searchHistory( pagination.currentPage, item )
+
+                $('#conditionBox').boxWidget('collapse')
+                $('#itemBox').boxWidget('collapse')
+                $('#historyBox').boxWidget('expand')
+            },
+        }
+    });
+
+
+    //*** grid vue *** //
+    // 페이징 처리 데이터
+    let historyPagination = {
+        totalPages         :  0,       // 전체 페이지수
+        totalElements      :  0,       // 전체 데이터수
+        currentPage        :  0,       // 현재 페이지수
+        currentElements    :  0,        // 현재 데이터수
+        amountPerPage      :  10,
+    };
+    // 페이지 정보
+    let historyShowPage = new Vue({
+        el : '#historyShowPage',
+        data : {
+            totalPages       : 0,
+            currentElements  : 0,
+            totalElements    : 0,
+            currentPage      : 0,
+            selectedElements : 0,    // 현재 조건 중 선택된 값들의 수
+        }
+    });
+    // 페이지 버튼 리스트
+    let historyPageBtnList = new Vue({
+        el : '#historyPageBtn',
+        data : {
+            btnList : {}
+        },
+        methods: {
+            indexClick: function (event) {
+                let id = parseInt( event.target.getAttribute("btn_id") );
+                search(id-1, conditions.item );
+            },
+            previousClick:function (event) {
+                if(pagination.currentPage !== 0){
+                    search(pagination.currentPage-1, conditions.item );
+                }
+            },
+            nextClick:function (event) {
+                if(pagination.currentPage !== pagination.totalPages-1){
+                    search(pagination.currentPage+1, conditions.item );
+                }
+            }
+        },
+        mounted:function () {
+            // 제일 처음 랜더링 후 색상 처리
+            setTimeout(function () {
+                $('li[btn_id]').removeClass( "active" );
+                $('li[btn_id='+(pagination.currentPage+1)+']').addClass( "active" );
+            },50)
+        }
+    });
+    // 데이터 리스트
+    let historyList = new Vue({
+        el : '#historyList',
+        data : {
+            item             : {},
+            itemList         : {},
+            selectedItemList : {},
+            amountSelect     : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
+        },
+        methods:{
             handlerCheckBox: function(event){
                 event.stopImmediatePropagation();
 
@@ -359,6 +493,7 @@
                 },50);
             },
             rowHandler : function( event, item ){
+                /*
                 itemModal.mode              = 1;
                 itemModal.item              = $.extend(true, {}, item );
                 itemModal.initCategory( );
@@ -373,7 +508,7 @@
 
                 console.log("itemModal.item : ",itemModal.item)
 
-                $('#itemModal').modal()
+                $('#itemModal').modal()*/
 
                 $('#itemBox').boxWidget('collapse')
             },

@@ -19,6 +19,17 @@ public class RentalSpecs {
                 : (Specification<Rental>) ((root, query, builder) -> builder.and() );
     }
 
+    public static Specification<Rental> itemId(Long itemId) {
+        return (itemId!=null)
+                ? (Specification<Rental>) ((root, query, builder) -> builder.equal(root.get("itemId"), itemId) )
+                : (Specification<Rental>) ((root, query, builder) -> builder.and() );
+    }
+
+    public static Specification<Rental> empId(Long empId) {
+        return (empId!=null)
+                ? (Specification<Rental>) ((root, query, builder) -> builder.equal(root.get("empId"), empId) )
+                : (Specification<Rental>) ((root, query, builder) -> builder.and() );
+    }
 
 
 }
