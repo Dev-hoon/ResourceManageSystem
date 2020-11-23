@@ -349,12 +349,12 @@
                     success: function(data) {
                         search( pagination.currentPage );
                         getCategories( );
-                        alert('카테고리 삭제 완료.');
+                        toastr.success('카테고리 삭제 완료.');
                         $('#categoryModal').modal("hide");
                         $('#deleteButton').attr('disabled', false);
                     },
                     error: function( ){
-                        alert('카테고리 삭제 실패.');
+                        toastr.error('카테고리 삭제 실패.');
                         $('#deleteButton').attr('disabled', false);
                     },
                     contentType: "application/json",

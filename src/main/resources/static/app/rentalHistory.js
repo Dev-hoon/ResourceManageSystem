@@ -1,49 +1,36 @@
 (function ($) {
 
-    let maxBtnSize = 7;              // 검색 하단 최대 범위
-    let indexBtn = [];               // 인덱스 버튼
+    var maxBtnSize = 7;              // 검색 하단 최대 범위
+    var indexBtn = [];               // 인덱스 버튼
 
+    //*** common functions *** //
+    // Date 객체를 format에 맞는 string으로 변환
     $(document).ready(function () {
         search(0,[], false)
-        getSetting();
-        $('#itemBox').boxWidget('expand');
-    });
-
-    //*** condition vue *** //
-    // 초기 설정 받아오기
-    function getSetting( ) {
-        $.get("/api/item/setting", function(response){
-
-            console.log("response : ",response.data)
-
-            conditions.itemState      = "";
-            conditions.itemList       = response.data.itemList;
-
-            conditions.rentalState    = "";
-            conditions.rentalList     = response.data.rentalList;
-
-            conditions.placeState     = ""
-            conditions.placeList      = response.data.placeList;
-
-            conditions.categories     = response.data.categories;
-            conditions.selectCate01   = Object.keys( response.data.categories );
-
+        $.get( '/api/team/list' ,function (response) {
+            conditions.teams    = response.data
         });
-    }
-    // Date 객체를 format에 맞는 string으로 변환
+
+        $.get( '/api/department/list' ,function (response) {
+            conditions.departments      = response.data
+        });
+
+        $('#employeeBox').boxWidget('expand');
+    });
     function dateString( date ){
         return date.getFullYear()+ '-' + (date.getMonth()+1).toString().padStart(2,'0') + '-' + date.getDate().toString().padStart(2,'0')
     }
     // 데이터 받아오기
-    function search(index, param, collapse ) {
+    function search( index, param, collapse ) {
         let Parameter;
+
         if( param ){
             Parameter = Object.entries( param )
                 .filter( (item)=>(item[1]!=null)&&(item[1]!="") )
                 .map( item=>item.join("=") )
         }
 
-        $.get( ["/api/items?page="+index].concat(Parameter).join('&'), function (response) {
+        $.get( ["/api/employees?page="+index].concat(Parameter).join('&'), function (response) {
             /* 데이터 셋팅 */
             // 페이징 처리 데이터
             indexBtn = [];
@@ -55,10 +42,8 @@
             showPage.currentElements    = pagination.currentElements;
             showPage.currentPage        = pagination.currentPage+1;
 
-            console.log("showPage._data : ",showPage._data)
-
             // 검색 데이터
-            itemList.setItemList( response.data );
+            employeeList.items = response.data ;
 
             // 이전버튼
             if(pagination.currentPage === 0){
@@ -94,19 +79,17 @@
 
             if(collapse){
                 $('#conditionBox').boxWidget('collapse');
-                $('#itemBox').boxWidget('expand');
+                $('#employeeBox').boxWidget('expand');
                 $('#historyBox').boxWidget('collapse');
             }
-
         });
     }
     // 데이터 받아오기
     function searchHistory(index, param, collapse ) {
-        let updateUser = 1;
         let URL = "/api/rental/history?page="+index;
 
         if( param ){
-            URL = URL + '&itemId=' + param.id
+            URL = URL + '&empId=' + param.id
         }
 
         historyList.item = param;
@@ -170,134 +153,49 @@
         el : '#queryConditions',
         data : {
             item : {
-                id              :   "",
-                name            :   "",
-                createDate      :   "",
-                expireDate      :   "",
-                superCate       :   "",
-                subCateFirst    :   "",
-                subCateSecond   :   "",
-                itemState       :   "",
-                rentalState     :   "",
-                placeState      :   "",
-                cdKey           :   "",
-                licence         :   "",
+                id          :   "",
+                name        :   "",
+                phone       :   "",
+                email       :   "",
+                team        :   "",
+                department  :   "",
+                position    :   "",
             },
+            teams           : "",
+            teamName        : "",
 
-            categories      :   [],
-            selectCate01    :   [],
-            selectCate02    :   [],
-            selectCate03    :   [],
-
-            selectItem      :   [],
-            selectRental    :   [],
-
-            itemList        :   [],
-            itemState       :   "",
-
-            rentalList      :   [],
-            rentalState     :   "",
-
-            placeList       :   [],
-            placeState      :   "",
-
+            departments     : "",
+            departmentName  : "",
         },
         methods: {
-            initConditions  : function ( ) {
+            initItem    : function ( ) {
                 this.item = {
-                    id              :   "",
-                    name            :   "",
-                    createDate      :   "",
-                    expireDate      :   "",
-                    superCate       :   "",
-                    subCateFirst    :   "",
-                    subCateSecond   :   "",
-                    itemState       :   "",
-                    rentalState     :   "",
-                    placeState      :   "",
-                    cdKey           :   "",
-                    licence         :   "",
+                    id          :   "",
+                    name        :   "",
+                    phone       :   "",
+                    email       :   "",
+                    teamId      :   "",
+                    depId:   "",
+                    position    :   "",
                 },
-
-                    this.selectCate01    =   Object.keys(this.categories);
-                this.selectCate02    =   [];
-                this.selectCate03    =   [];
-
-                this.itemState       =   ""
-                this.placeState      =   ""
-                this.rentalState     =   ""
-
+                this.teamName        = ""
+                this.departmentName  = ""
             },
-            handleCate01    : function ( ) {
-                if(this.categories.hasOwnProperty(this.item.superCate)){
-                    this.selectCate02 = Object.keys( this.categories[this.item.superCate] );
-                    this.item.subCateFirst = ""
-                    this.item.subCateSecond = ""
-                }
+            searchItem  : function ( ) {
+                search( pagination.currentPage ,this.item, true );
             },
-            handleCate02    : function ( ) {
-                if(this.categories[this.item.superCate].hasOwnProperty(this.item.subCateFirst)){
-                    this.selectCate03 = this.categories[this.item.superCate][this.item.subCateFirst];
-                    this.item.subCateSecond = ""
-                }
-            },
-            searchItems     : function ( ) {
-                search(0, conditions.item, true );
-
-                conditions.amountSelect       = 0;
-                conditions.selectedItemList   = {};
-
-            },
-            createItem      : function ( ) {
-                location.href = "/pages/item/enroll"
-            },
-            itemHandler     : function ( ){
-                Object.entries( this.itemList ).filter(item=>item[1]==this.itemState)
-                    ?.map(item=>{
-                        this.item.itemState  = item[0];
-                    })
-            },
-            rentalHandler   : function ( ){
-                Object.entries( this.rentalList ).filter(item=>item[1]==this.rentalState)
-                    ?.map(item=>{
-                        this.item.rentalState   = item[0];
-                    })
-            },
-            placeHandler    : function ( ){
-                this.placeList.filter(item=>item.name==this.placeState)?.map(item=>{
-                    this.item.placeState   = item.id;
+            teamHandler : function ( ) {
+                Object.entries(this.teams).filter(item=>item[1]==this.teamName)?.map(item=>{
+                    this.item.teamId   = item[0];
                 })
             },
-            setCreateDate   : function ( date ) {
-                this.item.createDate = date;
-            },
-            setExpireDate   : function ( date ) {
-                this.item.expireDate = date;
-            },
-        }
-        ,mounted: function( ){
-            // 등록일 datepicker 처리
-            $('#createDate').datepicker({
-                format: "yyyy-mm-dd",
-                autoclose : true,
-                startDate: '-10d',
-                language : "ko"
-            }).on('changeDate', function (event) {
-                conditions.item.createDate = dateString(event.date);
-            });
-
-            // 만료일 datepicker 처리
-            $('#expireDate').datepicker({
-                format: "yyyy-mm-dd",	//데이터 포맷 형식(yyyy : 년 mm : 월 dd : 일 )
-                autoclose : true,	//사용자가 날짜를 클릭하면 자동 캘린더가 닫히는 옵션
-                startDate: '-10d',	//달력에서 선택 할 수 있는 가장 빠른 날짜. 이전으로는 선택 불가능 ( d : 일 m : 달 y : 년 w : 주)
-                language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
-            }).on('changeDate', function (event) {
-                conditions.item.expireDate = dateString(event.date);
-            });
+            depHandler : function ( ) {
+                Object.entries(this.departments).filter(item=>item[1]==this.departmentName)?.map(item=>{
+                    this.item.depId   = item[0];
+                })
+            }
         }
     });
-
 
     //*** grid vue *** //
     // 페이징 처리 데이터
@@ -317,6 +215,9 @@
             totalElements    : 0,
             currentPage      : 0,
             selectedElements : 0,    // 현재 조건 중 선택된 값들의 수
+        },methods: {
+
+
         }
     });
     // 페이지 버튼 리스트
@@ -350,24 +251,21 @@
         }
     });
     // 데이터 리스트
-    let itemList = new Vue({
-        el : '#itemList',
+    var employeeList = new Vue({
+        el : '#employeeList',
         data : {
-            itemList         : {},
-            selectedItemList : {},
-            amountSelect     : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
-        },
-        methods:{
-            setItemList: function( itemList ){
-                this.itemList = itemList;
-            },
-            rowHandler : function( event, item ){
+            items : {}
+        },methods   : {
+            rowHandler      :   function( event, item ) {
+                historyList.item = item;
+
                 searchHistory( pagination.currentPage, item )
 
                 $('#conditionBox').boxWidget('collapse')
-                $('#itemBox').boxWidget('collapse')
+                $('#employeeBox').boxWidget('collapse')
                 $('#historyBox').boxWidget('expand')
-            },
+
+            }
         }
     });
 
@@ -428,9 +326,16 @@
         el : '#historyList',
         data : {
             item             : {},
+            items            : {},
             itemList         : {},
             selectedItemList : {},
-            amountSelect     : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
+            amountSelect     : 0 ,
+
+            teams           : "",
+            teamName        : "",
+
+            departments     : "",
+            departmentName  : "",
         },
         methods:{
             handlerCheckBox: function(event){
@@ -474,6 +379,5 @@
             },
         }
     });
-
 
 })(jQuery);

@@ -25,23 +25,25 @@
     <div class="content-wrapper">
         <section class="content-header">
             <h1>
-                대여 관리
-                <small>대여기록조회</small>
+                사원 관리
+                <small>사원 관리</small>
             </h1>
             <ol class="breadcrumb">
-                <li><a href="#"><i class="fa fa-dashboard"></i>대여 관리</a></li>
-                <li class="active">대여기록조회</li>
+                <li><a href="#"><i class="fa fa-dashboard"></i> 사원 관리</a></li>
+                <li class="active">사원 관리</li>
             </ol>
         </section>
 
         <section class="content">
-
             <div class="row">
-                <div class="col-xs-12">
-                    <div class="box">
+                <div class="col-sm-12">
+                    <div id="conditionBox" class="box">
                         <!-- /.box-header -->
                         <div class="box-header md-1">
-                            <h3 class="box-title">대여기록조회</h3>
+                            <h3 class="box-title">사원상세정보</h3>
+                            <div class="box-tools pull-right">
+                                <button class="btn btn-box-tools" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div><!-- /.box-tools -->
                         </div>
                         <!-- /.box-body -->
                         <div class="box-body">
@@ -49,66 +51,346 @@
                                 <div class="col-sm-12">
 
                                     <div class="row text-center md-4">
-
                                         <div class="col-sm-4 row-center">
-                                            <label class="col-sm-3 col-form-label">대여인</label>
+                                            <label class="col-sm-3 col-form-label">사원명</label>
                                             <div class="col-sm-9">
-                                                <label class="sr-only" for="name">대여인</label>
-                                                <input type="text" class="form-control" id="name" placeholder="대여인" v-model="name">
+                                                <label class="sr-only" for="name">사원명</label>
+                                                <input type="text" class="form-control" id="name" placeholder="사원명" v-model="item.name">
                                             </div>
                                         </div>
 
-
-                                        <div class="col-sm-4 row-center">
+                                        <div class="col-sm-4 row-center ">
                                             <label class="col-sm-3 col-form-label">전화번호</label>
                                             <div class="col-sm-9">
                                                 <label class="sr-only" for="phone">전화번호</label>
-                                                <input type="text" class="form-control" id="phone" placeholder="전화번호" v-model="phone">
+                                                <input type="text" class="form-control" id="phone" placeholder="전화번호" v-model="item.phone">
                                             </div>
                                         </div>
-
 
                                         <div class="col-sm-4 row-center">
                                             <label class="col-sm-3 col-form-label">이메일</label>
                                             <div class="col-sm-9">
                                                 <label class="sr-only" for="email">이메일</label>
-                                                <input type="text" class="form-control" id="email" placeholder="이메일" v-model="email">
+                                                <input type="text" class="form-control" id="email" placeholder="이메일" v-model="item.email">
                                             </div>
                                         </div>
-
-
 
                                     </div>
 
                                     <div class="row text-center md-4">
-                                        <div class="col-sm-6 row-center">
+                                        <div class="col-sm-4 row-center">
                                             <label class="col-sm-3 col-form-label">부서정보</label>
                                             <div class="col-sm-9">
-                                                <select id="department" class="col-sm-8 form-control" v-model="department">
+                                                <select id="department" class="col-sm-8 form-control" v-model="departmentName" v-on:change="depHandler">
                                                     <option value="">선택</option>
-                                                    <option v-for="category in departments" >{{category}}</option>
+                                                    <option v-for="department in departments" >{{department}}</option>
                                                 </select>
                                             </div>
                                         </div>
 
-                                        <div class="col-sm-6 row-center">
+                                        <div class="col-sm-4 row-center">
                                             <label class="col-sm-3 col-form-label">팀정보</label>
                                             <div class="col-sm-9">
-                                                <select id="team" class="col-sm-8 form-control" v-model="team" >
+                                                <select id="team" class="col-sm-8 form-control" v-model="teamName" v-on:change="teamHandler">
                                                     <option value="">선택</option>
-                                                    <option v-for="category in teams" >{{category}}</option>
+                                                    <option v-for="team in teams" >{{team}}</option>
                                                 </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-4 row-center">
+                                            <label class="col-sm-3 col-form-label">직급</label>
+                                            <div class="col-sm-9">
+                                                <label class="sr-only" for="position">직급</label>
+                                                <input type="text" class="form-control" id="position" placeholder="직급" v-model="item.position">
                                             </div>
                                         </div>
 
                                     </div>
 
                                     <div class="form-group pull-right">
-                                        <button id="initButton"   type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 초기화 </button>
-                                        <button id="searchButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="searchItems">    조회   </button>
+                                        <button id="initButton"   type="button" class="btn btn-sm btn-primary dark" v-on:click="initItem"> 초기화 </button>
+                                        <button id="searchButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="searchItem">    조회   </button>
                                     </div>
                                 </div>
                             </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div id="employeeBox" class="box">
+                        <div class="box-header">
+                            <h3 class="box-title">사원 목록</h3>
+                            <div class="box-tools pull-right">
+                                <button class="btn btn-box-tools" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div><!-- /.box-tools -->
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                                <div class="row ">
+                                    <div class="col-sm-12">
+                                        <table id="items_table" class="table table-bordered table-hover dataTable font-14"
+                                               role="grid" aria-describedby="example2_info">
+                                            <thead>
+                                            <tr role="row">
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    id
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    이름
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    전화번호
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    e-mail
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    부서
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    팀
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    직급
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="employeeList">
+                                            <tr role="row" class="odd item" v-for="(dto, idx) in items" >
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.id}}              </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.name}}            </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.phone}}           </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.email}}           </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.departmentName}}  </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.teamName}}        </td>
+                                                <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.position}}        </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+
+                                <div id="showPage" class="row col-sm-12">
+                                    <span class="dataTables_info" role="status" aria-live="polite">
+                                                Showing {{currentPage}} to 10 of {{totalElements}} entries
+                                    </span>
+                                    <span v-if="selectedElements != 0">
+                                                / selected item(s) {{selectedElements}}
+                                    </span>
+                                </div>
+
+                                <div class="row text-center">
+                                    <div class="col-sm-12">
+                                        <div class="dataTables_paginate paging_simple_numbers" id="pageBtn">
+                                            <ul class="pagination">
+                                                <li class="paginate_button previous" id="previousBtn">
+                                                    <a href="javascript:;" v-on:click="previousClick()">이전</a>
+                                                </li>
+
+                                                <li class="paginate_button" v-for="btn in btnList" v-bind:btn_id="btn" v-on:click="indexClick">
+                                                    <a href="javascript:;" aria-controls="example2">{{btn}}</a>
+                                                </li>
+
+                                                <li class="paginate_button next" id="nextBtn">
+                                                    <a href="javascript:;" v-on:click="nextClick()">다음</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div  class="row">
+                <div class="col-xs-12">
+                    <div id="historyBox" class="box collapsed-box">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">사원대여기록</h3>
+                            <div class="box-tools pull-right">
+                                <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div><!-- /.box-tools -->
+                        </div><!-- /.box-header -->
+                        <div class="box-body">
+                            <div id="history_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+
+                                <div id="historyList" class="row">
+
+                                    <div class="col-sm-12">
+
+                                        <!--
+                                        <table class="table table-bordered table-hover dataTable font-14"
+                                               role="grid" aria-describedby="example2_info">
+                                            <thead>
+                                            <tr role="row">
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    자산번호
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    자산명칭
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대분류
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    소분류 1
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    소분류 2
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    등록일
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    만료일
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    자산상태
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대여상태
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    자산위치
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr role="row" class="odd item" >
+                                                <td class="text-center">{{item.id}}              </td>
+                                                <td class="text-center">{{item.name}}            </td>
+                                                <td class="text-center">{{item.superCate}}       </td>
+                                                <td class="text-center">{{item.subCateFirst}}    </td>
+                                                <td class="text-center">{{item.subCateSecond}}   </td>
+                                                <td class="text-center">{{item.registerDate}}    </td>
+                                                <td class="text-center">{{item.expireDate}}      </td>
+                                                <td class="text-center">{{item.itemState}}       </td>
+                                                <td class="text-center">{{item.rentalState}}     </td>
+                                                <td class="text-center">{{item.placeState}}      </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        -->
+                                        <table class="table table-bordered table-hover dataTable font-14"
+                                               role="grid" aria-describedby="example2_info">
+                                            <thead>
+                                            <tr role="row">
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    id
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    이름
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    전화번호
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    e-mail
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    부서
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    팀
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    직급
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr role="row" class="odd item" >
+                                                <td class="text-center">{{item.id}}              </td>
+                                                <td class="text-center">{{item.name}}            </td>
+                                                <td class="text-center">{{item.phone}}           </td>
+                                                <td class="text-center">{{item.email}}           </td>
+                                                <td class="text-center">{{item.departmentName}}  </td>
+                                                <td class="text-center">{{item.teamName}}        </td>
+                                                <td class="text-center">{{item.position}}        </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="col-sm-12">
+                                        <table class="table table-bordered table-hover dataTable font-14"
+                                               role="grid" aria-describedby="example2_info">
+                                            <thead>
+                                            <tr role="row">
+                                                <th id="selectAll" class="text-center bg-dark-blue-gradient table-middle" tabindex="0" rowspan="1" colspan="1">
+                                                    <input type="checkbox" id="rowID" aria-label="Checkbox for following text input">
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대여인
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대여팀
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대여시작일
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대여종료일
+                                                </th>
+                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                                    대여사유
+                                                </th>
+
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr role="row" class="odd item" v-for="(dto, idx) in itemList" >
+                                                <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="handlerCheckBox"> </td>
+                                                <td class="text-center">{{dto.userName}}  </td>
+                                                <td class="text-center">{{dto.teamName}}  </td>
+                                                <td class="text-center">{{dto.startDate}} </td>
+                                                <td class="text-center">{{dto.endDate}}   </td>
+                                                <td class="text-center">{{dto.reason}}    </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div id="historyShowPage" class="col-sm-12">
+                                        <span  class="dataTables_info" role="status" aria-live="polite">
+                                            Showing {{currentPage}} to {{totalPages}} of {{currentElements}} entries
+                                        </span>
+                                        <span v-if="selectedElements != 0">
+                                            / selected item(s) {{selectedElements}}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="row text-center col-sm-12">
+                                    <div class="dataTables_paginate paging_simple_numbers" id="historyPageBtn">
+                                        <ul class="pagination">
+                                            <li class="paginate_button previous" id="historyPreviousBtn">
+                                                <a href="javascript:;" v-on:click="previousClick">이전</a>
+                                            </li>
+
+                                            <li class="paginate_button" v-for="btn in btnList" v-bind:btn_id="btn" v-on:click="indexClick">
+                                                <a href="javascript:;" aria-controls="example2" v-bind:btn_id="btn">{{btn}}</a>
+                                            </li>
+
+                                            <li class="paginate_button next" id="historyNextBtn">
+                                                <a href="javascript:;" v-on:click="nextClick">다음</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -126,15 +408,11 @@
     <div th:replace="fragment/controlSidebar :: controlSidebar"></div>
     <!-- controlSidebar End -->
 
+
     <div class="control-sidebar-bg"></div>
-
-    <!-- itemModal Start -
-    <div th:replace="fragment/itemModal :: itemModal"></div>
-     itemModal End -->
-
 </div>
 
 
-<script src="/app/bookmark.js"></script>
+<script src="/app/rentalHistory.js"></script>
 </body>
 </html>

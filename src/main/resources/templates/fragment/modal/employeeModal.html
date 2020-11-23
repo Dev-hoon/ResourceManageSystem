@@ -7,7 +7,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">사원정보수정</h4>
+                <h4 v-if="!mode" class="modal-title">사원정보등록</h4>
+                <h4 v-if="mode" class="modal-title">사원정보수정</h4>
             </div>
             <div class="modal-body">
                 <form id="employeeModalForm" >
@@ -88,7 +89,8 @@
             </div>
 
             <div class="modal-footer">
-                <button id="createButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="createItem" > 수정 </button>
+                <button v-if="!mode" id="createButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="createItem" > 등록 </button>
+                <button v-if="mode" id="updateButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="updateItem" > 수정 </button>
                 <button id="deleteButton" type="button" class="btn btn-sm btn-danger"  v-on:click="deleteItem" > 삭제 </button>
                 <button type="Button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">   닫기 </button>
             </div>

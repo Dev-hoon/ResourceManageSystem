@@ -107,11 +107,30 @@
                     phone       :   "",
                     email       :   "",
                     teamId      :   "",
-                    departmentId:   "",
+                    depId:   "",
                     position    :   "",
                 },
                 this.teamName        = ""
                 this.departmentName  = ""
+            },
+            createItem  : function ( ) {
+                search( pagination.currentPage ,this.item );
+                employeeModal.item  = $.extend(true, {},
+                {
+                    id          :   "",
+                    name        :   "",
+                    phone       :   "",
+                    email       :   "",
+                    team        :   "",
+                    department  :   "",
+                    position    :   "",
+                } );
+
+                employeeModal.mode           = 0;
+                employeeModal.teamName       = "";
+                employeeModal.departmentName = "";
+
+                $('#employeeModal').modal();
             },
             searchItem  : function ( ) {
                 search( pagination.currentPage ,this.item );
@@ -123,7 +142,7 @@
             },
             depHandler : function ( ) {
                 Object.entries(this.departments).filter(item=>item[1]==this.departmentName)?.map(item=>{
-                    this.item.departmentId   = item[0];
+                    this.item.depId   = item[0];
                 })
             }
         }
@@ -192,6 +211,8 @@
             rowHandler      :   function( event, item ) {
                 employeeModal.item  = $.extend(true, {}, item);
 
+                employeeModal.mode           = 1;
+
                 employeeModal.teamName       = employeeModal.teams[item.teamId];
 
                 employeeModal.departmentName = employeeModal.departments[item.depId];
@@ -214,15 +235,16 @@
                 department  :   "",
                 position    :   "",
             },
-            teams           : "",
-            teamName        : "",
+            mode            :   0,  // modal type 지정 0:create / 1:update
+            teams           :   "",
+            teamName        :   "",
 
-            departments     : "",
-            departmentName  : "",
+            departments     :   "",
+            departmentName  :   "",
         },methods   : {
             depHandler : function ( ) {
                 Object.entries(this.departments).filter(item=>item[1]==this.departmentName)?.map(item=>{
-                    this.item.departmentId   = item[0];
+                    this.item.depId   = item[0];
                 })
             },
             teamHandler : function ( ) {
@@ -246,6 +268,40 @@
                 console.log('postBody : ',postBody)
 
                 $.ajax({
+                    type: 'POST',
+                    url: '/api/employee',
+                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    success: function(data) {
+                        search( pagination.currentPage, conditions.item );
+                        toastr.success('사원 등록 완료');
+                        $('#employeeModal').modal("hide");
+                        this.item = { };
+                        $('#createButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        toastr.error('사원 등록 실패');
+                        $('#createButton').attr('disabled', false);
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
+            },
+            updateItem  : function ( ) {
+                $('#updateButton').attr('disabled', true);
+
+                let registerUser = 1;
+
+                let postBody = Object.entries( this.item )
+                    .filter( (v)=>( (v[1]!=null)&&(v[1]!="")) )
+                    .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
+
+                // update user 등록 부분
+                postBody['updateUser']      = registerUser;
+                postBody['registerUser']    = registerUser
+
+                console.log('postBody : ',postBody)
+
+                $.ajax({
                     type: 'PUT',
                     url: '/api/employee',
                     data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
@@ -254,20 +310,36 @@
                         toastr.success('사원 수정 완료');
                         $('#employeeModal').modal("hide");
                         this.item = { };
-                        $('#createButton').attr('disabled', false);
+                        $('#updateButton').attr('disabled', false);
                     },
                     error: function( ){
                         toastr.error('사원 수정 실패');
-                        $('#createButton').attr('disabled', false);
+                        $('#updateButton').attr('disabled', false);
                     },
                     contentType: "application/json",
                     dataType: 'json'
                 });
             },
             deleteItem  : function ( ) {
-                Object.entries(this.teams).filter(item=>item[1]==this.teamName)?.map(item=>{
-                    this.item.teamId   = item[0];
-                })
+                $('#deleteButton').attr('disabled', true);
+
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/api/employee/'+this.item.id,
+                    success: function( data ) {
+                        search( pagination.currentPage, conditions.item );
+                        toastr.success('사원 삭제 완료');
+                        $('#employeeModal').modal("hide");
+                        this.item = { };
+                        $('#deleteButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        toastr.error('사원 삭제 실패');
+                        $('#deleteButton').attr('disabled', false);
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
             },
         },mounted : function (){
             $('#enteredDate').datepicker({
