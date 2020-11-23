@@ -37,6 +37,7 @@
             showPage.currentElements    = pagination.currentElements;
             showPage.currentPage        = pagination.currentPage+1;
 
+            console.log("showPage : ",showPage)
             // 검색 데이터
             itemList.setItemList( response.data );
 
@@ -130,7 +131,6 @@
                 }
             },
             getParameter:       function () {
-
                 let Parameter = Object.entries(this.item)
                     .filter( (item)=>( (item[1].constructor == String) && ( item[1] != "" ) ))
                     .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1];  return acc;} ,{ } );
@@ -140,27 +140,33 @@
                         (this.expireDate == "year")? this.item.expireDate * 12 : this.item.expireDate
                         : null
 
-                return Object.entries(Parameter).filter( item => item[1]!=null );
+                return Object.entries(Parameter).filter( item => item[1]!=null ).reduce( (acc,cur)=>{acc[cur[0]]=cur[1]; return acc;}, {});
 
             },
             searchCategories :  function () {
-
                 search(0, this.getParameter() );
-
                 itemList.amountSelect   = 0;
-
             },
-            createcategory  :   function () {
+            createCategory  :   function () {
+                $('#createButton').attr('disabled', false);
                 let postBody = this.getParameter();
 
                 postBody['registerUser'] = 1;
+
+                console.log("postBody : ",postBody)
 
                 $.ajax({
                     type: 'POST',
                     url: '/api/category',
                     data: JSON.stringify({'data':postBody}),
-                    success: function(data) { alert('data: ' + data); },function(response){
-                        alert("Category가 등록되었습니다.")
+                    success: function( data ) {
+                        search( pagination.currentPage );
+                        toastr.success('카테고리 등록 완료')
+                        $('#createButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        toastr.error('카테고리 등록 실패')
+                        $('#createButton').attr('disabled', false);
                     },
                     contentType: "application/json",
                     dataType: 'json'
@@ -189,6 +195,7 @@
             totalPages          : 0,
             currentPage         : 0,
             totalElements       : 0,
+            currentElements     : 0,
             selectedElements    : 0,    // 현재 조건 중 선택된 값들의 수
             amountPerPage       : 10,
         }
