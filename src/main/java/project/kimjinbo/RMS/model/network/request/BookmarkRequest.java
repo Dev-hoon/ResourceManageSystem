@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class BookmarkRequest {
     private Long       userId;
+    private Long       itemId;
     private List<Long> items;
     private String     memo;
 

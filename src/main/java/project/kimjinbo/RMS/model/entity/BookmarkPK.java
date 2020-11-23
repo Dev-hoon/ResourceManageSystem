@@ -23,10 +23,14 @@ public class BookmarkPK implements Serializable {
             throw new Exception("Primary key not ready");
         }
     }
-
     public BookmarkPK(BookmarkApiRequest bookmarkApiRequest){
         this.itemId         = bookmarkApiRequest.getItemId();
         this.registerUser   = bookmarkApiRequest.getRegisterUser();
+    }
+
+    public BookmarkPK(BookmarkRequest bookmarkRequest){
+        this.itemId         = bookmarkRequest.getUserId();
+        this.registerUser   = bookmarkRequest.getUserId();
     }
 
     @Override

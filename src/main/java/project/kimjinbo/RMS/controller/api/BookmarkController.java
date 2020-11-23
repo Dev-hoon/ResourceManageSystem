@@ -51,6 +51,12 @@ public class BookmarkController implements CrudInterface<BookmarkApiRequest, Boo
         return bookmarkApiLogicService.createItems( request );
     }
 
+    @PostMapping("/bookmarks/delete")
+    public Header deleteItems(@RequestBody Header<BookmarkRequest> request) {
+        System.out.println("bookmarks/delete BookmarkRequest request : "+request.getData());
+        return bookmarkApiLogicService.deleteItems( request );
+    }
+
     @Override
     @GetMapping("/bookmark") // /api/temp?id={id}
     public Header read(@RequestParam(name = "id") Long id) { return itemTempApiLogicService.read(id); }

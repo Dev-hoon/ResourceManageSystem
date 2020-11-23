@@ -107,10 +107,10 @@
         },methods : {
             rentalHandler       : function ( ){
 
-                if( Object.keys(bookmarkList.selectedItem).length == 0 ) return ;
-
-
-                console.log("this.selectedItem[0] : ",bookmarkList.selectedItem )
+                if( Object.keys(bookmarkList.selectedItem).length == 0 ) {
+                    toastr.error("선택된 자산이 없습니다.")
+                    return ;
+                }
 
                 bookmarkModal.item.title = Object.values( bookmarkList.selectedItem )[0]['name']
 
@@ -120,8 +120,45 @@
                     bookmarkModal.item.title = bookmarkModal.item.title+'  외 '+(Object.values(bookmarkModal.selectedItem).length-1) + ' 개';
 
                 $('#bookmarkModal').modal();
-                     },
-            deleteHandler       : function ( ){ }
+            },
+            deleteHandler       : function ( ){
+                if( Object.keys(bookmarkList.selectedItem).length == 0 ) {
+                    toastr.error("선택된 자산이 없습니다.")
+                    return ;
+                }
+
+                console.log("bookmarkList.selectedItem : ",bookmarkList.selectedItem)
+
+                let postBody = { };
+
+                postBody['items'] =  Object.values(bookmarkList.selectedItem).map((item)=>(item.itemId) );
+
+                // update user 등록 부분
+                postBody['userId'] = 1;
+
+                console.log("ITEM updateItem postBody : ",postBody )
+
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/bookmarks/delete',
+                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    success: function( data ) {
+                        search( pagination.currentPage );
+                        toastr.success('장바구니 삭제 완료')
+                        $('#updateItemButton').attr('disabled', false);
+                        $('#bookmarkModal').modal('hide');
+                    },
+                    error: function( ){
+                        toastr.error('장바구니 삭제 실패')
+                        $('#updateItemButton').attr('disabled', false);
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
+
+
+            }
         }
     });
     // 페이지 버튼 리스트

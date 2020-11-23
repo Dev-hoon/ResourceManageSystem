@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.kimjinbo.RMS.configs.BookmarkSpecs;
 import project.kimjinbo.RMS.configs.ItemSpecs;
 import project.kimjinbo.RMS.interfaces.CrudInterface;
@@ -22,6 +23,7 @@ import project.kimjinbo.RMS.model.network.response.BookmarkApiResponse;
 import project.kimjinbo.RMS.model.network.response.BookmarkResponse;
 import project.kimjinbo.RMS.repository.BookmarkRepository;
 
+import java.awt.print.Book;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -131,6 +133,32 @@ public class BookmarkApiLogicService implements CrudInterface<BookmarkApiRequest
 
         return Header.OK( bookmarks );
     }
+
+    @Transactional
+    public Header deleteItems(Header<BookmarkRequest> request) {
+        LocalDate date = LocalDate.now();
+
+        // 1. request data
+        BookmarkRequest bookmarkRequests = request.getData();
+
+        System.out.println("request.getData() : "+request.getData());
+
+        List bookmarks = bookmarkRequests.getItems().stream().map( ( item )->{
+
+            try {
+                System.out.println("item, bookmarkRequests.getUserId() "+item+" / "+bookmarkRequests.getUserId());
+                bookmarkRepository.deleteById( new BookmarkPK( item, bookmarkRequests.getUserId() ) );
+                return "deleted";
+            } catch(Exception e) {
+                return new RuntimeException("delete error");
+            }
+        }).collect(Collectors.toList());
+
+        System.out.println("bookmarks: "+bookmarks );
+
+        return Header.OK( bookmarks );
+    }
+
 
     public Header<List<BookmarkApiResponse>> search(Pageable pageable, BookmarkApiRequest request) {
 
