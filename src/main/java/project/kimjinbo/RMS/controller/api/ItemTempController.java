@@ -35,15 +35,8 @@ public class ItemTempController implements CrudInterface<ItemTempApiRequest, Ite
         return itemTempApiLogicService.search( pageable, ItemTempApiRequest );
     }
 
-    @GetMapping("/temp/amount")
-    @ResponseBody
-    public Header<Long> amount(@PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable, ItemTempApiRequest ItemTempApiRequest) {
-        System.out.println("request : "+ItemTempApiRequest);
-        return itemTempApiLogicService.amount( pageable, ItemTempApiRequest );
-    }
-
     @Override
-    @GetMapping("/temp") // /api/temp?id={id}
+    @GetMapping("/temp")
     public Header read(@RequestParam(name = "id") Long id) { return itemTempApiLogicService.read(id); }
 
     @Override
@@ -64,29 +57,3 @@ public class ItemTempController implements CrudInterface<ItemTempApiRequest, Ite
         return itemTempApiLogicService.delete(id);
     }
 }
-
-
-/*
-    // 조건 사용 가능  localhost:8080/api/temp
-    @GetMapping("/temp")
-    @ResponseBody
-    public Header<List<ItemApiResponse>> readItems(@PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable, ItemApiRequest itemApiRequest) {
-        System.out.println("request : "+itemApiRequest);
-        return itemApiLogicService.search( pageable, itemApiRequest );
-    }
- */
-
-
-/*
-    @GetMapping("/items") // localhost:8080/api/items
-    @ResponseBody
-    public Header<ItemApiResponse> readItems(ItemApiRequest itemApiRequest) {
-        System.out.println("request : "+itemApiRequest);
-        return itemApiLogicService.readWhere( new Header<ItemApiRequest>(itemApiRequest) );
-    }
-
-    @PostMapping("/items") // localhost:8080/api/items
-    public void readItems(@RequestBody Header<ItemApiRequest> request) {
-        itemApiLogicService.readWhere( request );
-    }
- */

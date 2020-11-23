@@ -463,8 +463,11 @@
         },methods: {
             initCategory    : function ( ){
                 this.selectCate01  = Object.keys( this.categories );
-                this.selectCate02  = Object.keys( this.categories[this.item.superCate] )
-                this.selectCate03  = this.categories[this.item.superCate][this.item.subCateFirst];
+                this.selectCate02  = (this.item.superCate!=null)?
+                    Object.keys( this.categories?.[this.item.superCate] ) : ""
+                this.selectCate03  = (this.item.subCateFirst!=null)?
+                    this.categories?.[this.item.superCate]?.[this.item.subCateFirst] : ""
+
             },
             handleCate01    : function ( ){
                 if( this.categories.hasOwnProperty( this.item.superCate) ) {

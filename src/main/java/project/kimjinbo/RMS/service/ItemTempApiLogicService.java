@@ -44,14 +44,14 @@ public class ItemTempApiLogicService implements CrudInterface<ItemTempApiRequest
 
         // 2. Item 생성
         ItemTemp item = ItemTemp.builder()
-                .id( itemTempApiRequest.getId() )
-                .superCate( itemTempApiRequest.getSuperCate() )
-                .subCateFirst( itemTempApiRequest.getSubCateFirst() )
-                .subCateSecond(itemTempApiRequest.getSubCateSecond() )
                 .registerDate( date )
                 .updateDate( date )
                 .registerUser( itemTempApiRequest.getRegisterUser() )
                 .updateUser( itemTempApiRequest.getRegisterUser() )
+                .id( itemTempApiRequest.getId() )
+                .superCate( itemTempApiRequest.getSuperCate() )
+                .subCateFirst( itemTempApiRequest.getSubCateFirst() )
+                .subCateSecond(itemTempApiRequest.getSubCateSecond() )
                 .expireDate( (itemTempApiRequest.getExpireDate()==null)? null : LocalDate.parse(itemTempApiRequest.getExpireDate(), DateTimeFormatter.ISO_DATE) )
                 .name( itemTempApiRequest.getName() )
                 .cost( itemTempApiRequest.getCost() )
