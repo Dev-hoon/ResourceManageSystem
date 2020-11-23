@@ -19,6 +19,10 @@ repositories {
 }
 
 dependencies {
+	compile group: 'org.apache.poi', name: 'poi', version: '3.11'
+	compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.11'
+	compile group: 'commons-io', name: 'commons-io', version: '2.4'
+
 	compile 'org.json:json:20200518'
 	compile 'mysql:mysql-connector-java'
 	compile 'org.projectlombok:lombok:1.18.10'

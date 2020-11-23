@@ -128,6 +128,10 @@
                                         <button type="button" class="btn btn-sm btn-primary dark" v-on:click="initConditions"> 초기화 </button>
                                         <button type="button" class="btn btn-sm btn-primary dark" v-on:click="searchItems"> 조회 </button>
                                         <button type="button" class="btn btn-sm btn-primary dark" v-on:click="createItem"> 등록 </button>
+                                        <form >
+                                            <input type="file" name="file" v-on:change="fileHandler">
+                                            <input type="button" v-on:click="saveExcel" value="제출" />
+                                        </form>
                                     </div>
                                 </div>
                             </form>

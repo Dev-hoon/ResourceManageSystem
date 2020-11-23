@@ -127,6 +127,8 @@
         });
     }
 
+
+
     // 상세 조회 처리 데이터
     let conditions = new Vue({
         el : '#queryConditions',
@@ -145,6 +147,8 @@
                 cdKey           :   "",
                 licence         :   "",
             },
+
+            excelFile       : {},
 
             categories      :   [],
             selectCate01    :   [],
@@ -211,6 +215,37 @@
             },
             createItem      : function ( ) {
               location.href = "/pages/item/enroll"
+            },
+            fileHandler      : function( event ) {
+                var file = event.target.files[0]
+                if (file) { // && file.type.match(/^image\/(png|jpeg)$/)
+                    this.preview = window.URL.createObjectURL(file)
+                    this.excelFile = file
+                }
+
+                console.log("file : ",file)
+            },
+            saveExcel       : function ( ) {
+                console.log("this.excelFile : ",this.excelFile )
+
+                let formData = new FormData()
+                formData.append('file', this.excelFile  )
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/excel/save',
+                    //data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    success: function( data ) {
+                        toastr.success('자산 수정 완료')
+                    },
+                    error: function( ){
+                        toastr.error('자산 수정 실패')
+                    },
+                    enctype: "multipart/form-data",
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                });
             },
             itemHandler     : function ( ){
                 Object.entries( this.itemList ).filter(item=>item[1]==this.itemState)
