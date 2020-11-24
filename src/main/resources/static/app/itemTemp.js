@@ -1,7 +1,10 @@
 (function ($) {
 
+    let maxBtnSize = 7;              // 검색 하단 최대 범위
+    let indexBtn = [];               // 인덱스 버튼
+
     $(document).ready(function () {
-        search(0,window.registerUser);
+        search(0, window.registerUser);
         getSetting();
 
         // table에 모두 선택 처리
@@ -11,15 +14,15 @@
 
             if(e.target.checked){
                 itemList.itemList.map( (element) =>{
-                    Object.defineProperty( itemList.selectedItemList, element.id, { value: element, configurable:true, enumerable:true } );
+                    Object.defineProperty( itemList.selectedItem, element.id, { value: element, configurable:true, enumerable:true } );
                 })
             }else{
                 itemList.itemList.map( (element) =>{
-                    delete itemList.selectedItemList[element.id]
+                    delete itemList.selectedItem[element.id]
                 })
             }
 
-            showPage.selectedElements = Object.entries( itemList.selectedItemList ).length
+            showPage.selectedElements = Object.entries( itemList.selectedItem ).length
 
             itemList.amountSelect = 10;
         });
@@ -54,9 +57,11 @@
             itemList.selectCate01   = Object.keys( itemList.categories );
         });
     }
-
     // 데이터 받아오기
-    function search(index, registerUser) {
+    function search( index ) {
+
+        let registerUser = 1;
+
         $.get("/api/temps?page="+index+"&registerUser="+registerUser, function (response) {
             /* 데이터 셋팅 */
             // 페이징 처리 데이터
@@ -102,7 +107,6 @@
             },50)
         });
     }
-
     // Date 객체를 format에 맞는 string으로 변환
     function dateString( date ){
         return date.getFullYear()+ '-' + date.getMonth().toString().padStart(2,'0') + '-' + date.getDate().toString().padStart(2,'0')
@@ -116,23 +120,127 @@
         currentElements    :  0,        // 현재 데이터수
         amountPerPage      :  10,
     };
-
     // 페이지 정보
     let showPage = new Vue({
         el : '#showPage',
         data : {
-            totalElements       : {},
-            currentPage         : {},
-            selectedElements    : 0,    // 현재 조건 중 선택된 값들의 수
+            totalPages       : 0,
+            currentElements  : 0,
+            totalElements    : 0,
+            currentPage      : 0,
+            selectedElements : 0,    // 현재 조건 중 선택된 값들의 수
+        },methods: {
+            registerHandler : function ( ) {
+                if( Object.keys( itemList.selectedItem ).length == 0 ) {
+                    toastr.error("선택된 자산이 없습니다.")
+                    return ;
+                }
+
+                $('#registerButton').attr('disabled', true);
+
+                let postBody = {
+                    "items" : Object.entries(  itemList.selectedItem )
+                        .filter( (v)=>( (v[1]!=null)&&(v[1]!="") ))
+                        .reduce( (acc,cur)=>{ acc.push( cur[1].id ); return acc; }, [] )
+                };
+
+                // update user 등록 부분
+                postBody['userId'] = 1;
+
+                console.log("postBody : ", postBody )
+
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/temps',
+                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    success: function( data ) {
+                        search( pagination.currentPage  );
+                        toastr.success('임시자산 등록 완료')
+                        $('#registerButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        toastr.error('임시자산 등록 실패')
+                        $('#registerButton').attr('disabled', false);
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
+            },
+            deleteHandler   : function ( ) {
+                if( Object.keys( itemList.selectedItem ).length == 0 ) {
+                    toastr.error("선택된 자산이 없습니다.")
+                    return ;
+                }
+
+                $('#deleteButton').attr('disabled', true);
+
+                let postBody = {
+                    "items" : Object.entries(  itemList.selectedItem )
+                        .reduce( (acc,cur)=>{ acc.push( cur[1].id ); return acc; }, [] )
+                };
+
+                console.log("postBody : ", postBody )
+
+                // update user 등록 부분
+                postBody['userId'] = 1;
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/temps/delete',
+                    data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
+                    success: function( data ) {
+                        search( pagination.currentPage );
+                        toastr.success('임시자산 삭제 완료')
+                        $('#deleteButton').attr('disabled', false);
+                    },
+                    error: function( ){
+                        toastr.error('임시자산 삭제 실패')
+                        $('#deleteButton').attr('disabled', false);
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
+            },
+
         }
     });
-
+    // 페이지 버튼 리스트
+    let pageBtnList = new Vue({
+        el : '#pageBtn',
+        data : {
+            btnList : {}
+        },
+        methods: {
+            indexClick: function (event) {
+                let id = parseInt( event.target.getAttribute("btn_id") );
+                search(id-1, conditions.item );
+            },
+            previousClick:function (event) {
+                if(pagination.currentPage !== 0){
+                    search(pagination.currentPage-1, conditions.item );
+                }
+            },
+            nextClick:function (event) {
+                if(pagination.currentPage !== pagination.totalPages-1){
+                    search(pagination.currentPage+1, conditions.item );
+                }
+            }
+        },
+        mounted:function () {
+            // 제일 처음 랜더링 후 색상 처리
+            setTimeout(function () {
+                $('li[btn_id]').removeClass( "active" );
+                $('li[btn_id='+(pagination.currentPage+1)+']').addClass( "active" );
+            },50)
+        }
+    });
     // 데이터 리스트
     let itemList = new Vue({
         el : '#itemList',
         data : {
             itemList         : {},
-            selectedItemList : {},
+            selectedItem : {},
             amountSelect     : 0    // 현재 page에서 보여지는 값들중 선택된 값의 수
         },methods:{
             handlerCheckBox: function(event){
@@ -143,20 +251,20 @@
                 let seletedItem = this.itemList[ parseInt( event.target.getAttribute("index") ) ];
 
                 if(event.target.checked){
-                    Object.defineProperty( this.selectedItemList, seletedItem.id, { value: seletedItem, configurable:true, enumerable:true } );
+                    Object.defineProperty( this.selectedItem, seletedItem.id, { value: seletedItem, configurable:true, enumerable:true } );
                     this.amountSelect += 1;
                 }else{
-                    delete this.selectedItemList[seletedItem.id];
+                    delete this.selectedItem[seletedItem.id];
                     this.amountSelect -= 1;
                 }
 
-                showPage.selectedElements = Object.entries( this.selectedItemList ).length
+                showPage.selectedElements = Object.entries( this.selectedItem ).length
 
                 $('#selectAll input').prop('checked',(this.amountSelect==10)? true : false );
             },
             denoteCheckBox: function( ){
                 let items = $("#items_table").find( "td input:checkbox" ).toArray()
-                    .filter(element=>( this.selectedItemList.hasOwnProperty( element.getAttribute("itemId"))) )
+                    .filter(element=>( this.selectedItem.hasOwnProperty( element.getAttribute("itemId"))) )
                     .map( (element)=>{
                         element.checked = true;
                     })
@@ -176,7 +284,7 @@
                     this.denoteCheckBox( )
                 },50);
             },
-            itemRowHandler : function( event, item ){
+            rowHandler : function( event, item ){
                 console.log("event               : ",event);
                 console.log("itemList.categories : ",itemList.categories);
                 itemModal.pageMode      = 1;
@@ -189,37 +297,6 @@
                 $('#itemModal').modal()
 
             },
-        }
-    });
-
-    // 페이지 버튼 리스트
-    let pageBtnList = new Vue({
-        el : '#pageBtn',
-        data : {
-            btnList : {}
-        },
-        methods: {
-            indexClick: function (event) {
-                let id = parseInt( event.target.getAttribute("btn_id") );
-                search(id-1, conditions.getParameter());
-            },
-            previousClick:function (event) {
-                if(pagination.currentPage !== 0){
-                    search(pagination.currentPage-1, conditions.getParameter() );
-                }
-            },
-            nextClick:function (event) {
-                if(pagination.currentPage !== pagination.totalPages-1){
-                    search(pagination.currentPage+1, conditions.getParameter() );
-                }
-            }
-        },
-        mounted:function () {
-            // 제일 처음 랜더링 후 색상 처리
-            setTimeout(function () {
-                $('li[btn_id]').removeClass( "active" );
-                $('li[btn_id='+(pagination.currentPage+1)+']').addClass( "active" );
-            },50)
         }
     });
 

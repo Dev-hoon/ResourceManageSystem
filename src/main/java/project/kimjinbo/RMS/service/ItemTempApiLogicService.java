@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.transaction.annotation.Transactional;
 import project.kimjinbo.RMS.configs.ItemTempSpecs;
 import project.kimjinbo.RMS.exception.UserAuthException;
 import project.kimjinbo.RMS.interfaces.CrudInterface;
@@ -15,13 +16,12 @@ import project.kimjinbo.RMS.model.enumclass.ItemState;
 import project.kimjinbo.RMS.model.enumclass.RentalState;
 import project.kimjinbo.RMS.model.network.Header;
 import project.kimjinbo.RMS.model.network.Pagination;
-import project.kimjinbo.RMS.model.network.request.ItemApiRequest;
 import project.kimjinbo.RMS.model.network.request.ItemTempApiRequest;
-import project.kimjinbo.RMS.model.network.response.ItemApiResponse;
+import project.kimjinbo.RMS.model.network.request.ItemTempRequest;
 import project.kimjinbo.RMS.model.network.response.ItemTempApiResponse;
+import project.kimjinbo.RMS.repository.ItemRepository;
 import project.kimjinbo.RMS.repository.ItemTempRepository;
 
-import javax.persistence.NoResultException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -31,6 +31,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class ItemTempApiLogicService implements CrudInterface<ItemTempApiRequest, ItemTempApiResponse> {
+
+    @Autowired
+    private ItemRepository itemRepository;
 
     @Autowired
     private ItemTempRepository itemTempRepository;
@@ -165,6 +168,61 @@ public class ItemTempApiLogicService implements CrudInterface<ItemTempApiRequest
         return Header.OK( items.getTotalElements() );
     }
 
+    @Transactional
+    public Header createItems(Header<ItemTempRequest> request) {
+        LocalDate date = LocalDate.now();
+
+        ItemTempRequest itemTempRequest = request.getData();
+
+        List temps = itemTempRequest.getItems().stream().map( ( item )->{
+            try {
+
+                Optional<ItemTemp> itemTemp =  itemTempRepository.findById( item );
+
+                if( itemTemp.isPresent() ) {
+                    Item newItem = new Item( itemTemp.get() );
+
+                    newItem.setUpdateDate( date );
+                    newItem.setUpdateUser( itemTempRequest.getUserId() );
+
+                    itemRepository.save( newItem );
+
+                    itemTempRepository.delete( itemTemp.get() );
+
+                }else{
+                    throw new RuntimeException("delete error");
+                }
+
+                return "createItems";
+            } catch(Exception e) {
+                return new RuntimeException("delete error");
+            }
+        }).collect(Collectors.toList());
+
+        System.out.println("temps : "+temps );
+
+        return Header.OK( temps );
+    }
+
+    @Transactional
+    public Header deleteItems(Header<ItemTempRequest> request) {
+
+        ItemTempRequest itemTempRequest = request.getData();
+
+        List temps = itemTempRequest.getItems().stream().map( ( item )->{
+            try {
+                System.out.println("item, bookmarkRequests.getUserId() "+item+" / "+itemTempRequest.getUserId());
+                itemTempRepository.deleteById( item );
+                return "deleted";
+            } catch(Exception e) {
+                return new RuntimeException("delete error");
+            }
+        }).collect(Collectors.toList());
+
+        System.out.println("temps : "+temps );
+
+        return Header.OK( temps );
+    }
 
     public ItemTempApiResponse response(ItemTemp item){
 

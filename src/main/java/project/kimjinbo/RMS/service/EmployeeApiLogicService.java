@@ -150,6 +150,7 @@ public class EmployeeApiLogicService implements CrudInterface<EmployeeApiRequest
                 .phone( employee.getPhone() )
                 .position( employee.getPosition() )
                 .memo( employee.getMemo() )
+                .empNum( employee.getEmpNum() )
                 .teamName( (employee.getTeam()==null)?null:employee.getTeam().getName() )
                 .departmentName( (employee.getDepartment()==null)?null:employee.getDepartment().getName() )
                 .build();

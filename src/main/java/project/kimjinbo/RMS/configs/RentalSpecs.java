@@ -15,6 +15,12 @@ public class RentalSpecs {
 
     public static Specification<Rental> endDate(LocalDate endDate) {
         return (endDate!=null)
+                ? (Specification<Rental>) ((root, query, builder) -> builder.equal(root.get("endDate"), endDate) )
+                : (Specification<Rental>) ((root, query, builder) -> builder.and() );
+    }
+
+    public static Specification<Rental> endDateLess(LocalDate endDate) {
+        return (endDate!=null)
                 ? (Specification<Rental>) ((root, query, builder) -> builder.lessThan(root.get("endDate"), endDate) )
                 : (Specification<Rental>) ((root, query, builder) -> builder.and() );
     }

@@ -137,12 +137,12 @@
                     url: '/api/item',
                     data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
                     success: function(data) {
-                        alert('아이템 등록 완료.');
+                        toastr.success('아이템 등록 완료.');
                         itemList.initItem();
                         $('#registerButton').attr('disabled', false);
                     },
                     error: function( ){
-                        alert('아이템 등록 실패.');
+                        toastr.error('아이템 등록 실패.');
                         $('#registerButton').attr('disabled', false);
                     },
                     contentType: "application/json",
@@ -167,12 +167,12 @@
                     url: '/api/temp',
                     data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
                     success: function(data) {
-                        alert('아이템 임시등록 완료.');
+                        toastr.success('아이템 임시등록 완료.');
                         itemList.initItem();
                         $('#tempButton').attr('disabled', false);
                     },
                     error: function( ){
-                        alert('아이템 임시등록 실패.');
+                        toastr.error('아이템 임시등록 실패.');
                         $('#tempButton').attr('disabled', false);
                     },
                     contentType: "application/json",

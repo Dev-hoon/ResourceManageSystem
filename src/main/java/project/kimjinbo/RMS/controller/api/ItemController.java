@@ -27,6 +27,13 @@ public class ItemController implements CrudInterface<ItemApiRequest, ItemApiResp
         return itemApiLogicService.search( pageable, itemApiRequest );
     }
 
+    @GetMapping("/items/amount")
+    @ResponseBody
+    public Header readItems(@PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) ItemApiRequest itemApiRequest) {
+        System.out.println("/items/amount");
+        return itemApiLogicService.amount( itemApiRequest );
+    }
+
     @Override
     @PostMapping("/item")
     public Header<ItemApiResponse> create(@RequestBody Header<ItemApiRequest> request) {

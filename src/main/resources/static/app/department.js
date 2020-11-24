@@ -192,41 +192,6 @@
             },
             deleteHandler : function( evnet ){
                 console.log(" departmentList.selectedItem : ",departmentList.selectedItem )
-                let IDs = Object.keys(departmentList.selectedItem);
-
-                let result = {
-                    total           :   IDs.length,
-                    results         :   [],
-                    alertHandler    :   function (){
-                        if( this.total == this.results.length ) {
-                            search(0, 'departments');
-                            let wait = alert( 'delete done' );
-                            if(!wait) $('#departmentModal').modal("hide");
-                            this.results    = [];
-                        }
-                    },
-                    createHandler   :   function ( data ){
-                        this.results.push(data);
-                    },
-                    errorHandler    :   function ( data ){
-                        this.results.push(data);
-                    },
-                }
-
-                IDs.map((id)=>{
-                    $.ajax({
-                        type: 'DELETE',
-                        url: '/api/department/'+id,
-                        success: function(data) {
-                            result.createHandler( data );
-                            result.alertHandler( );
-                        },
-                        error   : function(data) {
-                            result.errorHandler( data );
-                            result.alertHandler( );
-                        },
-                    });
-                });
 
             },
         }
@@ -283,13 +248,13 @@
                     success: function(data) {
                         search( paginationList['departments'].currentPage, 'departments' );
                         getDepartmentList( );
-                        alert('부서 삭제 완료.');
+                        toastr.success('부서 삭제 완료.');
                         $('#departmentModal').modal("hide");
                         this.item = { };
                         $('#deleteDepButton').attr('disabled', false);
                     },
                     error: function( ){
-                        alert('부서 삭제 실패.');
+                        toastr.error('부서 삭제 실패.');
                         $('#deleteDepButton').attr('disabled', false);
                     },
                     contentType: "application/json",
@@ -313,13 +278,13 @@
                     success: function(data) {
                         search( paginationList['departments'].currentPage, 'departments' );
                         getDepartmentList( );
-                        alert('부서 등록 완료.');
+                        toastr.success('부서 등록 완료.');
                         $('#departmentModal').modal("hide");
                         this.item = { };
                         $('#createDepButton').attr('disabled', false);
                     },
                     error: function( ){
-                        alert('부서 등록 실패.');
+                        toastr.error('부서 등록 실패.');
                         $('#createDepButton').attr('disabled', false);
                     },
                     contentType: "application/json",
@@ -341,13 +306,13 @@
                     success: function(data) {
                         search( paginationList['departments'].currentPage, 'departments' );
                         getDepartmentList( );
-                        alert('부서 수정 완료.');
+                        toastr.success('부서 수정 완료.');
                         $('#departmentModal').modal("hide");
                         this.item = { };
                         $('#updateDepButton').attr('disabled', false);
                     },
                     error: function( ){
-                        alert('부서 수정 실패.');
+                        toastr.error('부서 수정 실패.');
                         $('#updateDepButton').attr('disabled', false);
                     },
                     contentType: "application/json",
@@ -461,33 +426,6 @@
                 $("#teamModal").modal().off()
             },
             deleteHandler : function( evnet ){
-                let IDs = Object.keys(addressList.selectedItem);
-
-                let result = {
-                    total           :   IDs.length,
-                    results         :   [],
-                    alertHandler    :   function (){
-                        if( this.total == this.results.length ) {
-                            search(0, window.registerUser, 'teams');
-                            let wait = alert('data: ' );
-                            if(!wait) $('#teamModal').modal("hide");
-                        }
-                    },
-                    createHandler   :   function ( temp ){
-                        this.results.push(temp);
-                    }
-                }
-
-                IDs.map((id)=>{
-                    $.ajax({
-                        type: 'DELETE',
-                        url: '/api/team/'+id,
-                        success: function(data) {
-                            result.createHandler( );
-                            result.alertHandler( );
-                        }
-                    });
-                });
 
             },
         }
@@ -545,12 +483,12 @@
                     url: '/api/team/'+this.item.id,
                     success: function(data) {
                         search( paginationList['teams'].currentPage, 'teams' );
-                        alert('팀 삭제 완료.');
+                        toastr.success('팀 삭제 완료.');
                         $('#teamModal').modal("hide");
                         $('#deleteTeamButton').attr('disabled', false);
                     },
                     error: function( ){
-                        alert('팀 삭제 실패.');
+                        toastr.error('팀 삭제 실패.');
                         $('#deleteTeamButton').attr('disabled', false);
                     },
                     contentType: "application/json",
@@ -575,13 +513,13 @@
                     data: JSON.stringify({'data':postBody}),
                     success: function(data) {
                         search( paginationList['teams'].currentPage, 'teams' );
-                        alert('팀 등록 완료.');
+                        toastr.success('팀 등록 완료.');
                         $('#teamModal').modal("hide");
                         this.item = { };
                         $('#createTeamButton').attr('disabled', false);
                     },
                     error: function( ){
-                        alert('팀 등록 실패.');
+                        toastr.error('팀 등록 실패.');
                         $('#createTeamButton').attr('disabled', false);
                     },
                     contentType: "application/json",
@@ -605,13 +543,13 @@
                     data: JSON.stringify({'data':postBody}),
                     success: function(data) {
                         search( paginationList['teams'].currentPage, 'teams' );
-                        alert('팀 수정 완료.');
+                        toastr.success('팀 수정 완료.');
                         $('#teamModal').modal("hide");
                         this.item = { };
                         $('#updateTeamButton').attr('disabled', false);
                     },
                     error: function( ){
-                        alert('팀 수정 실패.');
+                        toastr.error('팀 수정 실패.');
                         $('#updateTeamButton').attr('disabled', false);
                     },
                     contentType: "application/json",
@@ -722,44 +660,7 @@
                 $("#addressModal").modal().off()
             },
             deleteHandler : function( evnet ){
-                window.evnetevnet = evnet
-                let IDs = Object.keys( addressList.selectedItem);
 
-                let result = {
-                    total           :   IDs.length,
-                    results         :   [],
-                    alertHandler    :   function (){
-                        if( this.total == this.results.length ) {
-                            search(0, 'places');
-                            let wait = alert( 'delete done' );
-                            if(!wait) $('#addressModal').modal("hide");
-                            this.results    = [];
-
-                            Object.keys( showPages['places']._data ).map( (key)=>{ console.log("key : ",key);showPages['places'][key]=0;} )
-                        }
-                    },
-                    createHandler   :   function ( temp ){
-                        this.results.push(temp['type']='done');
-                    },
-                    errorHandler   :   function ( temp ){
-                        this.results.push(temp['type']='error');
-                    }
-                }
-
-                IDs.map((id)=>{
-                    $.ajax({
-                        type: 'DELETE',
-                        url: '/api/place/'+id,
-                        success : function(data) {
-                            result.createHandler( data );
-                            result.alertHandler( );
-                        },
-                        error   : function(data) {
-                            result.errorHandler(data );
-                            result.alertHandler( );
-                        },
-                    });
-                });
             },
         }
     });
@@ -808,13 +709,13 @@
                     success: function(data) {
                         search( paginationList['places'].currentPage, 'places' );
                         getAddressList( );
-                        alert('주소 삭제 완료.');
+                        toastr.success('주소 삭제 완료.');
                         $('#addressModal').modal("hide");
                         this.item = { };
                         $('#deleteAddressButton').attr('disabled', false);
                     },
                     error: function( ){
-                        alert('주소 삭제 실패.');
+                        toastr.error('주소 삭제 실패.');
                         $('#deleteAddressButton').attr('disabled', false);
                     },
                     contentType: "application/json",
@@ -839,13 +740,13 @@
                     success: function(data) {
                         search( paginationList['places'].currentPage, 'places' );
                         getAddressList( );
-                        alert('주소 등록 완료.');
+                        toastr.success('주소 등록 완료.');
                         $('#addressModal').modal("hide");
                         this.item = { };
                         $('#createAddressButton').attr('disabled', false);
                     },
                     error: function( ){
-                        alert('주소 등록 실패.');
+                        toastr.error('주소 등록 실패.');
                         $('#createAddressButton').attr('disabled', false);
                     },
                     contentType: "application/json",
@@ -868,13 +769,13 @@
                     success: function(data) {
                         search( paginationList['places'].currentPage, 'places' );
                         getAddressList( );
-                        alert('주소 수정 완료.');
+                        toastr.success('주소 수정 완료.');
                         $('#addressModal').modal("hide");
                         this.item = { };
                         $('#updateAddressButton').attr('disabled', false);
                     },
                     error: function( ){
-                        alert('주소 수정 실패.');
+                        toastr.error('주소 수정 실패.');
                         $('#updateAddressButton').attr('disabled', false);
                     },
                     contentType: "application/json",

@@ -24,6 +24,7 @@ public class RentalApiRequest {
 
     private LocalDate   startDate;
     private LocalDate   endDate;
+    private LocalDate   endDateLess;
     private String      reason;
 
     private Integer     state;

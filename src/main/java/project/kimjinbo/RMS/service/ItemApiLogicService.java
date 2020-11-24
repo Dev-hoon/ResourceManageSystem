@@ -14,7 +14,6 @@ import project.kimjinbo.RMS.model.network.Header;
 import project.kimjinbo.RMS.model.network.Pagination;
 import project.kimjinbo.RMS.model.network.request.ItemApiRequest;
 import project.kimjinbo.RMS.model.network.response.ItemApiResponse;
-import project.kimjinbo.RMS.model.network.response.ItemTempApiResponse;
 import project.kimjinbo.RMS.repository.ItemRepository;
 
 import java.time.LocalDate;
@@ -24,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class ItemApiLogicService implements CrudInterface<ItemApiRequest, ItemApiResponse> {
@@ -159,6 +157,24 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest, ItemAp
                 .build();
 
         return Header.OK( itemApiResponseList, pagination );
+    }
+
+    public Header amount( ItemApiRequest request ) {
+
+        List<Item> items =itemRepository.findAll(
+                ItemSpecs.superCate( request.getSuperCate() ).and(
+                        ItemSpecs.subCateFirst( request.getSubCateFirst())).and(
+                        ItemSpecs.subCateSecond( request.getSubCateSecond())).and(
+                        ItemSpecs.expireDate( request.getExpireDate())).and(
+                        ItemSpecs.registerDate( request.getRegisterDate())).and(
+                        ItemSpecs.name( request.getName())).and(
+                        ItemSpecs.itemState( request.getItemState() )).and(
+                        ItemSpecs.rentalState( request.getRentalState() )).and(
+                        ItemSpecs.expireDateMore( request.getExpireDateMore())).and(
+                        ItemSpecs.registerDateMore( request.getRegisterDateMore()) )
+                );
+
+        return Header.OK( items.size() );
     }
 
     public ItemApiResponse response(Item item){

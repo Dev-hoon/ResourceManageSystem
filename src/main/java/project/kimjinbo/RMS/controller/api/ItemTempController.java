@@ -10,6 +10,7 @@ import project.kimjinbo.RMS.model.entity.ItemTemp;
 import project.kimjinbo.RMS.model.network.Header;
 import project.kimjinbo.RMS.model.network.request.ItemApiRequest;
 import project.kimjinbo.RMS.model.network.request.ItemTempApiRequest;
+import project.kimjinbo.RMS.model.network.request.ItemTempRequest;
 import project.kimjinbo.RMS.model.network.response.ItemApiResponse;
 import project.kimjinbo.RMS.model.network.response.ItemTempApiResponse;
 import project.kimjinbo.RMS.repository.ItemTempRepository;
@@ -34,6 +35,17 @@ public class ItemTempController implements CrudInterface<ItemTempApiRequest, Ite
         System.out.println("request : "+ItemTempApiRequest);
         return itemTempApiLogicService.search( pageable, ItemTempApiRequest );
     }
+
+    @PostMapping("/temps")
+    public Header createItems(@RequestBody Header<ItemTempRequest> request) {
+        return itemTempApiLogicService.deleteItems( request );
+    }
+
+    @PostMapping("/temps/delete")
+    public Header deleteItems(@RequestBody Header<ItemTempRequest> request) {
+        return itemTempApiLogicService.deleteItems( request );
+    }
+
 
     @Override
     @GetMapping("/temp")

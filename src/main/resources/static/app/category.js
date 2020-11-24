@@ -16,10 +16,12 @@
         return ( date )? date.groups['DateFormat'] : null ;
     }
     // 데이터 받아오기
-    function search(index, param, event) {
+    function search(index, param ) {
         let URL = "/api/categoryList?page="+index;
 
+
         if( param != null){
+            console.log("param : ",param)
             URL = URL.concat("&",param.map( item=>item.join('=') ).join('&'));
         }
 
@@ -140,7 +142,7 @@
                         (this.expireDate == "year")? this.item.expireDate * 12 : this.item.expireDate
                         : null
 
-                return Object.entries(Parameter).filter( item => item[1]!=null ).reduce( (acc,cur)=>{acc[cur[0]]=cur[1]; return acc;}, {});
+                return Object.entries(Parameter).filter( item => item[1]!=null ).reduce( (acc,cur)=>{acc.push([cur[0],cur[1]]); return acc;}, [] );
 
             },
             searchCategories :  function () {
@@ -149,7 +151,7 @@
             },
             createCategory  :   function () {
                 $('#createButton').attr('disabled', false);
-                let postBody = this.getParameter();
+                let postBody = $.extend(true, {}, this.item);
 
                 postBody['registerUser'] = 1;
 
@@ -377,12 +379,12 @@
                     data: JSON.stringify({'data':postBody}),
                     success: function(data) {
                         search( pagination.currentPage );
-                        alert('카테고리 수정 완료.');
+                        toastr.success('카테고리 수정 완료.');
                         $('#categoryModal').modal("hide");
                         $('#updateButton').attr('disabled', false);
                     },
                     error: function( ){
-                        alert('카테고리 수정 실패.');
+                        toastr.error('카테고리 수정 실패.');
                         $('#updateButton').attr('disabled', false);
                     },
                     contentType: "application/json",

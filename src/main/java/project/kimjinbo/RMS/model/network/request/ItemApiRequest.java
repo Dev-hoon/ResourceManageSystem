@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -32,5 +34,10 @@ public class ItemApiRequest {
 
     private String      cdKey;
     private String      licence;
+
+    //
+    private String   expireDateMore;
+    private String   registerDateMore;
+
 
 }

@@ -515,13 +515,13 @@
                     data: JSON.stringify({'data':postBody}), // or JSON.stringify ({name: 'jonas'}),
                     success: function(data) {
                         search( pagination.currentPage, conditions.item  );
-                        alert('자산 수정 완료.');
+                        toastr.success('자산 수정 완료.');
                         $('#itemModal').modal("hide");
                         this.item = { };
                         $('#updateItemButton').attr('disabled', false);
                     },
                     error: function( ){
-                        alert('자산 수정 실패.');
+                        toastr.error('자산 수정 실패.');
                         $('#updateItemButton').attr('disabled', false);
                     },
                     contentType: "application/json",

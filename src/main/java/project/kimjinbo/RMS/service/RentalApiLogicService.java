@@ -10,7 +10,6 @@ import project.kimjinbo.RMS.interfaces.CrudInterface;
 import project.kimjinbo.RMS.model.entity.BookmarkPK;
 import project.kimjinbo.RMS.model.entity.Rental;
 import project.kimjinbo.RMS.model.entity.RentalPK;
-import project.kimjinbo.RMS.model.enumclass.RentalResult;
 import project.kimjinbo.RMS.model.enumclass.RentalState;
 import project.kimjinbo.RMS.model.network.Header;
 import project.kimjinbo.RMS.model.network.Pagination;
@@ -52,7 +51,7 @@ public class RentalApiLogicService implements CrudInterface<RentalApiRequest, Re
                 .startDate( (rentalApiRequest.getStartDate()==null)? date : rentalApiRequest.getStartDate() )
                 .endDate( rentalApiRequest.getEndDate() )
                 .reason( rentalApiRequest.getReason() )
-                .state( (rentalApiRequest.getState()==null)? RentalResult.RENTAL_WAIT.getId() : rentalApiRequest.getState() )
+                .state( (rentalApiRequest.getState()==null)? RentalState.RENTAL_WAIT.getId() : rentalApiRequest.getState() )
                 .build();
 
         Rental newRental = rentalRepository.save(rental);
@@ -128,7 +127,7 @@ public class RentalApiLogicService implements CrudInterface<RentalApiRequest, Re
                     .startDate( (rentalRequest.getStartDate()==null)? date : LocalDate.parse( rentalRequest.getStartDate() ) )
                     .endDate( LocalDate.parse( rentalRequest.getEndDate() ) )
                     .reason( rentalRequest.getReason() )
-                    .state( (rentalRequest.getState()==null)? RentalResult.RENTAL_WAIT.getId() : rentalRequest.getState() )
+                    .state( (rentalRequest.getState()==null)? RentalState.RENTAL_WAIT.getId() : rentalRequest.getState() )
                     .build();
 
                 Rental newRental = rentalRepository.save( rental );
@@ -148,7 +147,7 @@ public class RentalApiLogicService implements CrudInterface<RentalApiRequest, Re
     }
 
     @Transactional
-    public Header updateState(Header<List<RentalApiRequest>> request, RentalResult state) {
+    public Header updateState(Header<List<RentalApiRequest>> request, RentalState state) {
         LocalDate date = LocalDate.now();
 
         // 1. request data
@@ -192,7 +191,8 @@ public class RentalApiLogicService implements CrudInterface<RentalApiRequest, Re
                 RentalSpecs.state( request.getState() ).and(
                 RentalSpecs.endDate(request.getEndDate())).and(
                 RentalSpecs.itemId(request.getItemId())).and(
-                RentalSpecs.empId(request.getEmpId())),
+                RentalSpecs.empId(request.getEmpId())).and(
+                RentalSpecs.endDateLess(request.getEndDateLess())),
                 pageable );
 
         List<RentalApiResponse> itemApiResponseList = items.stream()
@@ -207,6 +207,20 @@ public class RentalApiLogicService implements CrudInterface<RentalApiRequest, Re
                 .build();
 
         return Header.OK( itemApiResponseList, pagination );
+    }
+
+    public Header amount( RentalApiRequest request) {
+
+        List<Rental> items =rentalRepository.findAll(
+            RentalSpecs.state( request.getState() ).and(
+            RentalSpecs.endDate(request.getEndDate())).and(
+            RentalSpecs.itemId(request.getItemId())).and(
+            RentalSpecs.empId(request.getEmpId())).and(
+            RentalSpecs.endDateLess(request.getEndDateLess()))
+        );
+
+
+        return Header.OK( items.size() );
     }
 
     public RentalApiResponse response( Rental rental ){

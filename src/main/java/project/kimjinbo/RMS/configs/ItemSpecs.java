@@ -73,4 +73,17 @@ public class ItemSpecs {
                 : (Specification<Item>) ((root, query, builder) -> builder.and() );
     }
 
+
+    public static Specification<Item> registerDateMore(String registerDate) {
+        return (registerDate!=null)
+                ? (Specification<Item>) ((root, query, builder) -> builder.greaterThan(root.get("registerDate"),  LocalDate.parse( registerDate, DateTimeFormatter.ISO_DATE)) )
+                : (Specification<Item>) ((root, query, builder) -> builder.and() );
+    }
+
+    public static Specification<Item> expireDateMore(String expireDate) {
+        return (expireDate!=null)
+                ? (Specification<Item>) ((root, query, builder) -> builder.greaterThan(root.get("expireDate"),  LocalDate.parse( expireDate, DateTimeFormatter.ISO_DATE)) )
+                : (Specification<Item>) ((root, query, builder) -> builder.and() );
+    }
+
 }

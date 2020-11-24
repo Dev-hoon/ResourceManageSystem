@@ -18,7 +18,8 @@ public class AdminMenuService {
                     Arrays.asList(
                         AdminMenu.builder().title("자산등록").url("/pages/item/enroll").mode("item").build().check(title),
                         AdminMenu.builder().title("자산상세조회").url("/pages/item/detail").mode("item").build().check(title),
-                        AdminMenu.builder().title("자산내역조회").url("/pages/item/history").mode("item").build().check(title)
+                        AdminMenu.builder().title("자산내역조회").url("/pages/item/history").mode("item").build().check(title),
+                        AdminMenu.builder().title("임시자산내역").url("/pages/temp").mode("item").build().check(title)
                     )
                 ).build(),
 

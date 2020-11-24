@@ -47,5 +47,37 @@ public class Item {
     Place place;
 
 
+    public Item(ItemTemp itemItem ){
+        this.registerUser   = itemItem.getRegisterUser();
+        this.registerDate   = itemItem.getRegisterDate();
+        this.updateUser     = itemItem.getUpdateUser();
+        this.updateDate     = itemItem.getUpdateDate();
+
+        this.superCate      = itemItem.getSuperCate();
+        this.subCateFirst   = itemItem.getSubCateFirst();
+        this.subCateSecond  = itemItem.getSubCateSecond();
+        this.name           = itemItem.getName();
+        this.memo           = itemItem.getMemo();
+        this.detail         = itemItem.getDetail();
+        this.expireDate     = itemItem.getExpireDate();
+        this.itemState      = itemItem.getItemState();
+        this.placeState     = itemItem.getPlaceState();
+        this.rentalState    = itemItem.getRentalState();
+        this.cdKey          = itemItem.getCdKey();
+        this.licence        = itemItem.getLicence();
+        this.cost           = itemItem.getCost();
+        this.purchaseCost   = itemItem.getPurchaseCost();
+
+        //
+        this.expireDate     = itemItem.getExpireDate();
+        this.registerDate   = itemItem.getRegisterDate();
+
+
+
+
+
+
+    }
+
 }
 

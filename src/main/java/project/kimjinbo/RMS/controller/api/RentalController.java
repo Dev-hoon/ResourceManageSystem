@@ -6,15 +6,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import project.kimjinbo.RMS.interfaces.CrudInterface;
-import project.kimjinbo.RMS.model.enumclass.RentalResult;
 import project.kimjinbo.RMS.model.enumclass.RentalState;
 import project.kimjinbo.RMS.model.network.Header;
-import project.kimjinbo.RMS.model.network.request.ItemApiRequest;
 import project.kimjinbo.RMS.model.network.request.RentalApiRequest;
 import project.kimjinbo.RMS.model.network.request.RentalRequest;
-import project.kimjinbo.RMS.model.network.response.ItemApiResponse;
 import project.kimjinbo.RMS.model.network.response.RentalApiResponse;
-import project.kimjinbo.RMS.service.ItemApiLogicService;
 import project.kimjinbo.RMS.service.RentalApiLogicService;
 
 import java.time.LocalDate;
@@ -32,20 +28,26 @@ public class RentalController implements CrudInterface<RentalApiRequest, RentalA
         return rentalApiLogicService.createItems( request );
     }
 
+    @GetMapping("/rentals/amount")
+    @ResponseBody
+    public Header<RentalApiResponse> amount (@PageableDefault(sort = { "startDate" }, direction = Sort.Direction.ASC) RentalApiRequest request) {
+        return rentalApiLogicService.amount( request );
+    }
+
     @PutMapping("/rentals/accept")
     public Header<RentalApiResponse> acceptItems(@RequestBody Header<List<RentalApiRequest>> request) {
         System.out.println("request : "+request);
-        return rentalApiLogicService.updateState( request, RentalResult.RENTAL_ACCEPT );
+        return rentalApiLogicService.updateState( request, RentalState.RENTAL_ACCEPT );
     }
 
     @PutMapping("/rentals/deny")
     public Header<RentalApiResponse> denyItems(@RequestBody Header<List<RentalApiRequest>> request) {
-        return rentalApiLogicService.updateState( request, RentalResult.RENTAL_DENY );
+        return rentalApiLogicService.updateState( request, RentalState.RENTAL_DENY );
     }
 
     @PutMapping("/rentals/return")
     public Header<RentalApiResponse> returnItems(@RequestBody Header<List<RentalApiRequest>> request) {
-        return rentalApiLogicService.updateState( request, RentalResult.RENTAL_RETURN );
+        return rentalApiLogicService.updateState( request, RentalState.rentalState );
     }
 
     @GetMapping("/rentals")
@@ -57,7 +59,7 @@ public class RentalController implements CrudInterface<RentalApiRequest, RentalA
     @GetMapping("/rental/requests")
     @ResponseBody
     public Header<RentalApiResponse> readRequests (@PageableDefault(sort = { "startDate" }, direction = Sort.Direction.ASC) Pageable pageable, RentalApiRequest request) {
-        request.setState( RentalResult.RENTAL_WAIT.getId() );
+        request.setState( RentalState.RENTAL_WAIT.getId() );
         return rentalApiLogicService.search( pageable, request );
     }
 
@@ -65,7 +67,7 @@ public class RentalController implements CrudInterface<RentalApiRequest, RentalA
     @ResponseBody
     public Header<RentalApiResponse> readOverdue (@PageableDefault(sort = { "startDate" }, direction = Sort.Direction.ASC) Pageable pageable, RentalApiRequest request) {
         request.setEndDate( LocalDate.now() );
-        request.setState( RentalResult.RENTAL_ACCEPT.getId() );
+        request.setState( RentalState.RENTAL_ACCEPT.getId() );
         return rentalApiLogicService.search( pageable, request );
     }
 

@@ -226,60 +226,6 @@
                                 <div id="historyList" class="row">
 
                                     <div class="col-sm-12">
-
-                                        <!--
-                                        <table class="table table-bordered table-hover dataTable font-14"
-                                               role="grid" aria-describedby="example2_info">
-                                            <thead>
-                                            <tr role="row">
-                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    자산번호
-                                                </th>
-                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    자산명칭
-                                                </th>
-                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    대분류
-                                                </th>
-                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    소분류 1
-                                                </th>
-                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    소분류 2
-                                                </th>
-                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    등록일
-                                                </th>
-                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    만료일
-                                                </th>
-                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    자산상태
-                                                </th>
-                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    대여상태
-                                                </th>
-                                                <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    자산위치
-                                                </th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr role="row" class="odd item" >
-                                                <td class="text-center">{{item.id}}              </td>
-                                                <td class="text-center">{{item.name}}            </td>
-                                                <td class="text-center">{{item.superCate}}       </td>
-                                                <td class="text-center">{{item.subCateFirst}}    </td>
-                                                <td class="text-center">{{item.subCateSecond}}   </td>
-                                                <td class="text-center">{{item.registerDate}}    </td>
-                                                <td class="text-center">{{item.expireDate}}      </td>
-                                                <td class="text-center">{{item.itemState}}       </td>
-                                                <td class="text-center">{{item.rentalState}}     </td>
-                                                <td class="text-center">{{item.placeState}}      </td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                        -->
                                         <table class="table table-bordered table-hover dataTable font-14"
                                                role="grid" aria-describedby="example2_info">
                                             <thead>
@@ -333,7 +279,7 @@
                                                     대여인
                                                 </th>
                                                 <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
-                                                    대여팀
+                                                    자산명칭
                                                 </th>
                                                 <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
                                                     대여시작일
@@ -351,7 +297,7 @@
                                             <tr role="row" class="odd item" v-for="(dto, idx) in itemList" >
                                                 <td class="text-center"> <input type="checkbox" aria-label="Checkbox for following text input" v-bind:index="idx"  v-bind:itemId="dto.id" v-on:change="handlerCheckBox"> </td>
                                                 <td class="text-center">{{dto.userName}}  </td>
-                                                <td class="text-center">{{dto.teamName}}  </td>
+                                                <td class="text-center">{{dto.itemName}}  </td>
                                                 <td class="text-center">{{dto.startDate}} </td>
                                                 <td class="text-center">{{dto.endDate}}   </td>
                                                 <td class="text-center">{{dto.reason}}    </td>

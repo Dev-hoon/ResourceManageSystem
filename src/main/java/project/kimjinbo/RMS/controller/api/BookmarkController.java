@@ -38,13 +38,6 @@ public class BookmarkController implements CrudInterface<BookmarkApiRequest, Boo
         return bookmarkApiLogicService.search( pageable, bookmarkApiRequest );
     }
 
-    @GetMapping("/bookmark/amount")
-    @ResponseBody
-    public Header<Long> amount(@PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable, ItemTempApiRequest ItemTempApiRequest) {
-        System.out.println("request : "+ItemTempApiRequest);
-        return itemTempApiLogicService.amount( pageable, ItemTempApiRequest );
-    }
-
     @PostMapping("/bookmarks")
     public Header createItems(@RequestBody Header<BookmarkRequest> request) {
         System.out.println("bookmarks BookmarkRequest request : "+request);
