@@ -195,7 +195,7 @@
                                                     <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.expireDate}}      </td>
                                                     <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.itemState}}       </td>
                                                     <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.rentalState}}     </td>
-                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.placeState}}      </td>
+                                                    <td class="text-center" v-on:click="rowHandler(event, dto)">{{dto.placeName}}      </td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -216,7 +216,6 @@
                                         <div class="form-group pull-right">
                                             <button id="bookmarkButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="bookmarkHandler"> 장바구니 담기 </button>
                                             <button type="button" class="btn btn-sm btn-primary dark" v-on:click="openBookmark">    장바구니 열기 </button>
-                                            <button id="rentalButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="rentalHandler">  대여 신청    </button>
                                         </div>
                                     </div>
                                 </div>

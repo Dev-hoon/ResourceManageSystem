@@ -142,7 +142,8 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest, ItemAp
                 ItemSpecs.registerDate(request.getRegisterDate())).and(
                 ItemSpecs.name( request.getName())).and(
                 ItemSpecs.itemState( request.getItemState() )).and(
-                ItemSpecs.rentalState( request.getRentalState() ))
+                ItemSpecs.rentalState( request.getRentalState() )).and(
+                ItemSpecs.placeState( request.getPlaceState() ))
                 ,pageable);
 
         List<ItemApiResponse> itemApiResponseList = items.stream()

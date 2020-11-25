@@ -78,6 +78,8 @@
                 .map( item=>item.join("=") )
         }
 
+        console.log("param : ",param)
+        console.log("[\"/api/items?page=\"+index].concat(Parameter).join('&') : ",["/api/items?page="+index].concat(Parameter).join('&'))
         $.get( ["/api/items?page="+index].concat(Parameter).join('&'), function (response) {
             /* 데이터 셋팅 */
             // 페이징 처리 데이터
@@ -411,6 +413,9 @@
                 itemModal.rentalState       = (item.rentalState)?item.rentalState:"";
                 itemModal.placeState        = (item.placeState)?item.placeState:"";;
 
+                console.log("itemModal.placeState : ",itemModal.placeState)
+                console.log("itemModal.placeState : ",itemModal.placeState)
+
                 itemModal.itemHandler( );
                 itemModal.rentalHandler( );
                 itemModal.placeHandler( );
@@ -495,8 +500,8 @@
                     })
             },
             placeHandler    : function ( ){
-                this.placeList.filter(item=>item.name==this.placeState)?.map(item=>{
-                    this.item.placeState   = item.id;
+                this.placeList.filter(item=>item.id==this.placeState)?.map(item=>{
+                    this.item.placeState   = item.name;
                 })
             },
             updateItem      : function ( updateUser ) {

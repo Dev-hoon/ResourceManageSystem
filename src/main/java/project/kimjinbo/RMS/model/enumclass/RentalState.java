@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public enum RentalState {
 
+
+    RENTAL_ABLE     (0, "대여가능","대여가능상태"),
+    RENTAL_DISABLE  (1, "대여불가능","대여불가능상태"),
     RENTAL_WAIT     (10,"승인대기","대여승인대기"),
     RENTAL_ACCEPT   (11,"대여승인","대여승인상태"),
     RENTAL_DENY     (12,"대여반려","대여반려상태"),
@@ -20,8 +23,8 @@ public enum RentalState {
     RENTAL_HOLD     (14,"대여보류","대여보류상태");
 
     private Integer id;
-    private String title;
-    private String description;
+    private String  title;
+    private String  description;
 
     public static String titleOf(Integer id) {
         return Arrays.stream(RentalState.values()).filter(item->(item.getId()==id)).findFirst().get().getTitle();

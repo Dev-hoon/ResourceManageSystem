@@ -182,8 +182,6 @@ public class BookmarkApiLogicService implements CrudInterface<BookmarkApiRequest
 
     public BookmarkApiResponse response(Bookmark bookmark){
 
-        System.out.println("bookmark response : "+bookmark);
-
         BookmarkApiResponse bookmarkApiResponse = BookmarkApiResponse.builder()
                 .itemId( bookmark.getItemId() )
                 .userId( bookmark.getRegisterUser() )
