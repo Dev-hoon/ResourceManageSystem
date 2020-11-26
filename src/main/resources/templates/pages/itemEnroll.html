@@ -44,7 +44,8 @@
                                 <button id="initButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="initItem"> 초기화 </button>
                                 <button id="tempButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="registerTemp"> 임시 </button>
                                 <button id="registerButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="registerItem"> 등록 </button>
-                                <button id="excelButton" type="button" class="btn btn-sm btn-primary dark"> 엑셀업로드 </button>
+                                <button id="excelButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="document.all.file.click()">엑셀 업로드</button>
+                                <input  type="file" name="file" id="file" style="display:none"/>
                             </div>
 
                         </div>
@@ -211,10 +212,9 @@
 
     <div class="control-sidebar-bg"></div>
 
-    <!-- itemModal Start -->
-    <div th:replace="fragment/itemTempModal :: itemTempModal"></div>
-    <!-- itemModal End -->
-
+    <!-- excelModal Start -->
+    <div th:replace="fragment/modal/excelModal :: excelModal"></div>
+    <!-- excelModal End -->
 
 </div>
 

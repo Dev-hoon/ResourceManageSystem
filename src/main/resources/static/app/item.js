@@ -26,6 +26,36 @@
 
             itemList.amountSelect = 10;
         });
+
+        $("#excelUpload").on("change", function(e){
+
+            let files = e.target.files; //input file 객체를 가져온다.
+            let i,f;
+            for (i = 0; i != files.length; ++i) {
+                f = files[i];
+                let reader = new FileReader(); //FileReader를 생성한다.
+
+                //성공적으로 읽기 동작이 완료된 경우 실행되는 이벤트 핸들러를 설정한다.
+                reader.onload = function(e) {
+
+                    let data = e.target.result; //FileReader 결과 데이터(컨텐츠)를 가져온다.
+
+                    //바이너리 형태로 엑셀파일을 읽는다.
+                    let workbook = XLSX.read(data, {type: 'binary'});
+
+                    //엑셀파일의 시트 정보를 읽어서 JSON 형태로 변환한다.
+                    workbook.SheetNames.forEach(function(item, index, array) {
+                        EXCEL_JSON = XLSX.utils.sheet_to_json(workbook.Sheets[item]);
+                    });//end. forEach
+
+                }; //end onload
+
+                //파일객체를 읽는다. 완료되면 원시 이진 데이터가 문자열로 포함됨.
+                reader.readAsBinaryString(f);
+
+            }//end. for
+
+        });
     });
 
     //*** condition vue *** //
@@ -111,9 +141,9 @@
             }
 
             // 페이징 버튼 처리
-            var temp = Math.floor(pagination.currentPage / maxBtnSize);
-            for(var i = 1; i <= maxBtnSize; i++){
-                var value = i+(temp*maxBtnSize);
+            let temp = Math.floor(pagination.currentPage / maxBtnSize);
+            for(let i = 1; i <= maxBtnSize; i++){
+                let value = i+(temp*maxBtnSize);
 
                 if(value <= pagination.totalPages){
                     indexBtn.push(value)
@@ -411,7 +441,7 @@
 
                 itemModal.itemState         = (item.itemState)?item.itemState:"";
                 itemModal.rentalState       = (item.rentalState)?item.rentalState:"";
-                itemModal.placeState        = (item.placeState)?item.placeState:"";;
+                itemModal.placeState        = (item.placeName)?item.placeName:"";;
 
                 console.log("itemModal.placeState : ",itemModal.placeState)
                 console.log("itemModal.placeState : ",itemModal.placeState)
@@ -500,13 +530,16 @@
                     })
             },
             placeHandler    : function ( ){
-                this.placeList.filter(item=>item.id==this.placeState)?.map(item=>{
-                    this.item.placeState   = item.name;
+                console.log("this.placeState : ",this.placeState)
+                this.placeList.filter(item=>item.name==this.placeState)?.map(item=>{
+                    this.item.placeState   = item.id;
+                    console.log("test : ",this.item.placeState)
                 })
             },
             updateItem      : function ( updateUser ) {
                 $('#updateItemButton').attr('disabled', true);
 
+                console.log("this.item : ",this.item)
                 let postBody = Object.entries(this.item)
                     .filter( (v)=>( (v[1]!=null)&&(v[1]!="") ))
                     .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
@@ -563,7 +596,7 @@
             })
         }
     })
-
-    window.itemModal = itemModal
+    window.itemList =  itemList
+    window.itemModal =  itemModal
 
 })(jQuery);

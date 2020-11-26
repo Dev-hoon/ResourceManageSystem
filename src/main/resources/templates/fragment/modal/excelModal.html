@@ -1,0 +1,102 @@
+<html lang="ko"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org/" xmlns:v-on="http://www.w3.org/1999/xhtml">
+
+<div id="excelModal" class="modal fade" tabindex="-1" role="dialog"  th:fragment="excelModal"  >
+    <div class="modal-dialog modal-xl" role="document" >
+        <div class="modal-content">
+            <div class="modal-header md-1">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">엑셀정보</h4>
+            </div>
+
+            <div id="excelList" class="modal-body">
+                <div>
+                    <table id="items_table" class="table table-bordered table-hover dataTable font-14"
+                           role="grid" aria-describedby="example2_info">
+                        <thead>
+                        <tr role="row">
+                            <th id="selectAll" class="text-center bg-dark-blue-gradient table-middle" tabindex="0" rowspan="1" colspan="1">
+                                <input type="checkbox" id="idx" aria-label="Checkbox for following text input">
+                            </th>
+                            <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                자산명칭
+                            </th>
+                            <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                대분류
+                            </th>
+                            <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                소분류 1
+                            </th>
+                            <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                소분류 2
+                            </th>
+                            <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                등록일
+                            </th>
+                            <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                만료일
+                            </th>
+                            <th class="text-center bg-dark-blue-gradient" tabindex="0" rowspan="1" colspan="1">
+                                자산위치
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody style="color: #2a80d6;">
+                        <tr role="row" class="odd item" v-for="(dto, idx) in showItems" >
+                            <td class="text-center"> <input type="checkbox" v-bind:idx="dto.idx" aria-label="Checkbox for following text input" v-on:click="checkHandler(event,dto)"> </td>
+                            <td class="text-center">{{dto.name}}            </td>
+                            <td class="text-center">{{dto.superCate}}       </td>
+                            <td class="text-center">{{dto.subCateFirst}}    </td>
+                            <td class="text-center">{{dto.subCateSecond}}   </td>
+                            <td class="text-center">{{dto.registerDate}}    </td>
+                            <td class="text-center">{{dto.expireDate}}      </td>
+                            <td class="text-center">{{dto.placeName}}      </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <span  class="dataTables_info" role="status" aria-live="polite">
+                                Showing {{currentPage+1}} to {{totalPages}} of {{currentElements}} entries
+                            </span>
+                            <span v-if="selectedElements!=0">
+                                / selected item(s) {{selectedElements}}
+                            </span>
+                        </div>
+                        <div id="pageBtn" class="dataTables_paginate paging_simple_numbers col-sm-4 text-center">
+                            <ul class="pagination">
+                                <li class="paginate_button previous" id="previousBtn">
+                                    <a href="javascript:;" v-on:click="previousClick">이전</a>
+                                </li>
+
+                                <li class="paginate_button" v-for="btn in btnList" v-bind:btn_id="btn" v-on:click="indexClick">
+                                    <a href="javascript:;" aria-controls="example2" v-bind:btn_id="btn">{{btn}}</a>
+                                </li>
+
+                                <li class="paginate_button next" id="nextBtn">
+                                    <a href="javascript:;" v-on:click="nextClick">다음</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group pull-right">
+                                <button id="bookmarkButton" type="button" class="btn btn-sm btn-danger" v-on:click="deleteHandler"> 삭제 </button></div>
+                            </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="createButton" type="button" class="btn btn-sm btn-primary dark" v-on:click="deleteHandler"> 등록 </button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" v-on:click="closeHandler">닫기</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+</html>
+

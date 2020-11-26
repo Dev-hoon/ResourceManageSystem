@@ -49,3 +49,5 @@
 #loader-4 span:nth-child(3){
     animation: opacitychange 1s ease-in-out 0.66s infinite;
 }
+
+.modal-xl{width:90%}

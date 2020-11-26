@@ -66,7 +66,7 @@ public class RentalController implements CrudInterface<RentalApiRequest, RentalA
     @GetMapping("/rental/overdue")
     @ResponseBody
     public Header<RentalApiResponse> readOverdue (@PageableDefault(sort = { "startDate" }, direction = Sort.Direction.ASC) Pageable pageable, RentalApiRequest request) {
-        request.setEndDate( LocalDate.now() );
+        request.setEndDateLess( LocalDate.now() );
         request.setState( RentalState.RENTAL_ACCEPT.getId() );
         return rentalApiLogicService.search( pageable, request );
     }

@@ -135,7 +135,8 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest, ItemAp
     public Header<List<ItemApiResponse>> search(Pageable pageable,ItemApiRequest request) {
 
         Page<Item> items =itemRepository.findAll(
-                ItemSpecs.superCate( request.getSuperCate() ).and(
+                ItemSpecs.id( request.getId() ).and(
+                ItemSpecs.superCate( request.getSuperCate())).and(
                 ItemSpecs.subCateFirst(request.getSubCateFirst())).and(
                 ItemSpecs.subCateSecond(request.getSubCateSecond())).and(
                 ItemSpecs.expireDate(request.getExpireDate())).and(
@@ -163,16 +164,17 @@ public class ItemApiLogicService implements CrudInterface<ItemApiRequest, ItemAp
     public Header amount( ItemApiRequest request ) {
 
         List<Item> items =itemRepository.findAll(
-                ItemSpecs.superCate( request.getSuperCate() ).and(
-                        ItemSpecs.subCateFirst( request.getSubCateFirst())).and(
-                        ItemSpecs.subCateSecond( request.getSubCateSecond())).and(
-                        ItemSpecs.expireDate( request.getExpireDate())).and(
-                        ItemSpecs.registerDate( request.getRegisterDate())).and(
-                        ItemSpecs.name( request.getName())).and(
-                        ItemSpecs.itemState( request.getItemState() )).and(
-                        ItemSpecs.rentalState( request.getRentalState() )).and(
-                        ItemSpecs.expireDateMore( request.getExpireDateMore())).and(
-                        ItemSpecs.registerDateMore( request.getRegisterDateMore()) )
+                ItemSpecs.id( request.getId() ).and(
+                ItemSpecs.superCate( request.getSuperCate())).and(
+                ItemSpecs.subCateFirst( request.getSubCateFirst())).and(
+                ItemSpecs.subCateSecond( request.getSubCateSecond())).and(
+                ItemSpecs.expireDate( request.getExpireDate())).and(
+                ItemSpecs.registerDate( request.getRegisterDate())).and(
+                ItemSpecs.name( request.getName())).and(
+                ItemSpecs.itemState( request.getItemState() )).and(
+                ItemSpecs.rentalState( request.getRentalState() )).and(
+                ItemSpecs.expireDateMore( request.getExpireDateMore())).and(
+                ItemSpecs.registerDateMore( request.getRegisterDateMore()) )
                 );
 
         return Header.OK( items.size() );

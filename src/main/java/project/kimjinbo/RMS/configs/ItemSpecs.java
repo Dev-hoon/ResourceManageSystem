@@ -8,6 +8,12 @@ import java.time.format.DateTimeFormatter;
 
 public class ItemSpecs {
 
+    public static Specification<Item> id(Long id) {
+        return (id!=null)
+                ? (Specification<Item>) ((root, query, builder) -> builder.equal(root.get("id"), id) )
+                : (Specification<Item>) ((root, query, builder) -> builder.and() );
+    }
+
     public static Specification<Item> superCate(String superCate) {
         return (superCate!=null)
                 ? (Specification<Item>) ((root, query, builder) -> builder.equal(root.get("superCate"), superCate) )

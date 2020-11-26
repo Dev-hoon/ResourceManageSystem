@@ -1,5 +1,8 @@
 (function ($) {
 
+    let maxBtnSize = 7;              // 검색 하단 최대 범위
+    let indexBtn = [];               // 인덱스 버튼
+
     $(document).ready(function () {
         //test registerUser 값
         window.registerUser     = 1;
@@ -22,10 +25,6 @@
 
             itemList.categories     = response.data.categories;
             itemList.selectCate01   = Object.keys( itemList.categories );
-        });
-
-        $.get("/api/temp/amount?registerUser="+window.registerUser, function(response) {
-            itemList.tempAmount = response.data;
         });
 
     }
@@ -122,6 +121,14 @@
             registerItem    : function ( ) {
                 $('#registerButton').attr('disabled', true);
 
+                //validation
+                if(this.item.superCate==""||this.item.name==""){
+                    toastr.error('이름 또는 대분류가 입력되지 않았습니다.');
+                    $('#registerButton').attr('disabled', false);
+                    return;
+                }
+
+
                 let postBody = Object.entries( this.item )
                     .filter( (v)=>( (v[1]!=null)&&(v[1]!="") ) )
                     .reduce( (acc,cur)=>{ acc[cur[0]] = cur[1]; return acc;  }, {} );
@@ -151,6 +158,13 @@
             },
             registerTemp    : function (e){
                 $('#tempButton').attr('disabled', true);
+
+                //validation
+                if(this.item.superCate==""||this.item.name==""){
+                    toastr.error('이름 또는 대분류가 입력되지 않았습니다.');
+                    $('#tempButton').attr('disabled', false);
+                    return;
+                }
 
                 let postBody = Object?.entries( this.item )
                     .filter( (v)=>( (v[1]!=null)&&(v[1]!="") ) )
@@ -238,7 +252,197 @@
 
     });
 
+    let excelList = new Vue({
+        el : '#excelList',
+        data : {
+            items            : {},
+            showItems        : {},
+            selectedItem     : {},
+
+            btnList          : {},
+
+            currentPage      : 1,
+            currentElements  : 0,
+            totalPages       : 0,
+            totalElements    : 0,
+            selectedElements : 0,
+            amountSelect     : 0,
+
+        },
+        methods: {
+            indexClick      : function (event , id ) {
+                if( event!=null){ id = parseInt( event.target.getAttribute("btn_id") ); }
+                excelList.setItemList( excelList.items.slice( (id-1)*10, id*10 ) );
+                excelList.currentPage = id-1;
+                excelList.currentElements = excelList.showItems.length;
+
+                this.active();
+            },
+            previousClick   : function (event) {
+                if(excelList.currentPage !== 0){
+                    excelList.setItemList( excelList.items.slice( (excelList.currentPage-1)*10, (excelList.currentPage)*10 ) );
+                    excelList.currentPage -= 1;
+                    excelList.currentElements = excelList.showItems.length;
+
+                    this.active();
+                }
+
+            },
+            nextClick       : function (event) {
+                if(excelList.currentPage !== excelList.totalPages-1){
+                    excelList.setItemList( excelList.items.slice( (excelList.currentPage+1)*10, (excelList.currentPage+2)*10 ) );
+                    excelList.currentPage += 1;
+                    excelList.currentElements = excelList.showItems.length;
+
+                    this.active();
+                }
+
+            },
+            checkHandler    : function ( event, item ){
+                if(event.target.checked){
+                    Object.defineProperty( this.selectedItem, item.idx, { value: item, configurable:true, enumerable:true } );
+                    this.amountSelect += 1;
+                }else{
+                    delete this.selectedItem[item.idx];
+                    this.amountSelect -= 1;
+                }
+
+                this.selectedElements = Object.entries( this.selectedItem ).length
+
+                $('#selectAll input').prop('checked',(this.amountSelect==10)? true : false );
+            },
+            active          : function ( ){
+
+                setTimeout(function () {
+                    $('li[btn_id]').removeClass( "active" );
+                    $('li[btn_id='+(excelList.currentPage+1)+']').addClass( "active" );
+                },50)
+            },
+            denoteCheckBox  : function ( ){
+                let items = $("#items_table").find( "td input:checkbox" ).toArray()
+                    .filter(element=>( this.selectedItem.hasOwnProperty( element.getAttribute("idx"))) )
+                    .map( (element)=>{
+                        element.checked = true;
+                    })
+
+                this.amountSelect = items.length;
+
+                $('#selectAll input').prop('checked',(items.length==10)? true : false );
+
+            },
+            setItemList     : function (itemList){
+                excelList.disableAllCheckBox( );
+                excelList.showItems = itemList;
+                setTimeout( ()=>{
+                    excelList.denoteCheckBox( )
+                },50);
+            },
+            disableAllCheckBox: function ( ){
+                $("#items_table").find( "td input:checkbox" ).prop('checked',false );
+            },
+            deleteHandler   : function ( ){
+                console.log("selectedItem : ",this.selectedItem)
+                Object.keys( this.selectedItem ).map((idx)=>{
+                    delete this.items[idx];
+                })
+
+                this.selectedItem = {};
+
+                this.currentPage = 0;
+                this.showItems   = this.items.slice(0,10);
+                this.totalPages  = this.items.length/10
+                this.totalElements = this.items.length
+
+                indexBtn = [];
+
+                // 페이징 버튼 처리
+                let temp = Math.floor(this.currentPage / maxBtnSize);
+                for(let i = 1; i <= maxBtnSize; i++){
+                    let value = i+(temp*maxBtnSize);
+
+                    if(value <= this.totalPages){
+                        indexBtn.push(value)
+                    }
+                }
+
+                // 페이지 버튼 셋팅
+                this.btnList = indexBtn;
+
+                this.nextClick( null, 0 );
+            }
+
+        },mounted: function( ){
+            // table에 모두 선택 처리
+            $('#selectAll').click(function(e){
+                let table= $(e.target).closest('table');
+                $('td input:checkbox',table).prop('checked',e.target.checked);
+
+                if(e.target.checked){
+                    excelList.showItems.map( (element) =>{
+                        Object.defineProperty( excelList.selectedItem, element.idx, { value: element, configurable:true, enumerable:true } );
+                    })
+                }else{
+                    excelList.showItems.map( (element) =>{
+                        delete excelList.selectedItem[element.idx]
+                    })
+                }
+
+                excelList.selectedElements = Object.keys( excelList.selectedItem ).length
+
+                excelList.amountSelect = 10;
+            });
+            $("#file").on("change", function(event){
+                let reg = /(.*?)\.(xlsx)$/;
+                let input = event.target;
+
+                if(!input.files[0].name.match(reg)) { toastr.error("선택한 파일이 엑셀파일이 아닙니다.") }
+                
+                let reader = new FileReader();
+                reader.onload = function(){
+                    let fileData = reader.result;
+                    let wb = XLSX.read(fileData, {type : 'binary'});
+                    wb.SheetNames.forEach(function(sheetName){
+                        let rowObj =XLSX.utils.sheet_to_json(wb.Sheets[sheetName]);
+                        for(i=0;i<rowObj.length;i++){ rowObj[i]['idx'] = i; }
+                        excelList.items = rowObj
+
+                        excelList.currentPage = 0;
+                        excelList.showItems   = rowObj.slice(0,10);
+                        excelList.totalPages  = rowObj.length/10
+                        excelList.totalElements = rowObj.length
+
+                        indexBtn = [];
+
+                        // 페이징 버튼 처리
+                        let temp = Math.floor(excelList.currentPage / maxBtnSize);
+                        for(let i = 1; i <= maxBtnSize; i++){
+                            let value = i+(temp*maxBtnSize);
+
+                            if(value <= excelList.totalPages){
+                                indexBtn.push(value)
+                            }
+                        }
+
+                        // 페이지 버튼 셋팅
+                        excelList.btnList = indexBtn;
+
+                        // 색상처리
+                        setTimeout(function () {
+                            $('li[btn_id]').removeClass( "active" );
+                            $('li[btn_id='+(excelList.currentPage+1)+']').addClass( "active" );
+                        },50)
+
+
+                        $('#excelModal').modal()
+                        $("#file").val("");
+                    })
+                };
+                reader.readAsBinaryString(input.files[0]);
+            });
+        }
+    });
 
     window.itemList = itemList
+    window.excelList = excelList
 
 })(jQuery);
